@@ -1,0 +1,6 @@
+{
+    "a": "cycle temperature up and down, measure 2nd cycle (dynamic)",
+    "b": "single cycle H2-TPR (complete)",
+    "c": "hold at consistent temperature, then pulse a reductant gas then oxygen/air (dynamic). Consider only 1 pulse",
+    "d": "pulse reducing gas at constant temp followed by inert. Sum consumption from all pulses (complete)"
+}

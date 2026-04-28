@@ -1,0 +1,480 @@
+{
+    "update": [
+        {
+            "id": "6967aede5c48023e106c03e4",
+            "doi": "10.1016/j.ceramint.2024.07.019",
+            "name": "CeO2 - O",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0],
+                    [1, 1, 1]
+                ]
+            },
+            "particle_size_nm": 70,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 277,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aedf5c48023e106c03e5",
+            "doi": "10.1016/j.ceramint.2024.07.019",
+            "name": "CeO2 - C",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0],
+                    [1, 1, 1]
+                ]
+            },
+            "particle_size_nm": 40,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 254.8,
+            "morphology": "cubic"
+        },
+        {
+            "id": "6967aedf5c48023e106c03e6",
+            "doi": "10.1016/j.ceramint.2024.07.019",
+            "name": "CeO2 - P",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0],
+                    [1, 1, 1]
+                ]
+            },
+            "particle_size_nm": 50,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 260.8,
+            "morphology": "nanoparticle"
+        },
+        {
+            "id": "6967aee05c48023e106c03e7",
+            "doi": "10.1016/j.ceramint.2024.07.019",
+            "name": "CeO2 - S",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0],
+                    [1, 1, 1]
+                ]
+            },
+            "particle_size_nm": 300,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 233.6,
+            "morphology": "spherical"
+        },
+        {
+            "id": "6967aee05c48023e106c03e8",
+            "doi": "10.1016/j.ceramint.2024.07.019",
+            "name": "CeO2 - R",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0],
+                    [1, 1, 1]
+                ]
+            },
+            "particle_size_nm": 102,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 154.4,
+            "morphology": "nanorod"
+        },
+        {
+            "id": "6967aee05220ac46b0141223",
+            "doi": "10.1016/j.jcis.2023.10.069",
+            "name": "Co3O4",
+            "dft": {
+                "calculation": "Co3O4",
+                "miller_indices_to_study": [
+                    [1, 1, 1],
+                    [2, 2, 0]
+                ]
+            },
+            "particle_size_nm": null,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": null,
+            "morphology": "flower-like"
+        },
+        {
+            "id": "6967aee15220ac46b0141224",
+            "doi": "10.1016/j.jcis.2023.10.069",
+            "name": "Ag0.02Co",
+            "dft": {
+                "calculation": "Co3O4",
+                "miller_indices_to_study": [
+                    [1, 1, 1],
+                    [2, 2, 0]
+                ]
+            },
+            "particle_size_nm": null,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": null,
+            "morphology": "flower-like"
+        },
+        {
+            "id": "6967aee15220ac46b0141225",
+            "doi": "10.1016/j.fuel.2023.127529",
+            "name": "CuCe0.7Zr0.3",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "crystallite_size_nm": 18.4,
+            "phase_types": "t-ZrO2 &  m-ZrO2 & m-CuO",
+            "phase_flag": "multi",
+            "microscopy": false,
+            "Ea_apparent": null
+        },
+        {
+            "id": "6967aee15c48023e106c03e9",
+            "doi": "10.1016/j.fuel.2023.127529",
+            "name": "CuCe0.5Zr0.5",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "crystallite_size_nm": 22.3,
+            "phase_types": "t-ZrO2 &  m-ZrO2 & m-CuO",
+            "phase_flag": "multi",
+            "microscopy": false,
+            "Ea_apparent": null
+        },
+        {
+            "id": "6967aee25c48023e106c03ea",
+            "doi": "10.1016/j.fuel.2023.127529",
+            "name": "CuZr",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "crystallite_size_nm": 26.2,
+            "phase_types": "t-ZrO2 &  m-ZrO2 & m-CuO",
+            "phase_flag": "multi",
+            "microscopy": false,
+            "Ea_apparent": null
+        },
+        {
+            "id": "6967aee35220ac46b0141226",
+            "doi": "10.1016/j.fuel.2023.127529",
+            "name": "CuCe0.3Zr0.7",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "crystallite_size_nm": 24.7,
+            "phase_types": "t-ZrO2 &  m-ZrO2 & m-CuO",
+            "phase_flag": "multi",
+            "microscopy": false,
+            "Ea_apparent": null
+        },
+        {
+            "id": "6967aee35220ac46b0141227",
+            "doi": "10.1016/j.fuel.2023.127529",
+            "name": "CuCe",
+            "dft": {
+                "calculation": "CeO2"
+            },
+            "crystallite_size_nm": null,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": false,
+            "Ea_apparent": null
+        },
+        {
+            "id": "6967aee45c48023e106c03eb",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "Co3O4",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 33.2,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 67.8,
+            "morphology": "hollow polyhedral"
+        },
+        {
+            "id": "6967aee45c48023e106c03ec",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "CoCe-1",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 21.8,
+            "phase_types": "Spinel",
+            "phase_flag":"single",
+            "microscopy": true,
+            "Ea_apparent": 37.0,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aee45c48023e106c03ed",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "CoCe-2",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 19.8,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 28.6,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aee59890fdd35aa2c53e",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "CoCe-3",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 16.4,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 37.0,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aee59890fdd35aa2c53f",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "CoCe-4",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 15.5,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 36.7,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aee59890fdd35aa2c540",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "CoCe-5",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 16.1,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 55.8,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aee69890fdd35aa2c541",
+            "doi": "10.1016/j.fuel.2022.123638",
+            "name": "COP-CoCe-2",
+            "dft": {
+                "calculation": "Co3O4"
+            },
+            "crystallite_size_nm": 21.5,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": false,
+            "Ea_apparent": 41.5
+        },
+        {
+            "id": "6967aee75220ac46b0141228",
+            "doi": "10.1016/j.clet.2021.100171",
+            "name": "CuMn2RC",
+            "dft": {
+                "calculation": "Spinel Hopcalite"
+            },
+            "particle_size_nm": 3417,
+            "crystallite_size_nm": 4.12,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": true,
+            "Ea_apparent": 58,
+            "morphology": "nanoparticle"
+        },
+        {
+            "id": "6967aee79890fdd35aa2c542",
+            "doi": "10.1016/j.clet.2021.100171",
+            "name": "CuMn2Au0.25RC",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": 1824,
+            "crystallite_size_nm": 3.74,
+            "phase_types": "Spinel & m-AuO",
+            "phase_flag": "multi",
+            "microscopy": true,
+            "Ea_apparent": null,
+            "morphology": "nanoparticle"
+        },
+        {
+            "id": "6967aee85c48023e106c03ef",
+            "doi": "10.1016/j.clet.2021.100171",
+            "name": "CuMn2Au0.75RC",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": 1632,
+            "crystallite_size_nm": 3.56,
+            "phase_types": "Spinel & m-AuO",
+            "phase_flag": "multi",
+            "microscopy": true,
+            "Ea_apparent": 38,
+            "morphology": "nanoparticle"
+        },
+        {
+            "id": "6967aee85c48023e106c03f0",
+            "doi": "10.1016/j.clet.2021.100171",
+            "name": "CuMn2Au1RC",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": 1561,
+            "crystallite_size_nm": 3.42,
+            "phase_types": "Spinel & m-AuO",
+            "phase_flag": "multi",
+            "microscopy": true,
+            "Ea_apparent": null,
+            "morphology": "nanoparticle"
+        },
+        {
+            "id": "6967aee85c48023e106c03f1",
+            "doi": "10.1016/j.jcat.2021.07.016",
+            "name": "α-Mn2O3-550C",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": null,
+            "crystallite_size_nm": 7.0,
+            "phase_types": "Bixbyite",
+            "phase_flag": "single",
+            "microscopy": false,
+            "Ea_apparent": null
+        },
+        {
+            "id": "6967aee99890fdd35aa2c544",
+            "doi": "10.1016/j.jssc.2021.122253",
+            "name": "RT-CeO2",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0]
+                ]
+            },
+            "particle_size_nm": 8,
+            "crystallite_size_nm": 9,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": null,
+            "Ea_apparent": null,
+            "morphology": "polyhedral"
+        },
+        {
+            "id": "6967aee95c48023e106c03f2",
+            "doi": "10.1016/j.jssc.2021.122253",
+            "name": "HT-CeO2",
+            "dft": {
+                "calculation": "CeO2",
+                "miller_indices_to_study": [
+                    [1, 0, 0]
+                ]
+            },
+            "particle_size_nm": 18,
+            "crystallite_size_nm": 17.3,
+            "phase_types": "Fluorite",
+            "phase_flag": "single",
+            "microscopy": null,
+            "Ea_apparent": null,
+            "morphology": "cubic"
+        },
+        {
+            "id": "6967aeea5c48023e106c03f3",
+            "doi": "10.1016/j.jssc.2021.122091",
+            "name": "Bulk-NC",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": null,
+            "crystallite_size_nm": 33.1,
+            "phase_types": "Fluorite & Halite",
+            "phase_flag": "multi",
+            "microscopy": null,
+            "morphology": "nanoparticle",
+            "hierarchical": false
+        },
+        {
+            "id": "6967aeea5220ac46b014122a",
+            "doi": "10.1016/j.jssc.2021.122091",
+            "name": "NCP",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": null,
+            "crystallite_size_nm": 25,
+            "phase_types": "Fluorite & Halite",
+            "phase_flag": "multi",
+            "microscopy": null,
+            "morphology": "nanoparticle",
+            "hierarchical": true
+        },
+        {
+            "id": "6967aeea5220ac46b014122a",
+            "doi": "10.1016/j.jssc.2021.122091",
+            "name": "NCPP",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": null,
+            "crystallite_size_nm": 25.9,
+            "phase_types": "Fluorite & Halite",
+            "phase_flag": "multi",
+            "microscopy": null,
+            "morphology": "nanoparticle",
+            "hierarchical": true
+        },
+        {
+            "id": "6967aeeb5c48023e106c03f4",
+            "doi": "10.1016/j.jssc.2021.122091",
+            "name": "1.5NCPP",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": null,
+            "crystallite_size_nm": 18.1,
+            "phase_types": "Fluorite & Halite",
+            "phase_flag": "multi",
+            "microscopy": null,
+            "morphology": "nanoparticle",
+            "hierarchical": true
+        },
+        {
+            "id": "6967aeeb5220ac46b014122c",
+            "doi": "10.1016/j.resenv.2020.100003",
+            "name": "CuMn 2SA",
+            "dft": {
+                "calculation": "unsure"
+            },
+            "particle_size_nm": null,
+            "crystallite_size_nm": 3.6,
+            "phase_types": "Spinel",
+            "phase_flag": "single",
+            "microscopy": null,
+            "morphology": "nanoparticle",
+            "hierarchical": true
+        }
+    ],
+
+    "create": [
+    ]
+}

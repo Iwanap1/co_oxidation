@@ -1,0 +1,300 @@
+{
+    "create": [
+        {
+            "doi": "10.1016/j.apsusc.2011.03.124",
+            "name": "Ce0.8Cu0.2O2",
+            "Ce": 0.8,
+            "Cu": 0.2,
+            "Sbet": 120,
+            "Vtotal": 0.249,
+            "Dpore": 8.0,
+            "calcination_temp": 400,
+            "calcination_time": 3,
+            "calcination_flowing_gas": 0,
+            "calcination_reactive_gas": 0,
+            "synthesis_para" : "Nanosized copper cerium bimetal oxides were prepared by a hydrothermal method. In a typical synthesis, 1.6mmol of copper (II) nitrate trihydrate (Cu(NO3)2·3H2O) and 6.4mmol of cerium (III) nitrate hexahydrate (Ce(NO3)3·6H2O) were dissolved in 20mL of deionized water. In all cases, the concentrations of the total metal ions (i.e., [Cu(II)]+[Ce(III)]) were kept constant at 0.4M. 14.4mmol of NaOH solution (0.15M) was added into the above solution under vigorous stirring. After stirring for 10min, the obtained precipitate was collected by centrifugation and rinsed with distilled water for removing the excess metal ions by vacuum filtration. Then it was dispersed into 80mL deionized water and transferred into a 100mL PTFE autoclave. Subsequently, the autoclave was placed in an oven and maintained at 120°C for 5h. After the autoclave was cooled to ambient temperature naturally, the precipitate was dried at 80°C for 12h and then calcined at 500°C for 3h in air. The product was named as Ce0.80Cu0.20O2. For comparison, the percent of Cu doping content was varied from 0 to 25mol% and the calcination temperature was also varied from 300 to 600°C.",
+            "synthesis" : "hydrothermal",
+            "description": "nanocomposite nanocomposites",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 16000.000000000002,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0,
+            "temps": [29.839352729028434, 90.0136067360659, 120.14418750960154, 149.87578366752746, 179.5639260554365],
+            "conversion": [0.025327306733167083, 37.388949501246884, 87.50389650872819, 94.77283354114714, 99.52852244389028]
+        },
+        {
+            "doi": "10.1016/j.apsusc.2011.03.124",
+            "name": "Ce0.95Cu0.05O2",
+            "Ce": 0.95,
+            "Cu": 0.05,
+            "Sbet": 68,
+            "Vtotal": 0.079,
+            "Dpore": 3.6,
+            "calcination_temp": 500,
+            "calcination_time": 3,
+            "calcination_flowing_gas": 0,
+            "calcination_reactive_gas": 0,
+            "synthesis_para" : "Nanosized copper cerium bimetal oxides were prepared by a hydrothermal method. In a typical synthesis, 1.6mmol of copper (II) nitrate trihydrate (Cu(NO3)2·3H2O) and 6.4mmol of cerium (III) nitrate hexahydrate (Ce(NO3)3·6H2O) were dissolved in 20mL of deionized water. In all cases, the concentrations of the total metal ions (i.e., [Cu(II)]+[Ce(III)]) were kept constant at 0.4M. 14.4mmol of NaOH solution (0.15M) was added into the above solution under vigorous stirring. After stirring for 10min, the obtained precipitate was collected by centrifugation and rinsed with distilled water for removing the excess metal ions by vacuum filtration. Then it was dispersed into 80mL deionized water and transferred into a 100mL PTFE autoclave. Subsequently, the autoclave was placed in an oven and maintained at 120°C for 5h. After the autoclave was cooled to ambient temperature naturally, the precipitate was dried at 80°C for 12h and then calcined at 500°C for 3h in air. The product was named as Ce0.80Cu0.20O2. For comparison, the percent of Cu doping content was varied from 0 to 25mol% and the calcination temperature was also varied from 300 to 600°C.",
+            "synthesis" : "hydrothermal",
+            "description": "nanocomposite nanocomposites",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 16000.000000000002,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0,
+            "temps": [29.794997152738233, 69.75180210836263, 90.00208336226893, 109.92986013694635, 149.55166043972832, 170.0806955652162, 189.96222169752357],
+            "conversion": [0.07068850604891645, 18.08010017571143, 46.13535839072567, 61.07991840526731, 78.19259588390928, 83.15391917274252, 99.98788197039163]
+        },
+        {
+            "doi": "10.1016/j.apsusc.2011.03.124",
+            "name": "Ce0.85Cu0.15O2",
+            "Ce": 0.85,
+            "Cu": 0.15,
+            "Sbet": 97,
+            "Vtotal": 0.135,
+            "Dpore": 4.4,
+            "calcination_temp": 500,
+            "calcination_time": 3,
+            "calcination_flowing_gas": 0,
+            "calcination_reactive_gas": 0,
+            "synthesis_para" : "Nanosized copper cerium bimetal oxides were prepared by a hydrothermal method. In a typical synthesis, 1.6mmol of copper (II) nitrate trihydrate (Cu(NO3)2·3H2O) and 6.4mmol of cerium (III) nitrate hexahydrate (Ce(NO3)3·6H2O) were dissolved in 20mL of deionized water. In all cases, the concentrations of the total metal ions (i.e., [Cu(II)]+[Ce(III)]) were kept constant at 0.4M. 14.4mmol of NaOH solution (0.15M) was added into the above solution under vigorous stirring. After stirring for 10min, the obtained precipitate was collected by centrifugation and rinsed with distilled water for removing the excess metal ions by vacuum filtration. Then it was dispersed into 80mL deionized water and transferred into a 100mL PTFE autoclave. Subsequently, the autoclave was placed in an oven and maintained at 120°C for 5h. After the autoclave was cooled to ambient temperature naturally, the precipitate was dried at 80°C for 12h and then calcined at 500°C for 3h in air. The product was named as Ce0.80Cu0.20O2. For comparison, the percent of Cu doping content was varied from 0 to 25mol% and the calcination temperature was also varied from 300 to 600°C.",
+            "synthesis" : "hydrothermal",
+            "description": "nanocomposite nanocomposites",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 16000.000000000002,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0,
+            "temps": [30.12875178821928, 60.149168738454705, 90.20083612272393, 120.1675023264212, 149.85916471062097],
+            "conversion": [0.03736392462585584, 20.032112778462224, 57.902974976268865, 83.7618403247632, 98.97400682649003]
+        },
+        {
+            "doi": "10.1016/j.apsusc.2011.03.124",
+            "name": "Ce0.90Cu0.10O2",
+            "Ce": 0.90,
+            "Cu": 0.10,
+            "Sbet": 81,
+            "Vtotal": 0.132,
+            "Dpore": 4.8,
+            "calcination_temp": 500,
+            "calcination_time": 3,
+            "calcination_flowing_gas": 0,
+            "calcination_reactive_gas": 0,
+            "synthesis_para" : "Nanosized copper cerium bimetal oxides were prepared by a hydrothermal method. In a typical synthesis, 1.6mmol of copper (II) nitrate trihydrate (Cu(NO3)2·3H2O) and 6.4mmol of cerium (III) nitrate hexahydrate (Ce(NO3)3·6H2O) were dissolved in 20mL of deionized water. In all cases, the concentrations of the total metal ions (i.e., [Cu(II)]+[Ce(III)]) were kept constant at 0.4M. 14.4mmol of NaOH solution (0.15M) was added into the above solution under vigorous stirring. After stirring for 10min, the obtained precipitate was collected by centrifugation and rinsed with distilled water for removing the excess metal ions by vacuum filtration. Then it was dispersed into 80mL deionized water and transferred into a 100mL PTFE autoclave. Subsequently, the autoclave was placed in an oven and maintained at 120°C for 5h. After the autoclave was cooled to ambient temperature naturally, the precipitate was dried at 80°C for 12h and then calcined at 500°C for 3h in air. The product was named as Ce0.80Cu0.20O2. For comparison, the percent of Cu doping content was varied from 0 to 25mol% and the calcination temperature was also varied from 300 to 600°C.",
+            "synthesis" : "hydrothermal",
+            "description": "nanocomposite nanocomposites",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 16000.000000000002,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0,
+            "temps": [30.015000208336225, 70.06180641397798, 89.82333087959555, 109.77360796677732, 129.96513840470007, 150.00666675926055],
+            "conversion": [0.04342293943004868, 3.9423989659281404, 51.99947488538364, 76.01135055439985, 85.92793811726214, 95.92430270837963]
+        },
+        {
+            "doi" : "10.1016/j.cej.2014.01.077",
+            "name" : "CeSnO–1",
+            "Ce" : 1,
+            "Sbet" : 22.4,
+            "calcination_temp" : 550,
+            "calcination_time" : 5,
+            "Dpore" : 7.3,
+            "Vtotal" : 0.059,
+            "calcination_flowing_gas" : 0,
+            "calcination_reactive_gas" : 0,
+            "synthesis_para" : "Both pure CeO2 and SnO2 were prepared by precipitation with ammonium hydroxide from Ce(NO3)3·6H2O and SnCl4·5H2O precursors, respectively. Pure oxides were synthesized at room temperature and pH = 9, with dropwise addition of ammonium hydroxide, under magnetic stirring for 1 h. To dissolve SnCl4·5H2O precursor, hydrochloric acid was added into magnetically stirred solution until pH = 1.0, at which value the solution became transparent. The resultant slurry was filtered and washed several times with deionized water, dried overnight at 115 °C and calcined in air at 500 °C for 5 h.",
+            "synthesis" : "co-precipitation",
+            "description" : "mesoporous crystallites doped",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 120000,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0.5,
+            "gas_air_content" : 0,
+            "temps": [149.89160540263293, 199.4528979312703, 249.87826978970762, 299.9757223457001, 349.6136091639596, 399.34005812959475, 449.34894853821163],
+            "conversion": [1.0159085723767447, 1.5767531578619867, 2.8145935743471675, 7.143716425030593, 16.048368697239333, 28.63169684524921, 48.49770808703047]
+        },
+        {
+            "doi" : "10.1016/j.cej.2014.01.077",
+            "name" : "CeSnO–0.975",
+            "Ce" : 0.975,
+            "Sn": 0.025,
+            "Sbet" : 40,
+            "calcination_temp" : 550,
+            "calcination_time" : 5,
+            "Dpore" : 6.68,
+            "Vtotal" : 0.09,
+            "calcination_flowing_gas" : 0,
+            "calcination_reactive_gas" : 0,
+            "synthesis_para" : "A set of CeXSn1−XO2−δ mixed oxides (X ranging from 0.975 to 0.80) were prepared by co-precipitation method, from cerium nitrate (Ce(NO3)3·6H2O) and tin chloride (SnCl2·2H2O) as precursors. The resultant solids were repeatedly washed, dried and calcined at 500 °C for 5 h in air. The synthesis of the mixed oxides was also carried out at pH = 9 and room temperature, baking the resultant suspension for 1 h. The resultant slurry was filtered and washed several times with deionized water, dried overnight at 115 °C and calcined in air at 500 °C for 5 h. The obtained solids were denoted as CeSnO–X, being X the mol fraction of ceria in the mixed oxide.",
+            "synthesis" : "co-precipitation",
+            "description" : "mesoporous crystallites doped",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 120000,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0.5,
+            "gas_air_content" : 0,
+            "temps": [249.71790049581125, 299.74593947683366, 349.4915370148743, 399.2467088391178, 449.8372371345529],
+            "conversion": [6.942940700640905, 20.107025076224254, 48.403957438865035, 78.6738016717483, 87.16860597764088]
+        },
+        {
+            "doi" : "10.1016/j.cej.2014.01.077",
+            "name" : "CeSnO–0.8",
+            "Ce" : 0.8,
+            "Sn": 0.2,
+            "Sbet" : 31.3,
+            "calcination_temp" : 550,
+            "calcination_time" : 5,
+            "Dpore" : 8.74,
+            "Vtotal" : 0.074,
+            "calcination_flowing_gas" : 0,
+            "calcination_reactive_gas" : 0,
+            "synthesis_para" : "A set of CeXSn1−XO2−δ mixed oxides (X ranging from 0.975 to 0.80) were prepared by co-precipitation method, from cerium nitrate (Ce(NO3)3·6H2O) and tin chloride (SnCl2·2H2O) as precursors. The resultant solids were repeatedly washed, dried and calcined at 500 °C for 5 h in air. The synthesis of the mixed oxides was also carried out at pH = 9 and room temperature, baking the resultant suspension for 1 h. The resultant slurry was filtered and washed several times with deionized water, dried overnight at 115 °C and calcined in air at 500 °C for 5 h. The obtained solids were denoted as CeSnO–X, being X the mol fraction of ceria in the mixed oxide.",
+            "synthesis" : "co-precipitation",
+            "description" : "mesoporous crystallites doped",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 120000,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0.5,
+            "gas_air_content" : 0,
+            "temps": [199.56300222260217, 249.7633783552744, 299.51615660796716, 349.3120191485724, 399.952812446572, 449.44229782868865],
+            "conversion": [2.9896500943728874, 8.564080227324581, 26.10623690705826, 57.03150602534586, 85.42716694667413, 99.67809511957356]
+        },
+        {
+            "doi" : "10.1016/j.cej.2014.01.077",
+            "name" : "CeSnO–1",
+            "Sn": 1,
+            "Sbet" : 11.7,
+            "calcination_temp" : 550,
+            "calcination_time" : 5,
+            "Dpore" : 32.6,
+            "Vtotal" : 0.063,
+            "calcination_flowing_gas" : 0,
+            "calcination_reactive_gas" : 0,
+            "synthesis_para" : "Both pure CeO2 and SnO2 were prepared by precipitation with ammonium hydroxide from Ce(NO3)3·6H2O and SnCl4·5H2O precursors, respectively. Pure oxides were synthesized at room temperature and pH = 9, with dropwise addition of ammonium hydroxide, under magnetic stirring for 1 h. To dissolve SnCl4·5H2O precursor, hydrochloric acid was added into magnetically stirred solution until pH = 1.0, at which value the solution became transparent. The resultant slurry was filtered and washed several times with deionized water, dried overnight at 115 °C and calcined in air at 500 °C for 5 h.",
+            "synthesis" : "co-precipitation",
+            "description" : "mesoporous crystallites doped",
+            "gas_co_content" : 1,
+            "flow_normalisation_note" : "from volumetric flow and mass (mL/min ÷ g × 60)",
+            "gas_h2o_content" : 0,
+            "flow_mL_h_g" : 120000,
+            "gas_co2_content" : 0,
+            "gas_o2_content" : 0.5,
+            "gas_air_content" : 0,
+            "temps": [199.72337151649853, 249.8567276457514, 299.55684732432894, 349.53940844588817, 399.1677209779449, 449.40878782697894],
+            "conversion": [1.3187314624686302, 3.510671395681662, 10.288926223217803, 21.989504905315993, 56.55777487399664, 95.36639495571734]
+        }
+    ],
+    "update": [
+        {
+            "id": "6967af159890fdd35aa2c562",
+            "temps": [90.0213315830496, 149.8030930795422, 245.7295811625713, 299.58362390778194, 30.048816507363497],
+            "conversion": [14.066669631738126, 14.989548123109769, 23.98594556128803, 51.026285358477146, 0.04781177726383206]
+        },
+        {
+            "id": "6967af159890fdd35aa2c563",
+            "temps": [29.757558354186322, 69.78299216474545, 90.08286499569266, 109.57049677975141, 129.9175452270583],
+            "conversion": [0.018902330546166163, 25.011119017968333, 72.84847002312756, 85.93555417185554, 97.90072940757872]
+        },
+        {
+            "id": "6967af169890fdd35aa2c564",
+            "temps": [60.041039671682626, 89.75156733505492, 119.75442036035905, 149.96400798847085, 209.5101575016277],
+            "conversion": [0.053576995012468834, 23.2183213840399, 69.70854114713217, 87.12009039900249, 99.9912328553616]
+        },
+        {
+            "id": "6967af169890fdd35aa2c565",
+            "temps": [60.110829059891586, 89.97410330877781, 119.81235872038158, 149.9521569602844, 179.63503222455503],
+            "conversion": [8.217736907730673, 50.92834320448878, 80.4405003117207, 89.9694124064838, 97.51402743142145]
+        },
+        {
+            "id": "6967af165220ac46b0141252",
+            "temps": [29.90374866317588, 80.27069820414172, 109.98736093556856, 150.1779191377658, 190.1922248920124],
+            "conversion": [0.009088522206289258, 30.76464766828914, 77.10096338335387, 87.065013228849, 95.0184799951528]
+        },
+        {
+            "id": "6967af175220ac46b0141253",
+            "temps": [79.99321647386537, 99.8862676894877, 119.89651514386127, 139.99364946489527, 159.79274162703595, 179.7949065821853, 184.82828297407104],
+            "conversion": [3.7056589635735087, 11.191907494763372, 22.190528090461676, 33.256415932971166, 74.01355562745866, 96.19642036068868, 99.85099027605116]
+        },
+        {
+            "id": "6967af175220ac46b0141254",
+            "temps": [59.95569058461005, 70.01031961954521, 79.99321647386537, 89.91044302198873, 99.87616456545742, 109.9206904763623, 119.97228857408837],
+            "conversion": [3.794213313805964, 7.514347507705931, 16.640554486469917, 40.73159517038198, 66.63118816096456, 92.33153386352413, 99.94891095178897]
+        },
+        {
+            "id": "6967af175220ac46b0141255",
+            "temps": [30.146423133267422, 50.10615496748959, 59.90416465205563, 69.99718555830586, 79.98109272502904],
+            "conversion": [0.0698216992217435, 3.4766097307607158, 42.72406805061222, 81.96301152909521, 99.82714872021934]
+        },
+        {
+            "id": "6967af175220ac46b0141256",
+            "temps": [30.128237510012916, 49.984917479126224, 60.11430963188546, 70.20733053813568, 80.10940240021361, 90.07007238166716],
+            "conversion": [0.01873265101071167, 7.2291003218610035, 42.73854328093868, 81.22562626658265, 88.62842935236117, 99.87908925256723]
+        },
+        {
+            "id": "6967af185c48023e106c042e",
+            "temps": [50.16374277446219, 60.08400025979462, 69.95374212497565, 79.99321647386537, 90.22869142894257, 100.14995922667802, 115.07227341940232],
+            "conversion": [0.02043561928441273, 7.394288244410006, 18.47294834897226, 33.22576250404455, 77.1350964731527, 85.82789802625977, 99.77946560855571]
+        },
+        {
+            "id": "6967af185c48023e106c042f",
+            "temps": [30.070649703040317, 50.11928902872896, 60.0941033838249, 80.43169205677955, 90.1256395638337, 100.13278391582654],
+            "conversion": [0.0195841351475622, 7.098823248922873, 10.752541680148498, 42.72917695543332, 85.51199741148822, 99.89526745116738]
+        },
+        {
+            "id": "6967af185c48023e106c0430",
+            "temps": [40.37329483515512, 50.06967973836952, 60.08367461182641, 69.87699242803689, 79.99410742170237, 90.03697592881765, 100.01900356500988, 109.97009516513951],
+            "conversion": [0.9745625696116121, 5.484496820321201, 10.987856141989724, 55.387489670534976, 75.41766967269069, 85.81809362986382, 93.00740128624295, 99.98832321345165]
+        },
+        {
+            "id": "6967af195c48023e106c0432",
+            "temps": [50.01605727586105, 60.21979317050175, 70.05745263840194, 79.99513862290445, 90.02047670958427, 99.95506909048055, 109.97937597595829, 120.04699331192364, 129.99499130844703],
+            "conversion": [2.8293752020982286, 4.685086048934718, 8.31027916501994, 13.896274206876729, 30.711745050838932, 73.94908921064923, 93.58225847016132, 97.39338195667014, 100]
+        },
+        {
+            "id": "6967af195c48023e106c0431",
+            "temps": [30.14822755332126, 39.945662218607914, 50.08686652127305, 60.021809041511105, 70.11200236572654, 80.15118471149225, 89.95416404834953, 100.06986286178982, 110.01922152811149],
+            "conversion": [0.07647208768799388, 1.5931684934998727, 4.320672954371655, 11.12668875860311, 51.4329412621536, 74.4036997924329, 83.99184297731328, 89.10636903244601, 99.98907541604457]
+        },
+        {
+            "id": "6967af195c48023e106c0433",
+            "temps": [29.80066445182724, 39.85382059800664, 49.89767441860465, 59.79269102990033, 69.78471760797342, 79.92558139534884, 89.81926910299003, 99.93621262458473, 109.95348837209303, 120.10365448504984],
+            "conversion": [0.017804999643900005, 1.2267644754647105, 2.903995441920091, 5.578306388433872, 12.306815753863685, 30.013887899722242, 67.59668114806638, 84.42062531158749, 97.24734705505305, 100]
+        },
+        {
+            "reaction_id": "6967af2538e7cc6db0ba73f7",
+            "temps": [79.93990966010125, 99.81162155349199, 119.8349218893711],
+            "conversion": [56.524819474090556, 78.20791134928925, 99.94096007993096]
+        },
+        {
+            "reaction_id": "6967af2538e7cc6db0ba73f8",
+            "temps": [29.70281852308573, 49.80446794159928, 80.76087178683599, 99.59871643763755, 109.71937402489458],
+            "conversion": [52.91520959171624, 79.98365048367319, 88.05486171034107, 95.11149461828421, 100.01089967755121]
+        },
+        {
+            "id": "6967af405c48023e106c0470",
+            "temps": [250.6394255428278, 299.55206018122755, 349.0870234228073, 399.51957599589673, 449.2053342451701],
+            "conversion": [4.419140065957315, 14.760749175533569, 38.97330595482546, 75.87621595835148, 100]
+        },
+        {
+            "id": "6967af405c48023e106c0471",
+            "temps": [249.13865618054368, 299.1092494443494, 349.02957770559067, 398.77996238673273, 449.0712942383313],
+            "conversion": [5.6005641631925, 17.39987140397818, 45.71588575695352, 80.86740090846867, 99.81083940016178]
+        },
+        {
+            "id": "6967af405c48023e106c0472",
+            "temps": [199.58933150965976, 249.33971619080182, 299.52094375106856, 349.6423320225679, 399.1078816891776],
+            "conversion": [1.750150374380354, 11.103644245328024, 43.09916412585817, 80.20782776429593, 96.84151577375397]
+        }
+    ]
+}

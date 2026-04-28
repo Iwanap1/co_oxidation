@@ -1,0 +1,21 @@
+[
+  {
+    "id": "6967aeea5c48023e106c03f3",
+    "doi": "10.1016/j.jssc.2021.122091",
+    "name": "Bulk-NC",
+    "particle_size_nm": null,
+    "crystallite_size_nm": 33.1,
+    "phase_types": "Fluorite & Halite",
+    "phase_flag": "multi",
+    "microscopy": true,
+    "image_path": "SEM_100nm_6967aeea5c48023e106c03f3.png",
+    "morphology": "polyhedra",
+    "pretreatment_temp": 300,
+    "pretreatment_o2_vol%": 0,
+    "pretreatment_time_h": 1,
+    "osc": null,
+    "hierarchical": false,
+    "lattice_parameter_A": 5.42,
+    "failed_because": "'_id'"
+  }
+]

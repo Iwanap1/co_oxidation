@@ -1,0 +1,41 @@
+{
+    "update": [
+        {
+            "collection": "osc",
+            "_id": "69cd2ffd29cce59b64a1771c",
+            "measurement_class": "d"
+        },
+        {
+            "collection": "osc",
+            "_id": "69cd2ffe29cce59b64a1771e",
+            "measurement_class": "d"
+        },
+        {
+            "collection": "osc",
+            "_id": "69cd2ffe29cce59b64a17720",
+            "measurement_class": "d"
+        },
+        {
+            "collection": "osc",
+            "_id": "69cd2fff29cce59b64a17722",
+            "measurement_class": "d"
+        },
+        {
+            "collection": "osc",
+            "_id": "69cd300029cce59b64a17724",
+            "measurement_class": "d"
+        },
+        {
+            "collection": "osc",
+            "_id": "69cd300029cce59b64a17726",
+            "measurement_class": "d"
+        }
+    ],
+    "update_all_by_filter": [
+        {
+            "collection": "osc",
+            "filter": {"doi": "10.1039/C8CC01308J"},
+            "update": {"$set": {"measurement_class": "d"}}
+        }
+    ]
+}

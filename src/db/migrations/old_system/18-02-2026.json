@@ -1,0 +1,265 @@
+{
+    "calculations": [
+        {
+            "_id": "6967aee05220ac46b0141223",
+            "crystal": "spinel",
+            "dH_CO_eV": -2.06
+        },
+        {
+            "_id": "6967aee15220ac46b0141224",
+            "crystal": "spinel",
+            "dH_CO_eV": -2.1
+        },
+        {
+            "_id": "6967aef95c48023e106c0408",
+            "name": "CZS",
+            "single_phase": true,
+            "crystalline": true,
+            "dft": {
+                "doi": "10.1039/C5RA00557D",
+                "host_phase": {
+                    "crystal": "fluorite_CeO2",
+                    "space_group": "Fm-3m (225)",
+                    "host": "CeO2",
+                    "cation_fractions": {"Zr": 0.12, "Sn": 0.08, "Ce": 0.8},
+                    "n_configs": 5,
+                    "mixing": "solid_solution_random",
+                    "substitution_sublattice": "Ce",
+                    "dft_protocol_id": "ceria_doped_v1",
+                    "lattice_parameter_nm": 0.5376 
+                },
+                "interface_phase": null
+            }
+        },
+        {
+            "_id": "6967aef95c48023e106c0409",
+            "single_phase": true,
+            "crystalline": true,
+            "name": "CLS",
+            "dft": {
+                "doi": "10.1039/C5RA00557D",
+                "host_phase": {
+                    "crystal": "fluorite_CeO2",
+                    "space_group": "Fm-3m (225)",
+                    "host": "CeO2",
+                    "cation_fractions": {"La": 0.12, "Sn": 0.08, "Ce": 0.8},
+                    "n_configs": 5,
+                    "mixing": "solid_solution_random",
+                    "substitution_sublattice": "Ce",
+                    "dft_protocol_id": "ceria_doped_v1",
+                    "lattice_parameter_nm": 0.5427 
+                },
+                "interface_phase": null
+            }
+        },
+        {
+            "_id": "6967aef95220ac46b014123d",
+            "single_phase": true,
+            "crystalline": true,
+            "name": "CeO2",
+            "cation_fractions_total": {"Ce": 1},
+            "dft": {
+                "doi": "10.1039/C5RA00557D",
+                "host_phase":{
+                    "crystal": "fluorite_CeO2",
+                    "space_group": "Fm-3m (225)",
+                    "host": "CeO2",
+                    "n_configs": 1,
+                    "cation_fractions": {"Ce": 1.0},
+                    "mixing": "pure",
+                    "substitution_sublattice": "Ce",
+                    "dft_protocol_id": "ceria_doped_v1",
+                    "lattice_parameter_nm": 0.54
+                },
+                "interface_phase": null
+            }
+        },
+        {
+            "_id": "6967af0d5220ac46b014124d",
+            "single_phase": true,
+            "crystalline": true,
+            "name": "Mn0.33Ce1",
+            "dft": {
+                "doi": "10.1016/j.apcatb.2016.03.030",
+                "cation_fractions_total": {"Mn": 0.25, "Ce": 0.75},
+                "host_phase": {
+                    "crystal": "fluorite_CeO2",
+                    "space_group": "Fm-3m (225)",
+                    "host": "CeO2",
+                    "cation_fractions": {"Mn": 0.25, "Ce": 0.75},
+                    "mixing": "solid_solution_random",
+                    "substitution_sublattice": "Ce",
+                    "dft_protocol_id": "ceria_doped_v1",
+                    "n_configs": 3,
+                    "lattice_parameter_nm": null
+                },
+                "interface_phase": null
+            }
+        },
+        {
+            "_id": "6967af0d5220ac46b014124c",
+            "name": "Mn1.5Ce1",
+            "single_phase": false,
+            "crystalline": "mixed",
+            "mixing": "solid_solution_plus_surface_mnox",
+            "dft": {
+                "doi": "10.1016/j.apcatb.2016.03.030",
+                "cation_fractions_total": {"Mn": 0.6, "Ce": 0.4},
+                "host_phase": {
+                    "crystal": "fluorite_CeO2",
+                    "space_group": "Fm-3m (225)",
+                    "host": "CeO2",
+                    "substitution_sublattice": "Ce",
+                    "cation_fractions": "unknown",
+                    "dft_protocol_id": "ceria_doped_v1",
+                    "n_configs": 3,
+                    "notes": "Represents incorporated Mn as substitutional Mn on Ce sites in fluorite CeO2. Uses a capped Mn fraction on the Ce sublattice to avoid the 'all-Mn' unrealistic solid-solution limit at high nominal Mn/Ce."
+                },
+                "interface_phase": {
+                    "dft_protocol_id": "ceria_mnox_interface_v1",
+                    "mnox_model": {"type": "cluster", "template": "Mn3O6_like_cluster"},
+                    "mnox_oxidation_proxy": "MnO2_like",
+                    "notes": "Represents highly dispersed surface MnOx on CeO2(111) via a small MnOx cluster at the perimeter/interface."
+                },
+                "skip_full_dft": false
+            },
+            "notes": "XRD shows fluorite CeO2 plus MnOx features for Mn1.5Ce1; paper indicates both incorporated Mn in ceria lattice and highly dispersed surface MnOx. DFT representation therefore uses two complementary proxy models: (1) Mn-doped ceria (ceria_doped_v1) and (2) MnOx/CeO2 interface (ceria_mnox_interface_v1)."
+        },
+        {
+            "_id": "6967af0c5220ac46b014124b",
+            "name": "Mn2Ce1",
+            "single_phase": false,
+            "crystalline": "mixed",
+            "mixing": "solid_solution_plus_surface_mnox",
+            "cation_fractions_total": {"Mn": 0.667, "Ce": 0.333},
+            "dft": {
+                "doi": "10.1016/j.apcatb.2016.03.030",
+                "host_phase": {
+                    "crystal": "fluorite_CeO2",
+                    "space_group": "Fm-3m (225)",
+                    "host": "CeO2",
+                    "substitution_sublattice": "Ce",
+                    "cation_fractions": "unknown",
+                    "dft_protocol_id": "ceria_v1",
+                    "n_configs": 3,
+                    "notes": "Represents incorporated Mn as substitutional Mn on Ce sites in fluorite CeO2. Uses a capped Mn fraction on the Ce sublattice to avoid the 'all-Mn' unrealistic solid-solution limit at high nominal Mn/Ce."
+                },
+                "interface_phase": {
+                    "dft_protocol_id": "ceria_mnox_interface_v1",
+                    "mnox_model": {"type": "cluster", "template": "Mn3O6_like_cluster"},
+                    "mnox_oxidation_proxy": "MnO2_like",
+                    "notes": "Represents highly dispersed surface MnOx on CeO2(111) via a small MnOx cluster at the perimeter/interface."
+                },
+                "skip_full_dft": false
+            },
+            "notes": "XRD shows fluorite CeO2 plus MnOx features for Mn1.5Ce1; paper indicates both incorporated Mn in ceria lattice and highly dispersed surface MnOx. DFT representation therefore uses two complementary proxy models: (1) Mn-doped ceria (ceria_doped_v1) and (2) MnOx/CeO2 interface (ceria_mnox_interface_v1)."
+        }
+    ],
+    "skipped": [
+        "10.1016/j.ceramint.2024.07.019"
+    ],
+    "dft_protocols": [
+        {
+            "dft_protocol_id": "ceria_v1",
+          
+            "host_bulk_supercell": [2,2,2],
+          
+            "host_facets": ["100", "110", "111"],
+            "host_slab_supercell_xy": [3,3],
+            "host_slab_layers": 6,
+            "vacuum_A": 15,
+            "fix_bottom_layers": 2,
+          
+            "mixing_model": "solid_solution_random_substitution_on_Ce_sublattice",
+            "n_configs": 3,
+            "config_strategy": "random_seeded",
+          
+            "stages": [
+              "bulk_relax",
+              "slab_relax_clean",
+              "slab_relax_vacancy",
+              "co_adsorb_on_clean",
+              "co_adsorb_on_vacancy",
+              "gas_co",
+              "gas_o2"
+            ],
+          
+            "defect_models": [
+              "stoichiometric",
+              "surface_oxygen_vacancy"
+            ],
+          
+            "targets": [
+              "Eads_CO_clean_eV",
+              "Eads_CO_vac_eV",
+              "Evac_surf_eV"
+            ],
+          
+            "electronic": {
+              "xc": "PBE",
+              "encut_eV": 500,
+              "kpts_bulk": [3,3,3],
+              "kpts_slab": [3,3,1],
+              "ispin": 2,
+              "ldau": {"Ce": 5.0},
+              "potcar_set": "PBE.54",
+              "smearing": {"type": "gaussian", "sigma_eV": 0.05},
+              "ediff": 1e-5,
+              "ediffg_eV_per_A": -0.02,
+              "dipole_correction": {"ldipol": true, "idipol": 3}
+            },
+          
+            "notes": "Models doped fluorite CeO2 as a substitutional solid solution (dopants replace Ce sites) using a CeO2(111) slab. Calculates CO adsorption on clean and vacancy-containing surfaces and surface oxygen vacancy formation energy as low-cost descriptors for CO binding (proxy for ΔH_CO) and reducibility/oxygen mobility (proxy for MvK redox tendency). Uses multiple random dopant configurations (n_configs) to approximate disorder; results can be averaged across seeds/configs."
+        },
+        {
+            "dft_protocol_id": "ceria_mnox_interface_v1",
+          
+            "host_bulk_supercell": [2,2,2],
+          
+            "host_facets": ["111"],
+            "host_slab_supercell_xy": [3,3],
+            "host_slab_layers": 6,
+            "vacuum_A": 15,
+            "fix_bottom_layers": 2,
+          
+            "interface_mnox_template": "Mn3O6_like_cluster",
+            "interface_placement_rule": "place_cluster_on_111_oxygen_triangle_perimeter",
+            "n_interface_configs": 2,
+          
+            "stages": [
+              "slab_relax_clean",
+              "interface_relax_clean",
+              "interface_relax_vacancy",
+              "o2_adsorb_on_vacancy",
+              "co_adsorb_on_interface",
+              "gas_co",
+              "gas_o2"
+            ],
+          
+            "defect_models": [
+              "stoichiometric",
+              "interface_oxygen_vacancy_near_mn"
+            ],
+          
+            "targets": [
+              "Evac_int_eV",
+              "Eads_O2_at_Vo_eV",
+              "Eads_CO_int_eV"
+            ],
+          
+            "electronic": {
+              "xc": "PBE",
+              "encut_eV": 500,
+              "kpts_bulk": [3,3,3],
+              "kpts_slab": [3,3,1],
+              "ispin": 2,
+              "ldau": {"Ce": 5.0, "Mn": 3.9},
+              "potcar_set": "PBE.54",
+              "smearing": {"type": "gaussian", "sigma_eV": 0.05},
+              "ediff": 1e-5,
+              "ediffg_eV_per_A": -0.02,
+              "dipole_correction": {"ldipol": true, "idipol": 3}
+            }
+        }
+    ]
+}

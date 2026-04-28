@@ -1,0 +1,123 @@
+[
+    {
+        "doi": "",
+        "name": "",
+        "Ce": null,
+        "Cu": null,
+        "deposit": {
+            "Au": 0,
+            "wt.%": 0,
+            "oxide": false,
+            "calcination_temp": null,
+            "calcination_time": null,
+            "crystal_observed": false,
+            "diameter_nm": null
+        },
+        "Sbet" : null,
+        "calcination_temp" : null,
+        "calcination_time" : null,
+        "Dpore": null,
+        "Vtotal": null,
+        "calcination_flowing_gas" : null,
+        "calcination_reactive_gas" : null,
+        "synthesis_para" : "",
+        "synthesis" : "",
+        "description" : "solid solution",
+        "particle_size_nm": null,
+        "crystallite_size_nm": null,
+        "phase_types": "Fluorite",
+        "phase_flag": "single",
+        "microscopy": null,
+        "image_path": "",
+        "morphology": null,
+        "pretreatment_temp": null,
+        "pretreatment_o2_vol%": null,
+        "pretreatment_time_h": null, 
+        "hierarchical": false,
+        "lattice_parameter_A": null,
+        "reactions": [
+            {
+                "gas_co_content" : null,
+                "gas_o2_content" : null,
+                "gas_h2o_content" : 0,
+                "gas_co2_content" : 0,
+                "flow_mL_h_g" : null,
+                "flow_h-1": null,
+                "notes": null,
+                "mass_catalyst_g": null,
+                "temps": null,
+                "conversion": null
+            }
+        ],
+        "osc_entries": [
+            {
+                "value_raw": null,
+                "temperature": null,
+                "units_raw": "δ / umol g^-1 of H2 / O / CO / O2",
+                "measurement_class": null,
+                "method": "H2_TPR / CO_TPR / TG",
+                "pulse_duration_min": null,
+                "pulse_volume_ml": "FLOAT FOR CLASS c ONLY",
+                "basis": "g_catalyst / g_ceria",
+                "species_basis": "H2_equiv / O2 / O / CO_equiv",
+                "measure": "weight_change / red_cons",
+                "h2_vol%": null,
+                "co_vol%": null,
+                "o2_vol%": null,
+                "value_O_umol_per_g_catalyst": null
+            }
+        ],
+        "h2_tpr_peaks": {
+            "temps": [],
+            "h2_vol%": null,
+            "flow_rate_mL_min": null,
+            "mass_catalyst_g": null,
+            "pretreatment_temp": null,
+            "pretreatment_time": null,
+            "pretreatment_oxidising": null,
+            "start_temp": null,
+            "ramp_rate_C_min": null 
+        },
+        "o2_tpd_peaks": {
+            "temps": [],
+            "mass_catalyst_g": null,
+            "pretreatment_temp": null,
+            "pretreatment_time": null,
+            "pretreatment_gas_type": "inert / reducing",
+            "adsorption_o2_vol%": null,
+            "adsorption_flow_ml_min": null,
+            "adsorption_temp": null,
+            "adsorption_time": null,
+            "ramp_rate_C_min": null
+        },
+        "co2_tpd_peaks": {
+            "temps": [],
+            "mass_catalyst_g": null,
+            "pretreatment_temp": null,
+            "pretreatment_time": null,
+            "pretreatment_gas_type": "inert / reducing",
+            "adsorption_co2_vol%": null,
+            "adsorption_flow_ml_min": null,
+            "adsorption_temp": null,
+            "adsorption_time": null,
+            "ramp_rate_C_min": null
+        }
+    },
+    {
+        "collection": "materials",
+        "_id": null,
+        "particle_size_nm": null,
+        "crystallite_size_nm": null,
+        "phase_types": "Fluorite",
+        "phase_flag": "single",
+        "microscopy": null,
+        "image_path": "",
+        "morphology": "",
+        "pretreatment_temp": null,
+        "pretreatment_o2_vol%": null,
+        "pretreatment_time_h": null, 
+        "osc": null,
+        "hierarchical": false,
+        "lattice_parameter_A": null
+    }
+]

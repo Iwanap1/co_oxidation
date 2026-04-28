@@ -1,0 +1,30 @@
+{
+    "update": [
+        {
+            "material_id": "6967af0c5c48023e106c0420",
+            "o2_capacity_mmol_g": 0.22
+        },
+        {
+            "material_id": "6967af0c5220ac46b014124a",
+            "o2_capacity_mmol_g": 0.20,
+            "particle_size_nm" : 7.0
+        },
+        {
+            "material_id": "6967af0c5220ac46b014124b",
+            "o2_capacity_mmol_g": 0.11
+        },
+        {
+            "material_id": "6967af0d5220ac46b014124c",
+            "o2_capacity_mmol_g": 0.12
+        },
+        {
+            "material_id": "6967af0d5220ac46b014124d",
+            "o2_capacity_mmol_g": 0.15,
+            "particle_size_nm" : 10.8
+        },
+        {
+            "material_id": "697b46006f7ebc629f8d5199",
+            "o2_capacity_mmol_g": 0.16
+        }
+    ]
+}
