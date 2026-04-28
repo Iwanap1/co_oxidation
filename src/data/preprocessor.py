@@ -1,5 +1,5 @@
-from src.db import Database
-from src.constants import ELEMENTS
+from ..db import DB
+from ..constants import ELEMENTS
 import pandas as pd
 from typing import Tuple, Dict, List, Optional, Any
 from sklearn.preprocessing import StandardScaler
@@ -11,7 +11,7 @@ import torch
 
 
 class Preprocessor:
-    def __init__(self, database: Database):
+    def __init__(self, database: DB):
         self.database = database
 
     def get_base_dataframes(

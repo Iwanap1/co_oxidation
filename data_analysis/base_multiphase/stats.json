@@ -1,0 +1,2170 @@
+{
+    "base_preprocess": {
+        "materials": {
+            "total_rows_before_preprocessing": 550,
+            "total_rows_after_preprocessing": 482,
+            "total_rows_dropped": 68,
+            "columns_filled_with_mean": [
+                "calcination_time"
+            ],
+            "number_of_values_defaulted_to_mean": {
+                "calcination_time": 22
+            },
+            "columns_filled_with_zero": [
+                "pretreatment_temp",
+                "pretreatment_o2_vol%",
+                "pretreatment_time_h"
+            ],
+            "number_of_values_defaulted_to_zero": {
+                "pretreatment_temp": 137,
+                "pretreatment_o2_vol%": 137,
+                "pretreatment_time_h": 137
+            },
+            "dropped_due_to_missing_values": {
+                "Sbet": 22,
+                "calcination_temp": 8
+            },
+            "dropped_due_to_zero_or_negative_values": {
+                "Sbet": 3,
+                "calcination_temp": 0
+            },
+            "cannot_be_zero_or_none": [
+                "Sbet",
+                "calcination_temp"
+            ],
+            "add_synthesis_flags": false,
+            "synthesis_stats": null,
+            "element_stats": {
+                "element_columns_processed": [
+                    "Al",
+                    "Sc",
+                    "Ti",
+                    "Cr",
+                    "Mn",
+                    "Fe",
+                    "Co",
+                    "Ni",
+                    "Cu",
+                    "Zn",
+                    "Ga",
+                    "Sr",
+                    "Y",
+                    "Zr",
+                    "Nb",
+                    "Ru",
+                    "Ag",
+                    "Sn",
+                    "La",
+                    "Ce",
+                    "Pr",
+                    "Nd",
+                    "Pm",
+                    "Sm",
+                    "Eu",
+                    "Gd",
+                    "Tb",
+                    "Ho",
+                    "Yb",
+                    "Lu",
+                    "Hf",
+                    "Bi"
+                ],
+                "element_columns_ignored_because_empty": [],
+                "number_of_missing_element_values_defaulted_to_zero": {
+                    "Al": 526,
+                    "Sc": 526,
+                    "Ti": 510,
+                    "Cr": 524,
+                    "Mn": 415,
+                    "Fe": 509,
+                    "Co": 502,
+                    "Ni": 501,
+                    "Cu": 383,
+                    "Zn": 521,
+                    "Ga": 523,
+                    "Sr": 525,
+                    "Y": 520,
+                    "Zr": 430,
+                    "Nb": 526,
+                    "Ru": 526,
+                    "Ag": 526,
+                    "Sn": 505,
+                    "La": 480,
+                    "Ce": 2,
+                    "Pr": 501,
+                    "Nd": 509,
+                    "Pm": 526,
+                    "Sm": 503,
+                    "Eu": 519,
+                    "Gd": 491,
+                    "Tb": 520,
+                    "Ho": 526,
+                    "Yb": 526,
+                    "Lu": 526,
+                    "Hf": 508,
+                    "Bi": 505
+                },
+                "allowed_elements": null,
+                "disallowed_elements_checked": [],
+                "rows_with_nonzero_disallowed_element": {},
+                "rows_dropped_due_to_disallowed_elements": 0,
+                "rows_dropped_due_to_zero_total_element_content": 0,
+                "minimum_Ce_content": 0.5,
+                "rows_dropped_due_to_minimum_Ce_content": 12
+            },
+            "allow_supported_samples": false,
+            "default_deposited_fields_to_zero": true,
+            "deposit_stats": {
+                "allow_supported_samples": false,
+                "default_deposited_fields_to_zero": true,
+                "deposit_column_used": "deposit",
+                "deposit_prefix": "deposited_",
+                "rows_with_nonnull_deposit_before_processing": 23,
+                "rows_dropped_due_to_nonnull_deposit": 23,
+                "deposited_columns_created": [],
+                "number_of_missing_deposited_values_defaulted_to_zero": {}
+            },
+            "convert_phase_flag_to_binary": true,
+            "phase_flag_stats": {
+                "phase_flag_column_used": "phase_flag",
+                "phase_flag_output_column": "single_phase_binary",
+                "rows_with_missing_phase_flag": 0,
+                "rows_mapped_single_to_1": 449,
+                "rows_mapped_multi_to_0": 75,
+                "rows_unmapped_phase_flag": 3
+            }
+        },
+        "reactions": {
+            "total_rows_before_preprocessing": 692,
+            "oxygen_content_in_air_used": 0.2,
+            "convert_ghsv_to_whsv_with_assumed_density_used": null,
+            "convert_percentages_to_fractions": false,
+            "maximum_fractional_conversion": null,
+            "gas_o2_content_added_from_air": {
+                "rows_with_air_content": 373,
+                "rows_where_o2_was_missing_before": 7,
+                "rows_where_o2_was_present_before": 366
+            },
+            "flow_mL_h_g_defaulted_from_flow_h_minus_1": {
+                "rows_converted": 0,
+                "rows_where_flow_missing_before": 0,
+                "rows_where_flow_overwritten": 0,
+                "assumed_density_used": null
+            },
+            "percentage_conversion": {
+                "gas_co_content_rows_converted": 0,
+                "gas_o2_content_rows_converted": 0,
+                "conversion_rows_converted": 0,
+                "conversion_points_seen": 0,
+                "conversion_points_clipped": 0
+            },
+            "columns_filled_with_mean": [],
+            "number_of_values_defaulted_to_mean": {},
+            "total_rows_after_preprocessing": 531,
+            "total_rows_dropped": 161,
+            "cannot_be_zero_or_none": [
+                "gas_co_content",
+                "gas_o2_content",
+                "flow_mL_h_g"
+            ],
+            "must_be_zero_or_none": [
+                "gas_h2o_content",
+                "gas_co2_content"
+            ],
+            "minimum_number_datapoints": 3,
+            "rows_dropped_due_to_too_few_datapoints": 93,
+            "dropped_due_to_missing_values": {
+                "gas_co_content": 0,
+                "gas_o2_content": 0,
+                "flow_mL_h_g": 66
+            },
+            "dropped_due_to_zero_or_negative_values": {
+                "gas_co_content": 0,
+                "gas_o2_content": 4,
+                "flow_mL_h_g": 0
+            },
+            "dropped_due_to_nonzero_forbidden_values": {
+                "gas_h2o_content": 49,
+                "gas_co2_content": 5
+            }
+        },
+        "h2_tpr": {
+            "total_rows_before_preprocessing": 230,
+            "min_temps": 1,
+            "drop_cols_requested": [
+                "mass_catalyst_g",
+                "temps"
+            ],
+            "pretreatment_oxidising_conversion": {
+                "column_converted": true,
+                "true_values_seen": 76,
+                "false_values_seen": 112,
+                "missing_values_seen": 42,
+                "unrecognised_nonmissing_values": 0
+            },
+            "columns_filled_with_mean": [],
+            "number_of_values_defaulted_to_mean": {},
+            "columns_filled_with_zero": [
+                "pretreatment_temp",
+                "pretreatment_time"
+            ],
+            "number_of_values_defaulted_to_zero": {
+                "pretreatment_temp": 53,
+                "pretreatment_time": 67
+            },
+            "temps_validation": {
+                "temps_column_present": true,
+                "rows_with_missing_temps": 0,
+                "rows_with_non_list_temps": 0,
+                "rows_with_too_few_temps": 0
+            },
+            "total_rows_after_preprocessing": 180,
+            "total_rows_dropped": 50,
+            "cannot_be_none": [
+                "pretreatment_oxidising"
+            ],
+            "dropped_due_to_none_only": {
+                "pretreatment_oxidising": 42
+            },
+            "cannot_be_zero_or_none": [
+                "ramp_rate_C_min"
+            ],
+            "scalar_required_positive_cols": [
+                "ramp_rate_C_min"
+            ],
+            "rows_dropped_due_to_invalid_temps": 0,
+            "dropped_due_to_missing_values": {
+                "ramp_rate_C_min": 13
+            },
+            "dropped_due_to_zero_or_negative_values": {
+                "ramp_rate_C_min": 0
+            },
+            "dropped_columns_that_existed": [
+                "mass_catalyst_g",
+                "temps"
+            ]
+        },
+        "o2_tpd": {
+            "total_rows_before_preprocessing": 30,
+            "min_temps": 1,
+            "drop_cols_requested": [
+                "mass_catalyst_g",
+                "temps"
+            ],
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": [
+                "ramp_rate_C_min"
+            ],
+            "remove_ambiguous_pretreatment_type": false,
+            "numerical_pretreatment_type": false,
+            "columns_filled_with_mean": [],
+            "number_of_values_defaulted_to_mean": {},
+            "columns_filled_with_zero": [
+                "pretreatment_temp",
+                "pretreatment_time"
+            ],
+            "number_of_values_defaulted_to_zero": {
+                "pretreatment_temp": 11,
+                "pretreatment_time": 11
+            },
+            "temps_validation": {
+                "temps_column_present": true,
+                "rows_with_missing_temps": 0,
+                "rows_with_non_list_temps": 0,
+                "rows_with_too_few_temps": 0
+            },
+            "pretreatment_type_stats": {
+                "pretreatment_gas_type_column_used": "pretreatment_gas_type",
+                "remove_ambiguous_pretreatment_type": false,
+                "numerical_pretreatment_type": false,
+                "rows_with_missing_pretreatment_gas_type_before": 0,
+                "rows_with_slash_in_pretreatment_gas_type": 17,
+                "rows_with_unrecognized_pretreatment_gas_type": 17,
+                "rows_dropped_due_to_ambiguous_pretreatment_gas_type": 0,
+                "pretreatment_type_counts_after_cleaning": {
+                    "inert": 13
+                },
+                "pretreatment_type_encoding_mode": null,
+                "pretreatment_type_columns_created": []
+            },
+            "scalar_required_positive_cols": [
+                "ramp_rate_C_min"
+            ],
+            "dropped_due_to_none_only": {},
+            "dropped_due_to_missing_values": {
+                "ramp_rate_C_min": 0
+            },
+            "dropped_due_to_zero_or_negative_values": {
+                "ramp_rate_C_min": 0
+            },
+            "rows_dropped_due_to_invalid_temps": 0,
+            "dropped_columns_that_existed": [
+                "mass_catalyst_g",
+                "temps"
+            ],
+            "total_rows_after_preprocessing": 30,
+            "total_rows_dropped": 0
+        },
+        "co2_tpd": {
+            "total_rows_before_preprocessing": 12,
+            "min_temps": 1,
+            "drop_cols_requested": [
+                "mass_catalyst_g",
+                "temps"
+            ],
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": [
+                "ramp_rate_C_min"
+            ],
+            "remove_ambiguous_pretreatment_type": false,
+            "numerical_pretreatment_type": false,
+            "columns_filled_with_mean": [],
+            "number_of_values_defaulted_to_mean": {},
+            "columns_filled_with_zero": [
+                "pretreatment_temp",
+                "pretreatment_time"
+            ],
+            "number_of_values_defaulted_to_zero": {
+                "pretreatment_temp": 0,
+                "pretreatment_time": 0
+            },
+            "temps_validation": {
+                "temps_column_present": true,
+                "rows_with_missing_temps": 0,
+                "rows_with_non_list_temps": 0,
+                "rows_with_too_few_temps": 0
+            },
+            "pretreatment_type_stats": {
+                "pretreatment_gas_type_column_used": "pretreatment_gas_type",
+                "remove_ambiguous_pretreatment_type": false,
+                "numerical_pretreatment_type": false,
+                "rows_with_missing_pretreatment_gas_type_before": 0,
+                "rows_with_slash_in_pretreatment_gas_type": 6,
+                "rows_with_unrecognized_pretreatment_gas_type": 6,
+                "rows_dropped_due_to_ambiguous_pretreatment_gas_type": 0,
+                "pretreatment_type_counts_after_cleaning": {
+                    "oxidising": 6
+                },
+                "pretreatment_type_encoding_mode": null,
+                "pretreatment_type_columns_created": []
+            },
+            "scalar_required_positive_cols": [
+                "ramp_rate_C_min"
+            ],
+            "dropped_due_to_none_only": {},
+            "dropped_due_to_missing_values": {
+                "ramp_rate_C_min": 0
+            },
+            "dropped_due_to_zero_or_negative_values": {
+                "ramp_rate_C_min": 0
+            },
+            "rows_dropped_due_to_invalid_temps": 0,
+            "dropped_columns_that_existed": [
+                "mass_catalyst_g",
+                "temps"
+            ],
+            "total_rows_after_preprocessing": 12,
+            "total_rows_dropped": 0
+        },
+        "osc": {
+            "total_rows_before_preprocessing": 249,
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": [
+                "value_O_umol_per_g_catalyst",
+                "value_raw"
+            ],
+            "allowed_experiment_classes_requested": [
+                "a",
+                "b",
+                "c",
+                "d"
+            ],
+            "tag_dynamic": true,
+            "dynamic_or_total_tag_name": "is_dynamic_capacity",
+            "drop_cols_requested": [],
+            "columns_filled_with_mean": [],
+            "number_of_values_defaulted_to_mean": {},
+            "columns_filled_with_zero": [
+                "h2_vol%",
+                "co_vol%",
+                "o2_vol%"
+            ],
+            "number_of_values_defaulted_to_zero": {
+                "h2_vol%": 117,
+                "co_vol%": 164,
+                "o2_vol%": 242
+            },
+            "measurement_class_stats": {
+                "column_present": true,
+                "rows_missing_before_filter": 2,
+                "rows_not_in_allowed_classes": 2,
+                "counts_after_filter": {
+                    "c": 81,
+                    "b": 78,
+                    "d": 52,
+                    "a": 36
+                }
+            },
+            "dynamic_tag_stats": {
+                "tag_created": true,
+                "dynamic_classes": [
+                    "a",
+                    "c"
+                ],
+                "total_classes": [
+                    "b",
+                    "d"
+                ],
+                "positive_count": 117,
+                "zero_count": 130
+            },
+            "dropped_due_to_none_only": {},
+            "dropped_due_to_missing_values": {
+                "value_O_umol_per_g_catalyst": 0,
+                "value_raw": 0
+            },
+            "dropped_due_to_zero_or_negative_values": {
+                "value_O_umol_per_g_catalyst": 0,
+                "value_raw": 0
+            },
+            "dropped_columns_that_existed": [],
+            "total_rows_after_preprocessing": 247,
+            "total_rows_dropped": 2
+        }
+    },
+    "materials_merge": {
+        "reactions": {
+            "n_materials_before_merge": 482,
+            "n_reactions_before_merge": 531,
+            "n_unique_material_ids_in_materials": 482,
+            "n_unique_material_ids_in_reactions": 526,
+            "n_unique_material_ids_matched": 315,
+            "n_material_ids_dropped_from_materials_due_to_missing_reactions": 167,
+            "n_material_ids_dropped_from_reactions_due_to_missing_materials": 211,
+            "n_rows_after_merge": 315,
+            "drop_missing_rxns": true
+        },
+        "h2_tpr": {
+            "n_materials_before_merge": 482,
+            "n_characterisation_rows_before_merge": 180,
+            "n_rows_after_merge": 159,
+            "n_unique_materials_after_merge": 156,
+            "char_id_was_dropped": true
+        },
+        "o2_tpd": {
+            "n_materials_before_merge": 482,
+            "n_characterisation_rows_before_merge": 30,
+            "n_rows_after_merge": 26,
+            "n_unique_materials_after_merge": 26,
+            "char_id_was_dropped": true
+        },
+        "co2_tpd": {
+            "n_materials_before_merge": 482,
+            "n_characterisation_rows_before_merge": 12,
+            "n_rows_after_merge": 11,
+            "n_unique_materials_after_merge": 11,
+            "char_id_was_dropped": true
+        },
+        "osc": {
+            "n_materials_before_merge": 482,
+            "n_characterisation_rows_before_merge": 247,
+            "n_rows_after_merge": 225,
+            "n_unique_materials_after_merge": 159,
+            "char_id_was_dropped": true
+        }
+    },
+    "niche_elements_filter": {
+        "reactions": {
+            "min_appearances": 8,
+            "min_papers": 3,
+            "n_rows_before": 315,
+            "n_rows_after": 287,
+            "n_rows_removed": 28,
+            "n_unique_materials_before": 315,
+            "n_unique_materials_after": 287,
+            "removed_elements": [
+                "Ti",
+                "Hf",
+                "Eu",
+                "Zn",
+                "Tb",
+                "Ga",
+                "Sc",
+                "Sr",
+                "Ru",
+                "Y",
+                "Ag",
+                "Pm",
+                "Cr",
+                "Yb",
+                "Nb",
+                "Al",
+                "Ho",
+                "Lu"
+            ],
+            "kept_elements": [
+                "Ce",
+                "Cu",
+                "Mn",
+                "Zr",
+                "Gd",
+                "Bi",
+                "Co",
+                "Sm",
+                "La",
+                "Pr",
+                "Ni",
+                "Nd",
+                "Sn",
+                "Fe"
+            ],
+            "element_value_counts": {
+                "Ce": {
+                    "n_materials": 315,
+                    "n_papers": 65
+                },
+                "Cu": {
+                    "n_materials": 110,
+                    "n_papers": 26
+                },
+                "Mn": {
+                    "n_materials": 91,
+                    "n_papers": 21
+                },
+                "Zr": {
+                    "n_materials": 51,
+                    "n_papers": 19
+                },
+                "Gd": {
+                    "n_materials": 24,
+                    "n_papers": 7
+                },
+                "Bi": {
+                    "n_materials": 22,
+                    "n_papers": 5
+                },
+                "Co": {
+                    "n_materials": 19,
+                    "n_papers": 10
+                },
+                "Sm": {
+                    "n_materials": 19,
+                    "n_papers": 9
+                },
+                "La": {
+                    "n_materials": 17,
+                    "n_papers": 12
+                },
+                "Pr": {
+                    "n_materials": 16,
+                    "n_papers": 11
+                },
+                "Ni": {
+                    "n_materials": 16,
+                    "n_papers": 9
+                },
+                "Nd": {
+                    "n_materials": 15,
+                    "n_papers": 9
+                },
+                "Sn": {
+                    "n_materials": 12,
+                    "n_papers": 5
+                },
+                "Fe": {
+                    "n_materials": 11,
+                    "n_papers": 6
+                },
+                "Ti": {
+                    "n_materials": 6,
+                    "n_papers": 3
+                },
+                "Hf": {
+                    "n_materials": 4,
+                    "n_papers": 4
+                },
+                "Eu": {
+                    "n_materials": 4,
+                    "n_papers": 3
+                },
+                "Zn": {
+                    "n_materials": 3,
+                    "n_papers": 2
+                },
+                "Tb": {
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                "Ga": {
+                    "n_materials": 2,
+                    "n_papers": 1
+                },
+                "Sc": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Sr": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ru": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Y": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ag": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Pm": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Cr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Yb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Nb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Al": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ho": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Lu": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            },
+            "element_statistics": [
+                {
+                    "element": "Ce",
+                    "n_materials": 315,
+                    "n_papers": 65
+                },
+                {
+                    "element": "Cu",
+                    "n_materials": 110,
+                    "n_papers": 26
+                },
+                {
+                    "element": "Mn",
+                    "n_materials": 91,
+                    "n_papers": 21
+                },
+                {
+                    "element": "Zr",
+                    "n_materials": 51,
+                    "n_papers": 19
+                },
+                {
+                    "element": "Gd",
+                    "n_materials": 24,
+                    "n_papers": 7
+                },
+                {
+                    "element": "Bi",
+                    "n_materials": 22,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Co",
+                    "n_materials": 19,
+                    "n_papers": 10
+                },
+                {
+                    "element": "Sm",
+                    "n_materials": 19,
+                    "n_papers": 9
+                },
+                {
+                    "element": "La",
+                    "n_materials": 17,
+                    "n_papers": 12
+                },
+                {
+                    "element": "Pr",
+                    "n_materials": 16,
+                    "n_papers": 11
+                },
+                {
+                    "element": "Ni",
+                    "n_materials": 16,
+                    "n_papers": 9
+                },
+                {
+                    "element": "Nd",
+                    "n_materials": 15,
+                    "n_papers": 9
+                },
+                {
+                    "element": "Sn",
+                    "n_materials": 12,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Fe",
+                    "n_materials": 11,
+                    "n_papers": 6
+                },
+                {
+                    "element": "Ti",
+                    "n_materials": 6,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Hf",
+                    "n_materials": 4,
+                    "n_papers": 4
+                },
+                {
+                    "element": "Eu",
+                    "n_materials": 4,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Zn",
+                    "n_materials": 3,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Tb",
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Ga",
+                    "n_materials": 2,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Sc",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Sr",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ru",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Y",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ag",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Pm",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Cr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Yb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Nb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Al",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ho",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Lu",
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            ]
+        },
+        "h2_tpr": {
+            "min_appearances": 8,
+            "min_papers": 3,
+            "n_rows_before": 159,
+            "n_rows_after": 101,
+            "n_rows_removed": 58,
+            "n_unique_materials_before": 156,
+            "n_unique_materials_after": 99,
+            "removed_elements": [
+                "Ni",
+                "Pr",
+                "Co",
+                "Nd",
+                "Hf",
+                "Fe",
+                "Y",
+                "Cr",
+                "Eu",
+                "Gd",
+                "Sm",
+                "Ga",
+                "Ho",
+                "Al",
+                "Yb",
+                "Ru",
+                "Tb",
+                "Ag",
+                "Lu",
+                "Bi",
+                "Ti",
+                "Sr",
+                "Sc",
+                "Nb",
+                "Pm",
+                "Zn"
+            ],
+            "kept_elements": [
+                "Ce",
+                "Cu",
+                "Zr",
+                "Mn",
+                "La",
+                "Sn"
+            ],
+            "element_value_counts": {
+                "Ce": {
+                    "n_materials": 156,
+                    "n_papers": 45
+                },
+                "Cu": {
+                    "n_materials": 28,
+                    "n_papers": 14
+                },
+                "Zr": {
+                    "n_materials": 28,
+                    "n_papers": 14
+                },
+                "Mn": {
+                    "n_materials": 24,
+                    "n_papers": 14
+                },
+                "La": {
+                    "n_materials": 19,
+                    "n_papers": 13
+                },
+                "Sn": {
+                    "n_materials": 13,
+                    "n_papers": 4
+                },
+                "Ni": {
+                    "n_materials": 7,
+                    "n_papers": 4
+                },
+                "Pr": {
+                    "n_materials": 7,
+                    "n_papers": 5
+                },
+                "Co": {
+                    "n_materials": 6,
+                    "n_papers": 5
+                },
+                "Nd": {
+                    "n_materials": 5,
+                    "n_papers": 3
+                },
+                "Hf": {
+                    "n_materials": 5,
+                    "n_papers": 3
+                },
+                "Fe": {
+                    "n_materials": 4,
+                    "n_papers": 4
+                },
+                "Y": {
+                    "n_materials": 4,
+                    "n_papers": 3
+                },
+                "Cr": {
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                "Eu": {
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                "Gd": {
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                "Sm": {
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                "Ga": {
+                    "n_materials": 2,
+                    "n_papers": 1
+                },
+                "Ho": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Al": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Yb": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ru": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Tb": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ag": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Lu": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Bi": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ti": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sc": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Nb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Pm": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Zn": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            },
+            "element_statistics": [
+                {
+                    "element": "Ce",
+                    "n_materials": 156,
+                    "n_papers": 45
+                },
+                {
+                    "element": "Cu",
+                    "n_materials": 28,
+                    "n_papers": 14
+                },
+                {
+                    "element": "Zr",
+                    "n_materials": 28,
+                    "n_papers": 14
+                },
+                {
+                    "element": "Mn",
+                    "n_materials": 24,
+                    "n_papers": 14
+                },
+                {
+                    "element": "La",
+                    "n_materials": 19,
+                    "n_papers": 13
+                },
+                {
+                    "element": "Sn",
+                    "n_materials": 13,
+                    "n_papers": 4
+                },
+                {
+                    "element": "Ni",
+                    "n_materials": 7,
+                    "n_papers": 4
+                },
+                {
+                    "element": "Pr",
+                    "n_materials": 7,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Co",
+                    "n_materials": 6,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Nd",
+                    "n_materials": 5,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Hf",
+                    "n_materials": 5,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Fe",
+                    "n_materials": 4,
+                    "n_papers": 4
+                },
+                {
+                    "element": "Y",
+                    "n_materials": 4,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Cr",
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Eu",
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Gd",
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Sm",
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Ga",
+                    "n_materials": 2,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ho",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Al",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Yb",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ru",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Tb",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ag",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Lu",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Bi",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ti",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sc",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Nb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Pm",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Zn",
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            ]
+        },
+        "o2_tpd": {
+            "min_appearances": 8,
+            "min_papers": 3,
+            "n_rows_before": 26,
+            "n_rows_after": 10,
+            "n_rows_removed": 16,
+            "n_unique_materials_before": 26,
+            "n_unique_materials_after": 10,
+            "removed_elements": [
+                "Cu",
+                "Sn",
+                "Cr",
+                "Zr",
+                "Pr",
+                "Hf",
+                "La",
+                "Fe",
+                "Ho",
+                "Bi",
+                "Al",
+                "Nb",
+                "Yb",
+                "Sc",
+                "Sr",
+                "Ti",
+                "Y",
+                "Ga",
+                "Ru",
+                "Gd",
+                "Tb",
+                "Eu",
+                "Ag",
+                "Pm",
+                "Nd",
+                "Zn",
+                "Sm",
+                "Co",
+                "Ni",
+                "Lu"
+            ],
+            "kept_elements": [
+                "Ce",
+                "Mn"
+            ],
+            "element_value_counts": {
+                "Ce": {
+                    "n_materials": 26,
+                    "n_papers": 7
+                },
+                "Mn": {
+                    "n_materials": 11,
+                    "n_papers": 3
+                },
+                "Cu": {
+                    "n_materials": 8,
+                    "n_papers": 2
+                },
+                "Sn": {
+                    "n_materials": 4,
+                    "n_papers": 1
+                },
+                "Cr": {
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                "Zr": {
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                "Pr": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Hf": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "La": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Fe": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ho": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Bi": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Al": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Nb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Yb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sc": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ti": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Y": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ga": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ru": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Gd": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Tb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Eu": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ag": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Pm": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Nd": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Zn": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sm": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Co": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ni": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Lu": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            },
+            "element_statistics": [
+                {
+                    "element": "Ce",
+                    "n_materials": 26,
+                    "n_papers": 7
+                },
+                {
+                    "element": "Mn",
+                    "n_materials": 11,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Cu",
+                    "n_materials": 8,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Sn",
+                    "n_materials": 4,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Cr",
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Zr",
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Pr",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Hf",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "La",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Fe",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ho",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Bi",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Al",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Nb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Yb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sc",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ti",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Y",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ga",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ru",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Gd",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Tb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Eu",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ag",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Pm",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Nd",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Zn",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sm",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Co",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ni",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Lu",
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            ]
+        },
+        "co2_tpd": {
+            "min_appearances": 8,
+            "min_papers": 3,
+            "n_rows_before": 11,
+            "n_rows_after": 0,
+            "n_rows_removed": 11,
+            "n_unique_materials_before": 11,
+            "n_unique_materials_after": 0,
+            "removed_elements": [
+                "La",
+                "Nd",
+                "Cu",
+                "Zn",
+                "Ni",
+                "Co",
+                "Cr",
+                "Y",
+                "Ti",
+                "Sr",
+                "Yb",
+                "Sc",
+                "Gd",
+                "Nb",
+                "Al",
+                "Ga",
+                "Ho",
+                "Bi",
+                "Ru",
+                "Tb",
+                "Eu",
+                "Zr",
+                "Ag",
+                "Pm",
+                "Sm",
+                "Fe",
+                "Mn",
+                "Hf",
+                "Sn",
+                "Pr",
+                "Lu"
+            ],
+            "kept_elements": [
+                "Ce"
+            ],
+            "element_value_counts": {
+                "Ce": {
+                    "n_materials": 11,
+                    "n_papers": 3
+                },
+                "La": {
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                "Nd": {
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                "Cu": {
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                "Zn": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ni": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Co": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Cr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Y": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ti": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Yb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sc": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Gd": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Nb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Al": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ga": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ho": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Bi": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ru": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Tb": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Eu": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Zr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ag": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Pm": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sm": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Fe": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Mn": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Hf": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sn": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Pr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Lu": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            },
+            "element_statistics": [
+                {
+                    "element": "Ce",
+                    "n_materials": 11,
+                    "n_papers": 3
+                },
+                {
+                    "element": "La",
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Nd",
+                    "n_materials": 3,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Cu",
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Zn",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ni",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Co",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Cr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Y",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ti",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Yb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sc",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Gd",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Nb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Al",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ga",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ho",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Bi",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ru",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Tb",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Eu",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Zr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ag",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Pm",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sm",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Fe",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Mn",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Hf",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sn",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Pr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Lu",
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            ]
+        },
+        "osc": {
+            "min_appearances": 8,
+            "min_papers": 3,
+            "n_rows_before": 225,
+            "n_rows_after": 164,
+            "n_rows_removed": 61,
+            "n_unique_materials_before": 159,
+            "n_unique_materials_after": 113,
+            "removed_elements": [
+                "Ti",
+                "Nd",
+                "Sn",
+                "Ni",
+                "Tb",
+                "Y",
+                "Fe",
+                "Sm",
+                "Ga",
+                "Co",
+                "Al",
+                "Nb",
+                "Sr",
+                "Eu",
+                "Pm",
+                "Yb",
+                "Ho",
+                "Ru",
+                "Sc",
+                "Cr",
+                "Bi",
+                "Ag",
+                "Zn",
+                "Lu"
+            ],
+            "kept_elements": [
+                "Ce",
+                "Zr",
+                "La",
+                "Cu",
+                "Mn",
+                "Hf",
+                "Gd",
+                "Pr"
+            ],
+            "element_value_counts": {
+                "Ce": {
+                    "n_materials": 159,
+                    "n_papers": 41
+                },
+                "Zr": {
+                    "n_materials": 45,
+                    "n_papers": 20
+                },
+                "La": {
+                    "n_materials": 27,
+                    "n_papers": 13
+                },
+                "Cu": {
+                    "n_materials": 12,
+                    "n_papers": 6
+                },
+                "Mn": {
+                    "n_materials": 12,
+                    "n_papers": 5
+                },
+                "Hf": {
+                    "n_materials": 10,
+                    "n_papers": 5
+                },
+                "Gd": {
+                    "n_materials": 10,
+                    "n_papers": 5
+                },
+                "Pr": {
+                    "n_materials": 10,
+                    "n_papers": 8
+                },
+                "Ti": {
+                    "n_materials": 7,
+                    "n_papers": 5
+                },
+                "Nd": {
+                    "n_materials": 7,
+                    "n_papers": 5
+                },
+                "Sn": {
+                    "n_materials": 6,
+                    "n_papers": 4
+                },
+                "Ni": {
+                    "n_materials": 5,
+                    "n_papers": 2
+                },
+                "Tb": {
+                    "n_materials": 5,
+                    "n_papers": 5
+                },
+                "Y": {
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                "Fe": {
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                "Sm": {
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                "Ga": {
+                    "n_materials": 2,
+                    "n_papers": 1
+                },
+                "Co": {
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                "Al": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Nb": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Sr": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Eu": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Pm": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Yb": {
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                "Ho": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ru": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Sc": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Cr": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Bi": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Ag": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Zn": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                "Lu": {
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            },
+            "element_statistics": [
+                {
+                    "element": "Ce",
+                    "n_materials": 159,
+                    "n_papers": 41
+                },
+                {
+                    "element": "Zr",
+                    "n_materials": 45,
+                    "n_papers": 20
+                },
+                {
+                    "element": "La",
+                    "n_materials": 27,
+                    "n_papers": 13
+                },
+                {
+                    "element": "Cu",
+                    "n_materials": 12,
+                    "n_papers": 6
+                },
+                {
+                    "element": "Mn",
+                    "n_materials": 12,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Hf",
+                    "n_materials": 10,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Gd",
+                    "n_materials": 10,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Pr",
+                    "n_materials": 10,
+                    "n_papers": 8
+                },
+                {
+                    "element": "Ti",
+                    "n_materials": 7,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Nd",
+                    "n_materials": 7,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Sn",
+                    "n_materials": 6,
+                    "n_papers": 4
+                },
+                {
+                    "element": "Ni",
+                    "n_materials": 5,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Tb",
+                    "n_materials": 5,
+                    "n_papers": 5
+                },
+                {
+                    "element": "Y",
+                    "n_materials": 3,
+                    "n_papers": 3
+                },
+                {
+                    "element": "Fe",
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Sm",
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Ga",
+                    "n_materials": 2,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Co",
+                    "n_materials": 2,
+                    "n_papers": 2
+                },
+                {
+                    "element": "Al",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Nb",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Sr",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Eu",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Pm",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Yb",
+                    "n_materials": 1,
+                    "n_papers": 1
+                },
+                {
+                    "element": "Ho",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ru",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Sc",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Cr",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Bi",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Ag",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Zn",
+                    "n_materials": 0,
+                    "n_papers": 0
+                },
+                {
+                    "element": "Lu",
+                    "n_materials": 0,
+                    "n_papers": 0
+                }
+            ]
+        }
+    },
+    "final_counts": {
+        "reactions": 287,
+        "h2_tpr": 101,
+        "o2_tpd": 10,
+        "co2_tpd": 0,
+        "osc": 164
+    }
+}

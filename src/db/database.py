@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 
-class Database:
+class DB:
     def __init__(self, uri=None, db_name="hybrid_model"):
         if uri is None:
             load_dotenv()
@@ -17,4 +17,7 @@ class Database:
             "o2_tpd_peaks": self.db["o2_tpd_peaks"],
             "co2_tpd_peaks": self.db["co2_tpd_peaks"],
         }
+
+    def close(self):
+        self.client.close()
         

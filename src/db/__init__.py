@@ -8,5 +8,5 @@ warnings.filterwarnings(
     category=UserWarning,
 )
 
-from .database import Database
+from .database import DB
 from .migrator import Migrator

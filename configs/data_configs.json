@@ -57,7 +57,8 @@
             "drop_cols": ["mass_catalyst_g", "temps"]
         },
         "osc": {
-            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw", "measurement_class"],
+            "base_filter": {},
+            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw"],
             "default_to_zero_cols": ["h2_vol%", "co_vol%", "o2_vol%"],
             "allowed_experiment_classes": ["a", "b", "c", "d"],
             "tag_dynamic": true,
@@ -124,12 +125,81 @@
             "drop_cols": ["mass_catalyst_g", "temps"]
         },
         "osc": {
-            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw", "measurement_class"],
+            "base_filter": {},
+            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw"],
             "default_to_zero_cols": ["h2_vol%", "co_vol%", "o2_vol%"],
             "allowed_experiment_classes": ["a", "b", "c", "d"],
             "tag_dynamic": true,
             "dynamic_or_total_tag_name": "is_dynamic_capacity"
         },
         "x_cols_minus_T_and_elements": ["Sbet", "single_phase_binary", "calcination_temp", "calcination_time", "pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h", "gas_co_content", "gas_o2_content", "flow_mL_h_g"]
+    },
+    {
+        "name": "multiphase_crystallite_size",
+        "material": {
+            "base_filter": {"phase_flag": {"$exists": true}},
+            "default_to_mean_cols": ["calcination_time"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"],
+            "cannot_be_zero_or_none": ["Sbet", "calcination_temp", "crystallite_size_nm"],
+            "allow_supported_samples": false,
+            "add_synthesis_flags": false,
+            "minimum_Ce_content": 0.5,
+            "convert_phase_flag_to_binary": true,
+            "phase_flag_output_col": "single_phase_binary",
+            "element_min_appearances": 8,
+            "element_min_papers": 3
+        },
+        "reaction": {
+            "base_filter": {},
+            "oxygen_content_in_air": 0.2,
+            "convert_ghsv_to_whsv_with_assumed_density": null,
+            "default_to_mean_cols": [],
+            "cannot_be_zero_or_none": ["gas_co_content", "gas_o2_content", "flow_mL_h_g"],
+            "must_be_zero_or_none": ["gas_h2o_content", "gas_co2_content"],
+            "minimum_number_datapoints": 3
+        },
+        "h2_tpr_peaks": {
+            "base_filter": {},
+            "cannot_be_none": ["pretreatment_oxidising"],
+            "cannot_be_zero_or_none": ["ramp_rate_C_min"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_time"],
+            "min_temps": 1,
+            "use_only_first_temp": true,
+            "first_temp_output_col": "temp",
+            "drop_cols": ["mass_catalyst_g", "temps"]
+        },
+        "o2_tpd_peaks": {
+            "base_filter": {},
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": ["ramp_rate_C_min"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_time"],
+            "min_temps": 1,
+            "remove_ambiguous_pretreatment_type": false,
+            "numerical_pretreatment_type": false,
+            "use_only_first_temp": true,
+            "first_temp_output_col": "temp",
+            "drop_cols": ["mass_catalyst_g", "temps"]
+        },
+        "co2_tpd_peaks": {
+            "base_filter": {},
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": ["ramp_rate_C_min"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_time"],
+            "min_temps": 1,
+            "remove_ambiguous_pretreatment_type": false,
+            "numerical_pretreatment_type": false,
+            "use_only_first_temp": true,
+            "first_temp_output_col": "temp",
+            "drop_cols": ["mass_catalyst_g", "temps"]
+        },
+        "osc": {
+            "base_filter": {},
+            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw"],
+            "default_to_zero_cols": ["h2_vol%", "co_vol%", "o2_vol%"],
+            "allowed_experiment_classes": ["a", "b", "c", "d"],
+            "tag_dynamic": true,
+            "dynamic_or_total_tag_name": "is_dynamic_capacity"
+        },
+        "x_cols_minus_T_and_elements": ["Sbet", "crystallite_size_nm", "single_phase_binary", "calcination_temp", "calcination_time", "pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h", "gas_co_content", "gas_o2_content", "flow_mL_h_g"]
     }
 ]

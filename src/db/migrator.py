@@ -1,17 +1,17 @@
-from db import Database
+from .database import DB
 from typing import List, Dict, Tuple
 import json, os, hashlib, shutil
 from pathlib import Path
 from bson import ObjectId
 
 class Migrator:
-    def __init__(self, database: Database, microscopy_dir="db/microscopy_images", staging_dir="db/migrations/staged_microscopy", migration_failure_dir="db/migrations/failures"):
-        self.database = database
+    def __init__(self, db: DB, microscopy_dir="db/microscopy_images", staging_dir="db/migrations/staged_microscopy", migration_failure_dir="db/migrations/failures"):
+        self.db = DB
         self.microscopy_dir = Path(microscopy_dir)
         self.staging_dir = Path(staging_dir)
         self.staged_images = set(os.listdir(self.staging_dir))
-        self.materials_coll = database.collections["materials"]
-        self.reactions_coll = database.collections["reactions"]
+        self.materials_coll = db.collections["materials"]
+        self.reactions_coll = db.collections["reactions"]
         self.failure_dir = Path(migration_failure_dir)
         self.failure_dir.mkdir(exist_ok=True)
         return

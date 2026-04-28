@@ -1,5 +1,5 @@
-from db import Database
-from .preprocessor import Preprocessor
+from ..db import DB
+from ..data.preprocessor import Preprocessor
 from pathlib import Path
 from typing import Dict, Optional, List, Tuple
 import matplotlib.pyplot as plt
@@ -11,8 +11,8 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
-class DatasetAnalyser:
-    def __init__(self, database: Optional[Database]=None, preprocessor: Optional[Preprocessor]=None):
+class DatasetOverlapAnalysis:
+    def __init__(self, database: Optional[DB]=None, preprocessor: Optional[Preprocessor]=None):
         if database and not preprocessor:
             self.database = database
             self.preprocessor = Preprocessor(self.database)
@@ -45,8 +45,11 @@ class DatasetAnalyser:
         feature_cols: List[str] = [],
         only_pca_reactions: bool = True
     ) -> None:
-        if output_path.isinstance(str):
+        if output_path is None:
+            output_path = None
+        elif isinstance(output_path, str):
             output_path = Path(output_path)
+            output_path.mkdir(parents=True, exist_ok=True)
         
         self.element_frequencies_in_dataset_bar(
             merged_dataframes,
@@ -282,7 +285,8 @@ class DatasetAnalyser:
         if save_path is None:
             venny4py(sets=sets)
         else:
-            venny4py(sets=sets, out=save_path / "overlap_venn")
+            venny4py(sets=sets, out=save_path)
+            plt.close()
                 
     def pca_overlap(
         self,
@@ -359,6 +363,8 @@ class DatasetAnalyser:
 
         def transform_dataset(name: str):
             df = merged_dataframes[name]
+            if df.empty:
+                return None
             X, _ = prepare_features(df, feature_cols, fill_values=fill_values)
             scaled = scaler.transform(X)
             return pca.transform(scaled)
@@ -381,13 +387,17 @@ class DatasetAnalyser:
 
         dataset_keys = [
             k for k in preferred_order
-            if k in merged_dataframes and k != reference_name
+            if k in merged_dataframes and k != reference_name and not merged_dataframes[k].empty
         ]
 
         if not dataset_keys:
             return scaler, pca
 
-        transformed = {k: transform_dataset(k) for k in dataset_keys}
+        transformed = {
+            k: v
+            for k in dataset_keys
+            if (v := transform_dataset(k)) is not None
+        }
 
         # If PCA is fit on all_materials, it is useful to also plot reactions if present
         reactions_pca = None

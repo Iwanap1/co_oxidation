@@ -1,7 +1,6 @@
 from .preprocessor import Preprocessor
-from .metals import Metal
-from .dataset_analyser import DatasetAnalyser
-from src.constants import ELEMENTS
+from .metals import Metal, METALS
+from ..visualisation.dataset_analyser import DatasetOverlapAnalysis
 from typing import Dict, Optional, Tuple, List, Any, Literal, Union
 import pandas as pd
 from pathlib import Path
@@ -22,7 +21,7 @@ class Data:
         data_config_name: Optional[str]=None, 
         row_by_datapoint: bool=False,
         split_method: SplitMethod="Random_by_Material", 
-        split_value: Optional[Union[Metal, int, float]]=None,
+        split_value: Union[Metal, int, float]=0.2,
         save_results: bool=True,
         data_outdir: Optional[Union[str, Path]]=None,
         train_outdir: Optional[Union[str, Path]]=None,
@@ -32,7 +31,7 @@ class Data:
             raise ValueError("split_method 'Random_by_Point' requires row_by_datapoint=True to be set in the config.")
         self.preprocessor = preprocessor
         self.config = data_config
-        self.config_name = data_config_name
+        self.config_name = data_config_name or self.config.get("name", None)
         self.save_results = save_results
         self.split_method = split_method
         self.split_value = split_value
@@ -42,15 +41,18 @@ class Data:
         elif self.config_name and self.save_results:
             self.save_dir = Path(f"data_analysis/{self.config_name}")
             self.save_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            self.save_dir = None
+        print(self.save_dir)
 
         self.full_dataframes, stats = self.prepare_merged_dataframes_from_config(row_by_datapoint=row_by_datapoint)
         self.X_cols = self.resolve_x_cols(stats, row_by_datapoint)
         self.analyse_dataset() if analyse_data else None
-        
-        train_reactions, test_reactions = self.resolve_split(split_method, split_value)
+
+        train_reactions, test_reactions = self.resolve_split()
 
         self.scaled_train, self.scaled_test, self.scaler = self.scale_and_transform(
-            x_cols=self.config["training"]["x_cols"],
+            x_cols=self.X_cols,
             train_df=train_reactions,
             test_df=test_reactions,
             outdir=self.train_outdir,
@@ -73,8 +75,11 @@ class Data:
         niche_element_stats = {}
         results = {"all_materials": materials_df}
         final_counts = {}
+
         if self.config_name and self.save_results:
-            materials_df.to_csv(self.save_dir / "all_materials.csv", index=False)
+            data_dir = self.save_dir / "data"
+            data_dir.mkdir(parents=True, exist_ok=True) if self.save_dir else None
+            materials_df.to_csv(data_dir / "all_materials.csv", index=False)
 
         min_app = override_min_appearances if override_min_appearances is not None else self.config["material"]["element_min_appearances"]
         min_pap = override_min_papers if override_min_papers is not None else self.config["material"]["element_min_papers"]
@@ -94,7 +99,7 @@ class Data:
 
             final_counts[key] = len(results[key])
             if self.config_name and self.save_results:
-                results[key].to_csv(self.save_dir / f"{key}_merged.csv", index=False)
+                results[key].to_csv(data_dir / f"{key}_merged.csv", index=False)
 
         stats = {
             "base_preprocess": preprocessing_stats,
@@ -117,8 +122,13 @@ class Data:
         return x_cols
 
     def analyse_dataset(self):
-        analyser = DatasetAnalyser(preprocessor=self.preprocessor)
-        analyser.full_analysis_from_merged_dataframes(self.full_dataframes, outdir=self.save_dir if self.config_name and self.save_results else None)
+        analyser = DatasetOverlapAnalysis(preprocessor=self.preprocessor)
+        analyser.full_analysis_from_merged_dataframes(
+            self.full_dataframes, 
+            output_path=self.save_dir if self.save_results else None,
+            feature_cols=self.X_cols,
+            show_figures=False
+        )
     
 
     def scale_and_transform(
@@ -183,7 +193,7 @@ class Data:
         if self.split_method == "Random_by_Material":
             train, test, split_stats = self.split_by_material(self.full_dataframes["reactions"], test_size=self.split_value, seed=42)
         elif self.split_method == "Random_by_Point":
-            train, test, split_stats = self.split_by_point(self.full_dataframes["reactions"], element=self.split_value)
+            train, test, split_stats = self.split_by_point(self.full_dataframes["reactions"], test_size=self.split_value)
         elif self.split_method == "Remove_Metal":
             if self.split_value is None or not isinstance(self.split_value, str):
                 raise ValueError("For 'Remove_Metal' split method, split_value must be a string representing the metal to remove.")
@@ -213,6 +223,8 @@ class Data:
             test.to_csv(self.train_outdir / "test_reactions.csv", index=False)
             with open(self.train_outdir / "split_stats.json", "w") as f:
                 json.dump(split_stats, f, indent=4)
+        
+        return train, test
 
 
     def split_by_point(self, merged_df: pd.DataFrame, test_size: float = 0.2, seed: Optional[int] = None) -> Tuple[pd.DataFrame, pd.DataFrame, Dict]:
