@@ -1,5 +1,5 @@
 from .preprocessor import Preprocessor
-from .metals import Metal, METALS
+from .featurise_elements import Metal, METALS
 from ..visualisation.dataset_analyser import DatasetOverlapAnalysis
 from typing import Dict, Optional, Tuple, List, Any, Literal, Union
 import pandas as pd
