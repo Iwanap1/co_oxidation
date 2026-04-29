@@ -1,5 +1,7 @@
 from ..db import DB
 from ..constants import ELEMENTS
+from .element_attributes import Metal, Supported_Attributes, DEFAULT_OVERRIDES
+from .prep_training_data import DopantFeaturiser
 import pandas as pd
 from typing import Tuple, Dict, List, Optional, Any
 from sklearn.preprocessing import StandardScaler
@@ -11,8 +13,9 @@ import torch
 
 
 class Preprocessor:
-    def __init__(self, database: DB):
+    def __init__(self, database: DB, element_feature_map: Optional[Dict[Metal, Dict[Supported_Attributes, float]]]=None):
         self.database = database
+        self.feature_map = element_feature_map
 
     def get_base_dataframes(
         self,
@@ -1971,3 +1974,33 @@ class Preprocessor:
         }
 
         return merged_df, stats
+
+    def convert_metals_to_dopant_features(
+        self, 
+        df: pd.DataFrame,
+        config: Optional[Dict]=None
+    ) -> pd.DataFrame:
+        
+        if not config["material"].get("convert_features", False):
+            return df
+        
+        required_keys = ["max_dopants", "element_attributes"]
+        for key in required_keys:
+            if key not in config["material"]:
+                raise ValueError(f"'material' dict in data config must contain these keys if 'convert_features' is True: {required_keys}")
+
+        if self.feature_map is not None:
+            dopant_processor = DopantFeaturiser(
+                n_allowed_dopants=config["material"]["max_dopants"], 
+                desired_features=config["material"]["element_attributes"], 
+                overrides=config["material"].get("overrides", DEFAULT_OVERRIDES),
+                feature_map=self.feature_map
+            )
+        else:
+            dopant_processor = DopantFeaturiser(
+                n_allowed_dopants=config["material"]["max_dopants"], 
+                desired_features=config["material"]["element_attributes"], 
+                overrides=config["material"].get("overrides", DEFAULT_OVERRIDES)
+            )
+        
+        return dopant_processor.convert_features(df, leave_ce=config["material"].get("leave_ce", True), include_n_dopants=config["material"].get("include_n_dopants", True))

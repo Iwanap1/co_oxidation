@@ -1,5 +1,5 @@
 from .preprocessor import Preprocessor
-from .featurise_elements import Metal, METALS
+from .featurise_elements import Metal, Supported_Attributes
 from ..visualisation.dataset_analyser import DatasetOverlapAnalysis
 from typing import Dict, Optional, Tuple, List, Any, Literal, Union
 import pandas as pd
@@ -8,6 +8,7 @@ import json
 import pickle
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from .featurise_elements import DopantFeaturiser
 import torch
 import numpy as np
 
@@ -47,6 +48,7 @@ class Data:
 
         self.full_dataframes, stats = self.prepare_merged_dataframes_from_config(row_by_datapoint=row_by_datapoint)
         self.X_cols = self.resolve_x_cols(stats, row_by_datapoint)
+        self.reactions_df = self.full_dataframes["reactions"][self.X_cols + ["conversion"]].dropna()
         self.analyse_dataset() if analyse_data else None
 
         train_reactions, test_reactions = self.resolve_split()
@@ -66,6 +68,7 @@ class Data:
         preprocessed = {}
         preprocessing_stats = {}
         materials_df, preprocessing_stats["materials"] = self.preprocessor.preprocess_materials(base_dfs["materials"],config=self.config)
+
         preprocessed["reactions"], preprocessing_stats["reactions"] = self.preprocessor.preprocess_reactions(base_dfs["reactions"],config=self.config)
         preprocessed["h2_tpr"], preprocessing_stats["h2_tpr"] = self.preprocessor.preprocess_h2_tpr_peaks(base_dfs["h2_tpr_peaks"],config=self.config)
         preprocessed["o2_tpd"], preprocessing_stats["o2_tpd"] = self.preprocessor.preprocess_tpd_peaks(base_dfs["o2_tpd_peaks"],config=self.config,config_section="o2_tpd_peaks")
@@ -93,6 +96,7 @@ class Data:
                 doi_col = "doi_x"
 
             results[key], niche_element_stats[key] = self.preprocessor.filter_niche_elements(merged, min_appearances=min_app, min_papers=min_pap, doi_col=doi_col)
+            results[key] = self.preprocessor.convert_metals_to_dopant_features(merged, self.config)
 
             if row_by_datapoint and key == "reactions":
                 results[key] = self.preprocessor.row_by_temperature(results[key])

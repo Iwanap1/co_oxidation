@@ -1,5 +1,5 @@
 from .element_attributes import METALS, Supported_Attributes, Metal, DEFAULT_ATTRIBUTES, CUSTOM_FUNCS, FLOAT_ATTRIBUTES, METHOD_ATTRIBUTES, NON_FLOAT_VARIABLES, DEFAULT_OVERRIDES
-from typing import List, Dict
+from typing import List, Dict, Optional
 import pandas as pd
 from mendeleev import element
 from mendeleev.models import Element
@@ -11,13 +11,18 @@ class DopantFeaturiser:
         metals: List[Metal]=METALS, 
         n_allowed_dopants: int=2, 
         desired_features: List[Supported_Attributes]=DEFAULT_ATTRIBUTES,
-        overrides: Dict[Metal, Dict[str, float]]=DEFAULT_OVERRIDES
+        overrides: Dict[Metal, Dict[str, float]]=DEFAULT_OVERRIDES,
+        feature_map: Optional[Dict[Metal, Dict[Supported_Attributes, float]]]=None
     ) -> None:
+        
         self.metals = metals
         self.n_allowed_dopants = n_allowed_dopants
         self.desired_features = desired_features
         self.overrides = overrides
-        self.feature_map = self.get_feature_map()
+        if not feature_map:
+            self.feature_map = self.get_feature_map()
+        else:
+            self.feature_map = feature_map
 
     
     def convert_features(self, df: pd.DataFrame, leave_ce: bool = True, include_n_dopants: bool=True) -> pd.DataFrame:
