@@ -2101,10 +2101,10 @@
         }
     },
     "final_counts": {
-        "reactions": 239,
-        "h2_tpr": 86,
-        "o2_tpd": 3,
-        "co2_tpd": 0,
-        "osc": 154
+        "reactions": 265,
+        "h2_tpr": 140,
+        "o2_tpd": 21,
+        "co2_tpd": 6,
+        "osc": 202
     }
 }

@@ -1,7 +1,7 @@
 from ..db import DB
 from ..constants import ELEMENTS
 from .element_attributes import Metal, Supported_Attributes, DEFAULT_OVERRIDES
-from .prep_training_data import DopantFeaturiser
+from .featurise_elements import DopantFeaturiser
 import pandas as pd
 from typing import Tuple, Dict, List, Optional, Any
 from sklearn.preprocessing import StandardScaler

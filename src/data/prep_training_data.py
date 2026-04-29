@@ -1,5 +1,5 @@
 from .preprocessor import Preprocessor
-from .featurise_elements import Metal, Supported_Attributes
+from .featurise_elements import Metal
 from ..visualisation.dataset_analyser import DatasetOverlapAnalysis
 from typing import Dict, Optional, Tuple, List, Any, Literal, Union
 import pandas as pd
@@ -8,7 +8,6 @@ import json
 import pickle
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from .featurise_elements import DopantFeaturiser
 import torch
 import numpy as np
 
@@ -119,10 +118,23 @@ class Data:
     
     def resolve_x_cols(self, stats: Dict, row_by_datapoint: bool) -> List[str]:
         base_set = self.config["x_cols_minus_T_and_elements"]
-        element_set = stats["niche_elements_filter"]["reactions"]["kept_elements"]
-        x_cols = base_set + element_set
+
+        reaction_df = self.full_dataframes["reactions"]
+
+        dopant_feature_cols = [
+            c for c in reaction_df.columns
+            if c.startswith("dopant_") or c == "n_dopants"
+        ]
+
+        x_cols = base_set + dopant_feature_cols
+
         if row_by_datapoint:
             x_cols.append("temperature")
+
+        missing = [c for c in x_cols if c not in reaction_df.columns]
+        if missing:
+            raise KeyError(f"Resolved x_cols missing from reactions dataframe: {missing}")
+
         return x_cols
 
     def analyse_dataset(self):
