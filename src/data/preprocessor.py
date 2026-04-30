@@ -26,10 +26,10 @@ class Preprocessor:
         
         if config is not None:
             mat_filter = config["material"].get("base_filter", {})
-            rxn_filter = config.get("reaction", {}).get("base_filter", None)
-            tpr_filter = config.get("h2_tpr_peaks", {}).get("base_filter", None)
-            otpd_filter = config.get("o2_tpd_peaks", {}).get("base_filter", None)
-            cotpd_filter = config.get("co2_tpd_peaks", {}).get("base_filter", None)
+            rxn_filter = config.get("reactions", {}).get("base_filter", None)
+            tpr_filter = config.get("h2_tpr", {}).get("base_filter", None)
+            otpd_filter = config.get("o2_tpd", {}).get("base_filter", None)
+            cotpd_filter = config.get("co2_tpd", {}).get("base_filter", None)
             osc_filter = config.get("osc", {}).get("base_filter", None)
             return {
                 "materials": pd.DataFrame(list(self.database.collections["materials"].find(mat_filter))),
@@ -484,7 +484,7 @@ class Preprocessor:
         
         resolved = self._resolve_from_config(
             config,
-            "reaction",
+            "reactions",
             oxygen_content_in_air=oxygen_content_in_air,
             convert_ghsv_to_whsv_with_assumed_density=convert_ghsv_to_whsv_with_assumed_density,
             default_to_mean_cols=default_to_mean_cols,
@@ -724,17 +724,7 @@ class Preprocessor:
         section: str,
         **kwargs,
     ) -> Dict:
-        """
-        Resolve preprocessor kwargs from config[section], while letting any explicit
-        non-None kwargs override the config.
 
-        Example:
-            resolved = self._resolve_from_config(
-                config, "reaction",
-                oxygen_content_in_air=oxygen_content_in_air,
-                default_to_mean_cols=default_to_mean_cols,
-            )
-        """
         section_cfg = {}
         if config is not None:
             section_cfg = config.get(section, {})
@@ -1050,7 +1040,7 @@ class Preprocessor:
 
         resolved = self._resolve_from_config(
             config,
-            "h2_tpr_peaks",
+            "h2_tpr",
             default_to_mean_cols=default_to_mean_cols,
             default_to_zero_cols=default_to_zero_cols,
             cannot_be_zero_or_none=cannot_be_zero_or_none,
@@ -1976,31 +1966,38 @@ class Preprocessor:
         return merged_df, stats
 
     def convert_metals_to_dopant_features(
-        self, 
+        self,
         df: pd.DataFrame,
-        config: Optional[Dict]=None
+        config: Optional[Dict] = None,
+        config_section: str = "material",
     ) -> pd.DataFrame:
-        
+
         if not config["material"].get("convert_features", False):
             return df
-        
-        required_keys = ["max_dopants", "element_attributes"]
-        for key in required_keys:
-            if key not in config["material"]:
-                raise ValueError(f"'material' dict in data config must contain these keys if 'convert_features' is True: {required_keys}")
 
-        if self.feature_map is not None:
-            dopant_processor = DopantFeaturiser(
-                n_allowed_dopants=config["material"]["max_dopants"], 
-                desired_features=config["material"]["element_attributes"], 
-                overrides=config["material"].get("overrides", DEFAULT_OVERRIDES),
-                feature_map=self.feature_map
+        section_cfg = config.get(config_section, {})
+        material_cfg = config["material"]
+
+        element_attributes = section_cfg.get(
+            "element_attributes",
+            material_cfg.get("element_attributes", None)
+        )
+
+        if element_attributes is None:
+            raise ValueError(
+                f"Need element_attributes in config['{config_section}'] "
+                "or config['material'] when convert_features=True."
             )
-        else:
-            dopant_processor = DopantFeaturiser(
-                n_allowed_dopants=config["material"]["max_dopants"], 
-                desired_features=config["material"]["element_attributes"], 
-                overrides=config["material"].get("overrides", DEFAULT_OVERRIDES)
-            )
-        
-        return dopant_processor.convert_features(df, leave_ce=config["material"].get("leave_ce", True), include_n_dopants=config["material"].get("include_n_dopants", True))
+
+        dopant_processor = DopantFeaturiser(
+            n_allowed_dopants=material_cfg["max_dopants"],
+            desired_features=element_attributes,
+            overrides=material_cfg.get("overrides", DEFAULT_OVERRIDES),
+            feature_map=self.feature_map,
+        )
+
+        return dopant_processor.convert_features(
+            df,
+            leave_ce=material_cfg.get("leave_ce", True),
+            include_n_dopants=material_cfg.get("include_n_dopants", True),
+        )
