@@ -1,0 +1,115 @@
+{
+    "standard_mlp": {
+        "conversion_net": {
+            "hidden_dim": [32, 32],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "osc_net": null,
+        "tpr_net": null,
+        "hybridise_whsv": false,
+        "hybridise_pressures": false
+    },
+    "hybridised_whsv": {
+        "conversion_net": {
+            "hidden_dim": [32, 32],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "osc_net": null,
+        "tpr_net": null,
+        "hybridise_whsv": true,
+        "hybridise_pressures": false
+    },
+    "hybridised_whsv_and_pressure": {
+        "conversion_net": {
+            "hidden_dim": [32, 32],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "osc_net": null,
+        "tpr_net": null,
+        "hybridise_whsv": true,
+        "hybridise_pressures": true
+    },
+    "cont_learn_standard_mlp": {
+        "conversion_net": {
+            "hidden_dim": [],
+            "output_dim": 1,
+            "activation": null,
+            "include_material_features": false
+        },
+        "osc_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "tpr_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "hybridise_whsv": false,
+        "hybridise_pressures": false
+    },
+    "cont_learn_hybridised_whsv": {
+        "conversion_net": {
+            "hidden_dim": [],
+            "output_dim": 1,
+            "activation": null,
+            "include_material_features": false
+        },
+        "osc_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "tpr_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "hybridise_whsv": true,
+        "hybridise_pressures": false
+    },
+    "cont_learn_hybridised_whsv_and_pressure": {
+        "conversion_net": {
+            "hidden_dim": [],
+            "output_dim": 1,
+            "activation": null,
+            "include_material_features": false
+        },
+        "osc_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "tpr_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "hybridise_whsv": true,
+        "hybridise_pressures": true
+    },
+    "cont_learn_hybridised_whsv_and_pressure_incl_mat_feats_for_conv_net": {
+        "conversion_net": {
+            "hidden_dim": [],
+            "output_dim": 1,
+            "activation": null,
+            "include_material_features": true
+        },
+        "osc_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "tpr_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU"
+        },
+        "hybridise_whsv": true,
+        "hybridise_pressures": true
+    }
+}

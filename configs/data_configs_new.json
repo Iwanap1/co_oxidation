@@ -1,0 +1,99 @@
+[
+    {
+        "name": "base_single_phase_only",
+        "material": {
+            "base_filter": {"phase_flag": "single"},
+            "default_to_mean_cols": ["calcination_time"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"],
+            "cannot_be_zero_or_none": ["Sbet", "calcination_temp"],
+            "allow_supported_samples": false,
+            "add_synthesis_flags": false,
+            "minimum_Ce_content": 0.5,
+            "convert_phase_flag_to_binary": false,
+            "element_min_appearances": 8,
+            "element_min_papers": 3,
+            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"]
+        },
+        "reaction": {
+            "base_filter": {},
+            "oxygen_content_in_air": 0.2,
+            "convert_ghsv_to_whsv_with_assumed_density": null,
+            "default_to_mean_cols": [],
+            "cannot_be_zero_or_none": ["gas_co_content", "gas_o2_content", "flow_mL_h_g"],
+            "must_be_zero_or_none": ["gas_h2o_content", "gas_co2_content"],
+            "minimum_number_datapoints": 3,
+            "feature_cols_minus_conversion_temp": ["gas_co_content", "gas_o2_content", "flow_mL_h_g"]
+        },
+        "h2_tpr_peaks": {
+            "base_filter": {},
+            "cannot_be_none": ["pretreatment_oxidising"],
+            "cannot_be_zero_or_none": ["ramp_rate_C_min"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_time"],
+            "min_temps": 1,
+            "use_only_first_temp": true,
+            "first_temp_output_col": "temp",
+            "drop_cols": ["mass_catalyst_g", "temps"],
+            "feature_cols": ["ramp_rate_C_min"]
+        },
+        "osc": {
+            "base_filter": {},
+            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw"],
+            "default_to_zero_cols": ["h2_vol%", "co_vol%", "o2_vol%"],
+            "allowed_experiment_classes": ["c"],
+            "tag_dynamic": true,
+            "dynamic_or_total_tag_name": "is_dynamic_capacity",
+            "feature_cols": ["ramp_rate_C_min"]
+        }
+    },
+    {
+        "name": "base_converted_features",
+        "material": {
+            "base_filter": {"phase_flag": "single"},
+            "default_to_mean_cols": ["calcination_time"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"],
+            "cannot_be_zero_or_none": ["Sbet", "calcination_temp"],
+            "allow_supported_samples": false,
+            "add_synthesis_flags": false,
+            "minimum_Ce_content": 0.5,
+            "convert_phase_flag_to_binary": false,
+            "element_min_appearances": 1,
+            "element_min_papers": 1,
+            "convert_features": true,
+            "max_dopants": 3,
+            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"]
+        },
+        "reaction": {
+            "base_filter": {},
+            "oxygen_content_in_air": 0.2,
+            "convert_ghsv_to_whsv_with_assumed_density": null,
+            "default_to_mean_cols": [],
+            "cannot_be_zero_or_none": ["gas_co_content", "gas_o2_content", "flow_mL_h_g"],
+            "must_be_zero_or_none": ["gas_h2o_content", "gas_co2_content"],
+            "minimum_number_datapoints": 3,
+            "element_attributes": ["atomic_radius", "electronegativity_pauling", "protons", "oxidation_states_one_hot", "first_ionisation_energy"],
+            "feature_cols_minus_conversion_temp": ["gas_co_content", "gas_o2_content", "flow_mL_h_g"]
+        },
+        "h2_tpr_peaks": {
+            "base_filter": {},
+            "cannot_be_none": ["pretreatment_oxidising"],
+            "cannot_be_zero_or_none": ["ramp_rate_C_min"],
+            "default_to_zero_cols": ["pretreatment_temp", "pretreatment_time"],
+            "min_temps": 1,
+            "use_only_first_temp": true,
+            "first_temp_output_col": "temp",
+            "drop_cols": ["mass_catalyst_g", "temps"],
+            "element_attributes": ["atomic_radius", "electronegativity_pauling", "protons", "oxidation_states_one_hot", "first_ionisation_energy"],
+            "feature_cols": ["ramp_rate_C_min"]
+        },
+        "osc": {
+            "base_filter": {},
+            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw"],
+            "default_to_zero_cols": ["h2_vol%", "co_vol%", "o2_vol%"],
+            "allowed_experiment_classes": ["a", "b", "c", "d"],
+            "tag_dynamic": true,
+            "dynamic_or_total_tag_name": "is_dynamic_capacity",
+            "element_attributes": ["atomic_radius", "electronegativity_pauling", "protons", "oxidation_states_one_hot", "first_ionisation_energy"],
+            "feature_cols": ["ramp_rate_C_min"]
+        }
+    }
+]

@@ -8,7 +8,7 @@ import json
 import pickle
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-import torch
+from torch.utils.data import TensorDataset
 import numpy as np
 
 SplitMethod = Literal["Random_by_Material", "Random_by_Point", "Remove_Metal", "Above_WHSV_Threshold"]
@@ -62,7 +62,6 @@ class Data:
     
 
     def prepare_merged_dataframes_from_config(self, row_by_datapoint: bool=False, override_min_appearances: Optional[int]=None, override_min_papers: Optional[int]=None) -> Tuple[Dict[str, pd.DataFrame], Dict]:
-
         base_dfs = self.preprocessor.get_base_dataframes(self.config)
         preprocessed = {}
         preprocessing_stats = {}
@@ -174,35 +173,6 @@ class Data:
                 test_df.to_csv(outdir / "test_df_scaled.csv", index=False)
 
         return train_df, test_df, scaler
-    
-
-    def convert_to_tensors(
-        self,
-        scaled_df: pd.DataFrame,
-        x_cols: List[str],
-        y_cols: List[str]
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-
-        missing_x = [col for col in x_cols if col not in scaled_df.columns]
-        missing_y = [col for col in y_cols if col not in scaled_df.columns]
-
-        if missing_x:
-            raise KeyError(f"Missing x_cols in dataframe: {missing_x}")
-        if missing_y:
-            raise KeyError(f"Missing y_cols in dataframe: {missing_y}")
-
-        X = torch.tensor(
-            scaled_df[x_cols].to_numpy(dtype="float32", copy=True),
-            dtype=torch.float32
-        )
-
-        y_arr = scaled_df[y_cols].to_numpy(dtype="float32", copy=True)
-        if len(y_cols) == 1:
-            y_arr = y_arr[:, 0]
-
-        y = torch.tensor(y_arr, dtype=torch.float32)
-
-        return X, y
 
 
     def resolve_split(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -283,3 +253,6 @@ class Data:
         return train_df_split, test_df_split, split_details
     
 
+    def prepare_datasets(self, model_config):
+        """prepares datasets specific to the model, i.e. WHSV hybridisation model wants the flow_mL_h_g seperate from other features"""
+        return NotImplemented
