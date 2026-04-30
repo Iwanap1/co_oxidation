@@ -4,13 +4,13 @@ from ..visualisation.dataset_analyser import DatasetOverlapAnalysis
 from typing import Dict, Optional, Tuple, List, Any, Literal, Union
 import pandas as pd
 from pathlib import Path
-import json
-import pickle
+import json, pickle
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from torch.utils.data import TensorDataset
 import numpy as np
 import warnings
+import torch
 
 SplitMethod = Literal["Random_by_Material", "Random_by_Point", "Remove_Metal", "Above_WHSV_Threshold"]
 
@@ -69,12 +69,12 @@ class Data:
 
         self.feature_cols = self.resolve_feature_cols(row_by_datapoint)
 
-        self.full_dataframes = self.drop_missing_feature_rows(self.full_dataframes, self.feature_cols)
-        self.clean_dataframes = self.select_model_columns(self.full_dataframes, self.feature_cols)
+        self.full_dataframes = self._drop_missing_feature_rows(self.full_dataframes, self.feature_cols)
+        self.clean_dataframes = self._select_model_columns(self.full_dataframes, self.feature_cols)
 
         self.analyse_dataset() if analyse_data else None
 
-        self.train_dataframes, self.test_dataframes = self.resolve_split_all()
+        self.train_dataframes, self.test_dataframes = self._resolve_split_all()
 
         self.scaled_train_dfs, self.scaled_test_dfs, self.scalers = self.scale_and_transform(
             train_dfs=self.train_dataframes,
@@ -257,8 +257,8 @@ class Data:
 
         return scaled_train, scaled_test, scalers
 
-    def resolve_split_all(self) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
-        train_reactions, test_reactions = self.resolve_split()
+    def _resolve_split_all(self) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
+        train_reactions, test_reactions = self._resolve_split()
 
         material_col = "_id_material"
 
@@ -268,7 +268,7 @@ class Data:
         train_dfs = {"reactions": train_reactions.reset_index(drop=True)}
         test_dfs = {"reactions": test_reactions.reset_index(drop=True)}
 
-        for name, df in self.full_dataframes.items():
+        for name, df in self.clean_dataframes.items():
             if name in ["all_materials", "reactions"]:
                 continue
 
@@ -280,11 +280,11 @@ class Data:
 
         return train_dfs, test_dfs
 
-    def resolve_split(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def _resolve_split(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         if self.split_method == "Random_by_Material":
-            train, test, split_stats = self.split_by_material(self.full_dataframes["reactions"], test_size=self.split_value, seed=42)
+            train, test, split_stats = self._split_by_material(self.full_dataframes["reactions"], test_size=self.split_value, seed=42)
         elif self.split_method == "Random_by_Point":
-            train, test, split_stats = self.split_by_point(self.full_dataframes["reactions"], test_size=self.split_value)
+            train, test, split_stats = self._split_by_point(self.full_dataframes["reactions"], test_size=self.split_value)
         elif self.split_method == "Remove_Metal":
             if self.split_value is None or not isinstance(self.split_value, str):
                 raise ValueError("For 'Remove_Metal' split method, split_value must be a string representing the metal to remove.")
@@ -317,14 +317,14 @@ class Data:
         
         return train, test
 
-    def split_by_point(self, merged_df: pd.DataFrame, test_size: float = 0.2, seed: Optional[int] = None) -> Tuple[pd.DataFrame, pd.DataFrame, Dict]:
+    def _split_by_point(self, merged_df: pd.DataFrame, test_size: float = 0.2, seed: Optional[int] = None) -> Tuple[pd.DataFrame, pd.DataFrame, Dict]:
         split_details = {"seed": seed, "test_fraction": test_size}
         train_df_split, test_df_split = train_test_split(merged_df, test_size=test_size, random_state=seed)
         split_details["n_reactions_train"] = len(train_df_split)
         split_details["n_reactions_test"] = len(test_df_split)
         return train_df_split.reset_index(drop=True), test_df_split.reset_index(drop=True), split_details
 
-    def split_by_material(
+    def _split_by_material(
         self,
         merged_df: pd.DataFrame,
         test_size: float = 0.2,
@@ -355,7 +355,7 @@ class Data:
 
         return train_df_split, test_df_split, split_details
     
-    def drop_missing_feature_rows(
+    def _drop_missing_feature_rows(
         self,
         dfs: Dict[str, pd.DataFrame],
         feature_cols: Dict[str, List[str]],
@@ -391,7 +391,7 @@ class Data:
 
         return cleaned
 
-    def select_model_columns(
+    def _select_model_columns(
         self,
         dfs: Dict[str, pd.DataFrame],
         feature_cols: Dict[str, List[str]],
@@ -421,7 +421,172 @@ class Data:
 
         return selected
 
-    def prepare_datasets(self, model_config):
-        """prepares datasets specific to the model, i.e. WHSV hybridisation model wants the flow_mL_h_g seperate from other features"""
-        return NotImplemented
+    def prepare_datasets(self, model_config: Dict) -> Dict[str, Dict[str, Any]]:
+        """
+        Create model-config-specific TensorDatasets.
+
+        Returns:
+            {
+                "train": {
+                    "reactions": {
+                        "dataset": TensorDataset(...),
+                        "tensor_names": [...],
+                        "feature_names": {...},
+                        "n": ...
+                    },
+                    "h2_tpr": {...},
+                    "osc": {...},
+                },
+                "test": {...}
+            }
+
+        For reactions, possible tensors are:
+            - conversion_features
+            - whsv
+            - p_co
+            - p_o2
+            - target
+
+        For h2_tpr:
+            - tpr_features
+            - target
+
+        For osc:
+            - osc_features
+            - target
+        """
+
+        prepared = {"train": {}, "test": {}}
+
+        conversion_cols = self._resolve_conversion_input_cols(model_config)
+
+        for split_name, dfs in [
+            ("train", self.scaled_train_dfs),
+            ("test", self.scaled_test_dfs),
+        ]:
+            rxn_df = dfs["reactions"]
+
+            reaction_tensor_cols = {
+                "conversion_features": conversion_cols,
+            }
+
+            if model_config.get("hybridise_whsv", False):
+                if "flow_mL_h_g" not in rxn_df.columns:
+                    raise KeyError("hybridise_whsv=True but 'flow_mL_h_g' is missing.")
+                reaction_tensor_cols["whsv"] = ["flow_mL_h_g"]
+
+            if model_config.get("hybridise_pressures", False):
+                missing = [
+                    c for c in ["gas_co_content", "gas_o2_content"]
+                    if c not in rxn_df.columns
+                ]
+                if missing:
+                    raise KeyError(
+                        f"hybridise_pressures=True but pressure columns are missing: {missing}"
+                    )
+
+                reaction_tensor_cols["p_co"] = ["gas_co_content"]
+                reaction_tensor_cols["p_o2"] = ["gas_o2_content"]
+
+            reaction_targets = self.target_cols["reactions"]
+            reaction_tensor_cols["target"] = reaction_targets
+
+            prepared[split_name]["reactions"] = self._make_named_tensor_dataset(
+                rxn_df,
+                reaction_tensor_cols,
+            )
+            if model_config.get("tpr_net") is not None:
+                if "h2_tpr" not in dfs:
+                    raise KeyError("model_config contains tpr_net but no h2_tpr dataframe exists.")
+
+                tpr_df = dfs["h2_tpr"]
+
+                prepared[split_name]["h2_tpr"] = self._make_named_tensor_dataset(
+                    tpr_df,
+                    {
+                        "tpr_features": self.feature_cols["h2_tpr"],
+                        "target": self.target_cols["h2_tpr"],
+                    },
+                )
+            if model_config.get("osc_net") is not None:
+                if "osc" not in dfs:
+                    raise KeyError("model_config contains osc_net but no osc dataframe exists.")
+
+                osc_df = dfs["osc"]
+
+                prepared[split_name]["osc"] = self._make_named_tensor_dataset(
+                    osc_df,
+                    {
+                        "osc_features": self.feature_cols["osc"],
+                        "target": self.target_cols["osc"],
+                    },
+                )
+
+        return prepared
     
+    def _to_tensor(self, df: pd.DataFrame, cols: List[str], device: str) -> torch.Tensor:
+        if len(cols) == 0:
+            return torch.empty((len(df), 0), dtype=torch.float32)
+        return torch.tensor(
+            df[cols].to_numpy(dtype=np.float32),
+            dtype=torch.float32,
+            device=device
+        )
+    
+    def _resolve_conversion_input_cols(self, model_config: Dict) -> List[str]:
+        conv_cfg = model_config.get("conversion_net", {})
+
+        include_material_features = conv_cfg.get("include_material_features", True)
+
+        if not include_material_features:
+            cols = []
+        else:
+            included_features = conv_cfg.get("included_features", "all")
+
+            if included_features == "all":
+                cols = list(self.feature_cols["reactions"])
+            elif isinstance(included_features, list):
+                allowed = set(self.feature_cols["reactions"])
+                missing = [c for c in included_features if c not in allowed]
+                if missing:
+                    raise KeyError(
+                        f"conversion_net.included_features contains columns not in "
+                        f"reaction feature columns: {missing}"
+                    )
+                cols = list(included_features)
+            else:
+                raise ValueError(
+                    "conversion_net.included_features must be either 'all' or a list of columns"
+                )
+
+        if model_config.get("hybridise_whsv", False):
+            cols = [c for c in cols if c != "flow_mL_h_g"]
+
+        if model_config.get("hybridise_pressures", False):
+            cols = [c for c in cols if c not in ["gas_co_content", "gas_o2_content"]]
+
+        return cols
+    
+    def _make_named_tensor_dataset(
+        self,
+        df: pd.DataFrame,
+        tensor_cols: Dict[str, List[str]],
+    ) -> Dict[str, Any]:
+
+        tensors = []
+        tensor_names = []
+        feature_names = {}
+
+        for name, cols in tensor_cols.items():
+            tensor_names.append(name)
+            feature_names[name] = cols
+            tensors.append(self._to_tensor(df, cols))
+
+        dataset = TensorDataset(*tensors)
+
+        return {
+            "dataset": dataset,
+            "tensor_names": tensor_names,
+            "feature_names": feature_names,
+            "n": len(df),
+        }

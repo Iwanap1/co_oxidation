@@ -97,7 +97,8 @@
             "hidden_dim": [],
             "output_dim": 1,
             "activation": null,
-            "include_material_features": true
+            "include_material_features": true,
+            "included_features": "all"
         },
         "osc_net": {
             "hidden_dim": [16,16],
