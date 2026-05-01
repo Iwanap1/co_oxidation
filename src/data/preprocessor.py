@@ -584,9 +584,7 @@ class Preprocessor:
 
         stats["flow_mL_h_g_defaulted_from_flow_h_minus_1"] = flow_conversion_stats
 
-        # -----------------------------------------
         # Convert percentage-based quantities to fractions
-        # -----------------------------------------
         percentage_conversion_stats = {
             "gas_co_content_rows_converted": 0,
             "gas_o2_content_rows_converted": 0,
@@ -1543,8 +1541,7 @@ class Preprocessor:
                 dropped_due_to_none_only[col] = len(tpd_df)
             else:
                 dropped_due_to_none_only[col] = int(tpd_df[col].isna().sum())
------------------------
-        # Scalar required-positive checks-----------------------
+        # Scalar required-positive checks
         scalar_required_cols = [col for col in cannot_be_zero_or_none if col != "temps"]
 
         dropped_due_to_missing_values = {}
@@ -1562,7 +1559,6 @@ class Preprocessor:
             )
 
         # temps validation
-        # -------------------------
         def _is_sequence(vals):
             return isinstance(vals, (list, tuple, np.ndarray))
 
@@ -1611,9 +1607,7 @@ class Preprocessor:
 
         stats["temps_validation"] = temps_validation_stats
 
-        # -------------------------
         # Build keep mask
-        # -------------------------
         keep_mask = pd.Series(True, index=tpd_df.index)
 
         for col in cannot_be_none:
@@ -1634,9 +1628,7 @@ class Preprocessor:
 
         tpd_df = tpd_df.loc[keep_mask].copy()
 
-        # -------------------------
         # Clean / encode pretreatment gas type
-        # -------------------------
         tpd_df, pretreatment_type_stats = self._clean_and_encode_pretreatment_gas_type(
             df=tpd_df,
             remove_ambiguous_pretreatment_type=remove_ambiguous_pretreatment_type,
@@ -1644,9 +1636,7 @@ class Preprocessor:
             pretreatment_gas_type_col="pretreatment_gas_type",
         )
 
-        # -------------------------
         # Drop requested columns
-        # -------------------------
         dropped_columns_that_existed = [col for col in drop_cols if col in tpd_df.columns]
         if dropped_columns_that_existed:
             tpd_df = tpd_df.drop(columns=dropped_columns_that_existed)
@@ -1733,9 +1723,7 @@ class Preprocessor:
             "drop_cols_requested": drop_cols,
         }
 
-        # -------------------------
         # Fill columns with mean
-        # -------------------------
         number_of_values_defaulted_to_mean = {}
         for col in default_to_mean_cols:
             if col not in osc_df.columns:
@@ -1751,9 +1739,7 @@ class Preprocessor:
         stats["columns_filled_with_mean"] = default_to_mean_cols
         stats["number_of_values_defaulted_to_mean"] = number_of_values_defaulted_to_mean
 
-        # -------------------------
         # Fill columns with zero
-        # -------------------------
         number_of_values_defaulted_to_zero = {}
         for col in default_to_zero_cols:
             if col not in osc_df.columns:
@@ -1769,9 +1755,7 @@ class Preprocessor:
         stats["columns_filled_with_zero"] = default_to_zero_cols
         stats["number_of_values_defaulted_to_zero"] = number_of_values_defaulted_to_zero
 
-        # -------------------------
         # cannot_be_none validation
-        # -------------------------
         dropped_due_to_none_only = {}
         for col in cannot_be_none:
             if col not in osc_df.columns:
@@ -1779,9 +1763,7 @@ class Preprocessor:
             else:
                 dropped_due_to_none_only[col] = int(osc_df[col].isna().sum())
 
-        # -------------------------
         # cannot_be_zero_or_none validation
-        # -------------------------
         dropped_due_to_missing_values = {}
         dropped_due_to_zero_or_negative_values = {}
 
@@ -1804,9 +1786,7 @@ class Preprocessor:
                     (col_series.fillna("").astype(str).str.strip() == "").sum()
                 )
 
-        # -------------------------
         # Normalize and filter measurement_class
-        # -------------------------
         measurement_class_stats = {
             "column_present": "measurement_class" in osc_df.columns,
             "rows_missing_before_filter": 0,
@@ -1835,9 +1815,7 @@ class Preprocessor:
             allowed_mask = pd.Series(False, index=osc_df.index)
             measurement_class_stats["rows_missing_before_filter"] = len(osc_df)
 
-        # -------------------------
         # Build keep mask
-        # -------------------------
         keep_mask = pd.Series(True, index=osc_df.index)
 
         for col in cannot_be_none:
@@ -1865,11 +1843,9 @@ class Preprocessor:
             for k, v in osc_df["measurement_class"].value_counts(dropna=True).to_dict().items()
         }
 
-        # -------------------------
         # Tag dynamic vs total
         # a,c -> dynamic (1)
         # b,d -> total   (0)
-        # -------------------------
         dynamic_tag_stats = {
             "tag_created": False,
             "dynamic_classes": ["a", "c"],
@@ -1890,9 +1866,7 @@ class Preprocessor:
             dynamic_tag_stats["positive_count"] = int((osc_df[dynamic_or_total_tag_name] == 1).sum())
             dynamic_tag_stats["zero_count"] = int((osc_df[dynamic_or_total_tag_name] == 0).sum())
 
-        # -------------------------
         # Drop requested columns
-        # -------------------------
         dropped_columns_that_existed = [col for col in drop_cols if col in osc_df.columns]
         if dropped_columns_that_existed:
             osc_df = osc_df.drop(columns=dropped_columns_that_existed)
@@ -1922,9 +1896,7 @@ class Preprocessor:
         materials_df = materials_df.copy()
         char_df = char_df.copy()
 
-        # -------------------------
         # Ensure material_id exists in materials
-        # -------------------------
         if material_id_col_in_materials not in materials_df.columns:
             if "_id" in materials_df.columns:
                 materials_df[material_id_col_in_materials] = materials_df["_id"]

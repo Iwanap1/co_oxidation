@@ -131,11 +131,12 @@ After running .set_split():
         prepared = {"train": {}, "test": {}}
 
         conversion_cols = self._resolve_conversion_input_cols(model_config)
+        try:
+            dfs = [("train", self.scaled_train_dfs, self.train_dataframes),("test", self.scaled_test_dfs, self.test_dataframes)]
+        except:
+            raise ValueError("You need to run set_split_and_scale first")
 
-        for split_name, scaled_dfs, raw_dfs in [
-            ("train", self.scaled_train_dfs, self.train_dataframes),
-            ("test", self.scaled_test_dfs, self.test_dataframes),
-        ]:
+        for split_name, scaled_dfs, raw_dfs in dfs:
             # Reactions
             rxn_df = scaled_dfs["reactions"]
             raw_rxn_df = raw_dfs["reactions"]
@@ -156,9 +157,7 @@ After running .set_split():
                 missing = [c for c in pressure_cols if c not in raw_rxn_df.columns]
 
                 if missing:
-                    raise KeyError(
-                        f"hybridise_pressures=True but pressure columns are missing: {missing}"
-                    )
+                    raise KeyError(f"hybridise_pressures=True but pressure columns are missing: {missing}")
 
                 for c in pressure_cols:
                     rxn_df[c] = raw_rxn_df[c].to_numpy()
@@ -187,9 +186,7 @@ After running .set_split():
 
                 if model_config["tpr_net"].get("hybridise_ramp_rate", False):
                     if "ramp_rate_C_min" not in raw_tpr_df.columns:
-                        raise KeyError(
-                            "hybridise_ramp_rate=True but 'ramp_rate_C_min' is missing."
-                        )
+                        raise KeyError("hybridise_ramp_rate=True but 'ramp_rate_C_min' is missing.")
 
                     tpr_df["ramp_rate_C_min"] = raw_tpr_df["ramp_rate_C_min"].to_numpy()
                     tpr_tensor_cols["ramp_rate"] = ["ramp_rate_C_min"]
@@ -491,14 +488,14 @@ After running .set_split():
 
     def _resolve_split(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         if self.split_method == "Random_by_Material":
-            train, test, split_stats = self._split_by_material(self.full_dataframes["reactions"], test_size=self.split_value, seed=42)
+            train, test, split_stats = self._split_by_material(self.clean_dataframes["reactions"], test_size=self.split_value, seed=42)
         elif self.split_method == "Random_by_Point":
-            train, test, split_stats = self._split_by_point(self.full_dataframes["reactions"], test_size=self.split_value)
+            train, test, split_stats = self._split_by_point(self.clean_dataframes["reactions"], test_size=self.split_value)
         elif self.split_method == "Remove_Metal":
             if self.split_value is None or not isinstance(self.split_value, str):
                 raise ValueError("For 'Remove_Metal' split method, split_value must be a string representing the metal to remove.")
-            train = self.full_dataframes["reactions"][~self.full_dataframes["reactions"]["_id_material"].str.contains(self.split_value, case=False)].reset_index(drop=True)
-            test = self.full_dataframes["reactions"][self.full_dataframes["reactions"]["_id_material"].str.contains(self.split_value, case=False)].reset_index(drop=True)
+            train = self.clean_dataframes["reactions"][~self.clean_dataframes["reactions"]["_id_material"].str.contains(self.split_value, case=False)].reset_index(drop=True)
+            test = self.clean_dataframes["reactions"][self.clean_dataframes["reactions"]["_id_material"].str.contains(self.split_value, case=False)].reset_index(drop=True)
             split_stats = {
                 "removed_metal": self.split_value,
                 "n_reactions_removed": len(test),
@@ -507,8 +504,8 @@ After running .set_split():
         elif self.split_method == "Above_WHSV_Threshold":
             if self.split_value is None or not isinstance(self.split_value, (int, float)):
                 raise ValueError("For 'Above_WHSV_Threshold' split method, split_value must be a number representing the WHSV threshold.")
-            train = self.full_dataframes["reactions"][self.full_dataframes["reactions"]["flow_mL_h_g"] <= self.split_value].reset_index(drop=True)
-            test = self.full_dataframes["reactions"][self.full_dataframes["reactions"]["flow_mL_h_g"] > self.split_value].reset_index(drop=True)
+            train = self.clean_dataframes["reactions"][self.clean_dataframes["reactions"]["flow_mL_h_g"] <= self.split_value].reset_index(drop=True)
+            test = self.clean_dataframes["reactions"][self.clean_dataframes["reactions"]["flow_mL_h_g"] > self.split_value].reset_index(drop=True)
             split_stats = {
                 "whsv_threshold": self.split_value,
                 "n_reactions_above_threshold": len(test),
