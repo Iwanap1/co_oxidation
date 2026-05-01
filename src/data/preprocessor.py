@@ -1036,6 +1036,8 @@ class Preprocessor:
         cannot_be_none: Optional[List[str]] = None,
         min_temps: Optional[int] = None,
         drop_cols: Optional[List[str]] = None,
+        use_only_first_temp: Optional[bool] = None,
+        first_temp_output_col: Optional[str] = None,
     ) -> Tuple[pd.DataFrame, Dict]:
 
         resolved = self._resolve_from_config(
@@ -1047,6 +1049,8 @@ class Preprocessor:
             cannot_be_none=cannot_be_none,
             min_temps=min_temps,
             drop_cols=drop_cols,
+            use_only_first_temp=use_only_first_temp,
+            first_temp_output_col=first_temp_output_col,
         )
 
         default_to_mean_cols = resolved["default_to_mean_cols"]
@@ -1055,6 +1059,14 @@ class Preprocessor:
         cannot_be_none = resolved["cannot_be_none"]
         min_temps = resolved["min_temps"]
         drop_cols = resolved["drop_cols"]
+        use_only_first_temp = resolved["use_only_first_temp"]
+        first_temp_output_col = resolved["first_temp_output_col"]
+
+        if use_only_first_temp is None:
+            use_only_first_temp = False
+
+        if first_temp_output_col is None:
+            first_temp_output_col = "temp"
 
         if default_to_mean_cols is None:
             default_to_mean_cols = []
@@ -1080,10 +1092,8 @@ class Preprocessor:
             "drop_cols_requested": drop_cols,
         }
 
-        # -------------------------------------------------
         # Convert boolean-like pretreatment_oxidising to 1/0
         # only when it is being used as a required-positive field
-        # -------------------------------------------------
         boolean_conversion_stats = {
             "column_converted": False,
             "true_values_seen": 0,
@@ -1131,9 +1141,7 @@ class Preprocessor:
 
         stats["pretreatment_oxidising_conversion"] = boolean_conversion_stats
 
-        # -------------------------
         # Fill columns with mean
-        # -------------------------
         number_of_values_defaulted_to_mean = {}
         for col in default_to_mean_cols:
             if col not in h2_tpr_df.columns:
@@ -1149,9 +1157,7 @@ class Preprocessor:
         stats["columns_filled_with_mean"] = default_to_mean_cols
         stats["number_of_values_defaulted_to_mean"] = number_of_values_defaulted_to_mean
 
-        # -------------------------
         # Fill columns with zero
-        # -------------------------
         number_of_values_defaulted_to_zero = {}
         for col in default_to_zero_cols:
             if col not in h2_tpr_df.columns:
@@ -1167,9 +1173,7 @@ class Preprocessor:
         stats["columns_filled_with_zero"] = default_to_zero_cols
         stats["number_of_values_defaulted_to_zero"] = number_of_values_defaulted_to_zero
 
-        # -------------------------
         # cannot_be_none validation
-        # -------------------------
         keep_mask = pd.Series(True, index=h2_tpr_df.index)
         dropped_due_to_none_only = {}
 
@@ -1178,11 +1182,8 @@ class Preprocessor:
                 dropped_due_to_none_only[col] = len(h2_tpr_df)
             else:
                 dropped_due_to_none_only[col] = int(h2_tpr_df[col].isna().sum())
-
-        # ------------------------------------------------
         # Scalar required-positive checks
-        # Exclude list-like cols such as temps from this
-        # ------------------------------------------------
+        # Exclude list-like cols such as temps from this-----------------------
         scalar_required_cols = [col for col in cannot_be_zero_or_none if col != "temps"]
 
         dropped_due_to_missing_values = {}
@@ -1199,9 +1200,7 @@ class Preprocessor:
                 h2_tpr_df[col].notna().sum() - h2_tpr_df[col].gt(0).sum()
             )
 
-        # -------------------------
         # temps list validation
-        # -------------------------
         temps_validation_stats = {
             "temps_column_present": "temps" in h2_tpr_df.columns,
             "rows_with_missing_temps": 0,
@@ -1248,9 +1247,7 @@ class Preprocessor:
         rows_dropped_due_to_invalid_temps = int((~temps_mask).sum())
         stats["temps_validation"] = temps_validation_stats
 
-        # -------------------------
         # Build keep mask
-        # -------------------------
         for col in cannot_be_none:
             if col in h2_tpr_df.columns:
                 keep_mask &= h2_tpr_df[col].notna()
@@ -1267,10 +1264,20 @@ class Preprocessor:
             keep_mask &= temps_mask
 
         h2_tpr_df = h2_tpr_df[keep_mask].copy()
+        if use_only_first_temp:
+            if "temps" not in h2_tpr_df.columns:
+                raise KeyError("use_only_first_temp=True but 'temps' column is missing.")
 
-        # -------------------------
+            h2_tpr_df[first_temp_output_col] = h2_tpr_df["temps"].apply(
+                lambda x: x[0] if isinstance(x, (list, tuple, np.ndarray)) and len(x) > 0 else pd.NA
+            )
+
+            h2_tpr_df[first_temp_output_col] = pd.to_numeric(
+                h2_tpr_df[first_temp_output_col],
+                errors="coerce",
+            )
+
         # Drop requested columns
-        # -------------------------
         dropped_columns_that_existed = [col for col in drop_cols if col in h2_tpr_df.columns]
         if dropped_columns_that_existed:
             h2_tpr_df = h2_tpr_df.drop(columns=dropped_columns_that_existed)
@@ -1497,9 +1504,7 @@ class Preprocessor:
             "numerical_pretreatment_type": numerical_pretreatment_type,
         }
 
-        # -------------------------
         # Fill columns with mean
-        # -------------------------
         number_of_values_defaulted_to_mean = {}
         for col in default_to_mean_cols:
             if col not in tpd_df.columns:
@@ -1515,9 +1520,7 @@ class Preprocessor:
         stats["columns_filled_with_mean"] = default_to_mean_cols
         stats["number_of_values_defaulted_to_mean"] = number_of_values_defaulted_to_mean
 
-        # -------------------------
         # Fill columns with zero
-        # -------------------------
         number_of_values_defaulted_to_zero = {}
         for col in default_to_zero_cols:
             if col not in tpd_df.columns:
@@ -1533,19 +1536,15 @@ class Preprocessor:
         stats["columns_filled_with_zero"] = default_to_zero_cols
         stats["number_of_values_defaulted_to_zero"] = number_of_values_defaulted_to_zero
 
-        # -------------------------
         # cannot_be_none validation
-        # -------------------------
         dropped_due_to_none_only = {}
         for col in cannot_be_none:
             if col not in tpd_df.columns:
                 dropped_due_to_none_only[col] = len(tpd_df)
             else:
                 dropped_due_to_none_only[col] = int(tpd_df[col].isna().sum())
-
-        # ------------------------------------------------
-        # Scalar required-positive checks
-        # ------------------------------------------------
+-----------------------
+        # Scalar required-positive checks-----------------------
         scalar_required_cols = [col for col in cannot_be_zero_or_none if col != "temps"]
 
         dropped_due_to_missing_values = {}
@@ -1562,7 +1561,6 @@ class Preprocessor:
                 tpd_df[col].notna().sum() - tpd_df[col].gt(0).sum()
             )
 
-        # -------------------------
         # temps validation
         # -------------------------
         def _is_sequence(vals):
