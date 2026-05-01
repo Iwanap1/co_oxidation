@@ -7,6 +7,7 @@ import torch.optim.lr_scheduler as schedulers
 from torch.utils.data import DataLoader
 from .custom_losses import CustomLoss
 from itertools import cycle
+import pandas as pd
 import torch
 
 class Trainer:
@@ -41,7 +42,11 @@ class Trainer:
         self.history = []
 
         epochs = self.cfg.get("epochs", 100)
-
+        best_loss = float("inf")
+        self.best_epoch = None
+        best_state_dict = None
+        epochs_without_improvement = 0
+        patience = self.cfg.get("patience", None)
         for epoch in range(epochs):
             model.train()
 
@@ -74,9 +79,22 @@ class Trainer:
             }
             self.history.append(row)
 
+            eval_loss = test_metrics["total"]
+
+            improved = eval_loss < best_loss
+
+            if improved:
+                best_loss = eval_loss
+                self.best_epoch = epoch
+                epochs_without_improvement = 0
+                best_state_dict = deepcopy(model.state_dict())
+                torch.save(best_state_dict, outdir / "best_model.pt")
+            else:
+                epochs_without_improvement += 1
+
             if scheduler is not None:
                 if isinstance(scheduler, schedulers.ReduceLROnPlateau):
-                    scheduler.step(test_metrics["total"])
+                    scheduler.step(eval_loss)
                 else:
                     scheduler.step()
 
@@ -84,11 +102,19 @@ class Trainer:
                 print(
                     f"epoch {epoch:04d} "
                     f"train_total={train_metrics['total']:.6f} "
-                    f"test_total={test_metrics['total']:.6f}"
+                    f"test_total={test_metrics['total']:.6f} "
+                    f"best={best_loss:.6f} "
+                    f"best_epoch={self.best_epoch}"
                 )
 
-        torch.save(model.state_dict(), outdir / "model.pt")
-        return 
+            if patience is not None and epochs_without_improvement >= patience:
+                print(
+                    f"Early stopping at epoch {epoch:04d}. "
+                    f"Best epoch: {self.best_epoch}, best loss: {best_loss:.6f}"
+                )
+                break
+        model.load_state_dict(best_state_dict)
+        return model
 
 
     def _make_optimiser(self, model: LightOffModel) -> Any:
@@ -254,3 +280,72 @@ class Trainer:
             group = {"params": params}
             group.update(cfg)
             param_groups.append(group)
+
+    def save_train_history(self, outdir, save_graph=True, save_csv=False):
+        import matplotlib.pyplot as plt
+
+        if not hasattr(self, "history") or len(self.history) == 0:
+            raise ValueError("No training history found. Run train() first.")
+
+        outdir = Path(outdir)
+        outdir.mkdir(parents=True, exist_ok=True)
+
+        hist = pd.DataFrame(self.history)
+
+        if "epoch" not in hist.columns:
+            raise KeyError("history must contain an 'epoch' column.")
+
+        if save_csv:
+            hist.to_csv(outdir / "loss_history.csv", index=False)
+
+        if not save_graph:
+            return
+
+        branches = []
+        if "train_conversion" in hist.columns:
+            branches.append("conversion")
+        if "train_tpr" in hist.columns:
+            branches.append("tpr")
+        if "train_osc" in hist.columns:
+            branches.append("osc")
+
+        if not branches:
+            raise ValueError("No branch losses found in history.")
+
+        n = len(branches)
+
+        fig, axes = plt.subplots(n, 1, figsize=(10, 4 * n), sharex=True)
+
+        if n == 1:
+            axes = [axes]
+
+        for ax, branch in zip(axes, branches):
+            train_col = f"train_{branch}"
+            test_col = f"test_{branch}"
+
+            if train_col in hist.columns:
+                ax.plot(hist["epoch"], hist[train_col], label=f"train_{branch}")
+
+            if test_col in hist.columns:
+                ax.plot(hist["epoch"], hist[test_col], label=f"test_{branch}")
+
+            if hasattr(self, "best_epoch") and self.best_epoch is not None:
+                ax.axvline(
+                    x=self.best_epoch,
+                    linestyle="--",
+                    linewidth=2,
+                    label=f"Epoch {self.best_epoch} (best)"
+                )
+
+            ax.set_title(branch.upper())
+            ax.set_ylabel("Loss")
+            ax.legend()
+            ax.grid(True, alpha=0.3)
+
+        axes[-1].set_xlabel("Epoch")
+
+        plt.tight_layout()
+
+        fig_path = outdir / "loss_history.png"
+        plt.savefig(fig_path, dpi=300)
+        plt.close()
