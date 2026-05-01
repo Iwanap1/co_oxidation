@@ -25,7 +25,7 @@ class DopantFeaturiser:
             self.feature_map = feature_map
 
     
-    def convert_features(self, df: pd.DataFrame, leave_ce: bool = True, include_n_dopants: bool=True) -> pd.DataFrame:
+    def convert_features(self, df: pd.DataFrame, leave_ce: bool = True, include_n_dopants: bool=True, delete_old_features: bool=False) -> pd.DataFrame:
         """Converts metal-wise concentrations to dopant features"""
         df = df.copy()
 
@@ -37,7 +37,9 @@ class DopantFeaturiser:
             dopant_cols = metals_in_df
 
         # Non-element columns are kept as-is.
-        cols_to_drop = dopant_cols.copy()
+
+        cols_to_drop = dopant_cols.copy() if delete_old_features else []
+
         if not leave_ce and "Ce" in metals_in_df:
             cols_to_drop.append("Ce")
 

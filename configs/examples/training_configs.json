@@ -1,13 +1,39 @@
 [
     {
         "epochs": 500,
+        "patience": null,
         "optimiser": {
             "name": "AdamW",
             "lr": 0.001,
-            "weight_decay": 1e-5
+            "weight_decay": 1e-5,
+            "parameter_groups": {
+                "conversion": {"lr": 0.001},
+                "osc": {"lr": 0.0005},
+                "tpr": {"lr": 0.0005}
+            }
         },
         "scheduler": {
             "name": "ReduceLROnPlateau"
-        }
+        },
+        "dataloader": {
+            "batch_size": 32,
+            "shuffle": true,
+            "drop_last": false
+        },
+        "train_critereon": {
+            "conversion": {
+                "name": "MSELoss",
+                "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 0.1
+            }
+        },
+        "eval_critereon": null
     }
 ]

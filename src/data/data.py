@@ -19,7 +19,7 @@ class Data:
         preprocessor: Preprocessor, 
         data_config: Dict, 
         data_config_name: Optional[str]=None, 
-        row_by_datapoint: bool=False
+        row_by_datapoint: bool=True
     ):
         """Key Attributes from init:
 -   .full_dataframes        raw merged + featurised dfs
@@ -41,9 +41,9 @@ After running .set_split():
             "h2_tpr": self.config["h2_tpr"].get("target_cols", ["temp"]), 
             "osc": self.config["osc"].get("target_cols", ["value_O_umol_per_g_catalyst"]),
         }
-        self.full_dataframes, self.stats = self._prepare_merged_dataframes_from_config(
-            row_by_datapoint=row_by_datapoint
-        )
+        self.full_dataframes, self.stats = self._prepare_merged_dataframes_from_config(row_by_datapoint=row_by_datapoint)
+        self.global_element_cols = self._resolve_global_element_cols()
+        self._ensure_global_element_cols()
         self.feature_cols = self._resolve_feature_cols(row_by_datapoint)
         self.full_dataframes = self._drop_missing_feature_rows(self.full_dataframes, self.feature_cols)
         self.clean_dataframes = self._select_model_columns(self.full_dataframes, self.feature_cols)
@@ -359,7 +359,7 @@ After running .set_split():
         conversion_cols = (
             reaction_material_cols
             + self.config["reactions"]["feature_cols_minus_conversion_temp"]
-            + self._dopant_cols(reaction_df)
+            + self._composition_feature_cols(reaction_df)
         )
 
         if row_by_datapoint:
@@ -376,7 +376,7 @@ After running .set_split():
             tpr_cols = (
                 tpr_material_cols
                 + self.config["h2_tpr"].get("feature_cols", [])
-                + self._dopant_cols(tpr_df)
+                + self._composition_feature_cols(tpr_df)
             )
 
             tpr_cols = list(dict.fromkeys(tpr_cols))
@@ -390,7 +390,7 @@ After running .set_split():
             osc_cols = (
                 osc_material_cols
                 + self.config["osc"].get("feature_cols", [])
-                + self._dopant_cols(osc_df)
+                + self._composition_feature_cols(osc_df)
             )
 
             osc_cols = list(dict.fromkeys(osc_cols))
@@ -766,3 +766,37 @@ After running .set_split():
             input_dims["tpr"] = len(tensor_cols_by_dataset["h2_tpr"]["tpr_features"])
 
         return input_dims
+        
+    def _resolve_global_element_cols(self) -> List[str]:
+        """
+        Elements that appear in any dataset after preprocessing.
+        """
+        present = set()
+
+        for df in self.full_dataframes.values():
+            for el in METALS:
+                if el in df.columns:
+                    # check if actually present (not all zeros)
+                    if pd.to_numeric(df[el], errors="coerce").fillna(0).gt(0).any():
+                        present.add(el)
+
+        return sorted(present)
+    
+    def _composition_feature_cols(self, df: pd.DataFrame) -> List[str]:
+        if self.config["material"].get("convert_features", False):
+            return self._dopant_cols(df)
+
+        return list(self.global_element_cols)
+    
+    def _ensure_global_element_cols(self) -> None:
+        if self.config["material"].get("convert_features", False):
+            return
+
+        for name, df in self.full_dataframes.items():
+            df = df.copy()
+
+            for el in self.global_element_cols:
+                if el not in df.columns:
+                    df[el] = 0.0
+
+            self.full_dataframes[name] = df
