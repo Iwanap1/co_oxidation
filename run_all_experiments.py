@@ -19,7 +19,6 @@ SPLIT_MODES = [
 
 def main():
     experiment_dir = Path(f"experiments/{EXPERIMENT_NAME}")
-    experiment_dir.mkdir(parents=True, exist_ok=True)
     db = DB(os.getenv("MONGO"))
     pp = Preprocessor(database=db)
     data_cfgs = _load_json(DATA_CONFIGS)
@@ -27,9 +26,29 @@ def main():
     train_cfgs = _load_json(TRAIN_CONFIGS)
 
     for d_cfg in data_cfgs:
-        data = Data(preprocessor=pp, data_config=d_cfg, data_config_name=DATA_CONFIGS.get("name", "unnamed"))
+        data_name = d_cfg.pop("name", "unnamed")
+        data = Data(preprocessor=pp, data_config=d_cfg, data_config_name=data_name)
+        for m_name, m_cfg in model_cfgs.items():
+            for split_mode, split_value in SPLIT_MODES:
+                for i, train_cfg in enumerate(train_cfgs):
+                    tail = f"/train_config_{i}" if len(train_cfgs) > 1 else ""
+                    outdir = experiment_dir / f"{m_name}/{data_name}/{split_mode}_{split_value}{tail}"
+                    try:
+                        outdir.mkdir(parents=True, exist_ok=False)
+                    except:
+                        raise ValueError(f"Could not make directory {outdir}, ensure all config names are unique")
+                    
+                    data.set_split_and_scale(split_mode, split_value)
+                    datasets = data.prepare_datasets(m_cfg)
+                    data.save(outdir, save_scalers=True, save_preprocess_stats=True, save_scaled=False, save_unscaled=True, save_full=False)
+
+                    model = LightOffModel(input_dims=data.input_dims, model_config=m_cfg)
 
 
 def _load_json(file_path):
     with open(file_path, "r") as f:
         return json.load(f)
+    
+
+if __name__ == "__main__":
+    main()

@@ -121,14 +121,15 @@ After running .set_split():
         For h2_tpr:
             - tpr_features
             - ramp_rate unscaled
-            - target
+            - target scaled only if specified in config
 
         For osc:
             - osc_features
-            - target
+            - target scaled only if specified in config
         """
 
         prepared = {"train": {}, "test": {}}
+        tensor_cols_for_input_dims = {}
 
         conversion_cols = self._resolve_conversion_input_cols(model_config)
         try:
@@ -144,6 +145,8 @@ After running .set_split():
             reaction_tensor_cols = {
                 "conversion_features": conversion_cols,
             }
+            if split_name == "train":
+                tensor_cols_for_input_dims["reactions"] = reaction_tensor_cols.copy()
 
             if model_config.get("hybridise_whsv", False):
                 if "flow_mL_h_g" not in raw_rxn_df.columns:
@@ -156,8 +159,7 @@ After running .set_split():
                 pressure_cols = ["gas_co_content", "gas_o2_content"]
                 missing = [c for c in pressure_cols if c not in raw_rxn_df.columns]
 
-                if missing:
-                    raise KeyError(f"hybridise_pressures=True but pressure columns are missing: {missing}")
+                if missing: raise KeyError(f"hybridise_pressures=True but pressure columns are missing: {missing}")
 
                 for c in pressure_cols:
                     rxn_df[c] = raw_rxn_df[c].to_numpy()
@@ -174,19 +176,16 @@ After running .set_split():
 
             # H2-TPR
             if model_config.get("tpr_net") is not None:
-                if "h2_tpr" not in scaled_dfs:
-                    raise KeyError("model_config contains tpr_net but no h2_tpr dataframe exists.")
+                if "h2_tpr" not in scaled_dfs: raise KeyError("model_config contains tpr_net but no h2_tpr dataframe exists.")
 
                 tpr_df = scaled_dfs["h2_tpr"]
                 raw_tpr_df = raw_dfs["h2_tpr"]
 
-                tpr_tensor_cols = {
-                    "tpr_features": self._resolve_tpr_input_cols(model_config),
-                }
+                tpr_tensor_cols = {"tpr_features": self._resolve_tpr_input_cols(model_config)}
+                if split_name == "train": tensor_cols_for_input_dims["h2_tpr"] = tpr_tensor_cols.copy()
 
                 if model_config["tpr_net"].get("hybridise_ramp_rate", False):
-                    if "ramp_rate_C_min" not in raw_tpr_df.columns:
-                        raise KeyError("hybridise_ramp_rate=True but 'ramp_rate_C_min' is missing.")
+                    if "ramp_rate_C_min" not in raw_tpr_df.columns: raise KeyError("hybridise_ramp_rate=True but 'ramp_rate_C_min' is missing.")
 
                     tpr_df["ramp_rate_C_min"] = raw_tpr_df["ramp_rate_C_min"].to_numpy()
                     tpr_tensor_cols["ramp_rate"] = ["ramp_rate_C_min"]
@@ -200,18 +199,21 @@ After running .set_split():
 
             # OSC
             if model_config.get("osc_net") is not None:
-                if "osc" not in scaled_dfs:
-                    raise KeyError("model_config contains osc_net but no osc dataframe exists.")
-
-                osc_df = scaled_dfs["osc"]
-
+                if "osc" not in scaled_dfs: raise KeyError("model_config contains osc_net but no osc dataframe exists.")
+                osc_tensor_cols = {
+                    "osc_features": self.feature_cols["osc"],
+                    "target": self.target_cols["osc"],
+                }
                 prepared[split_name]["osc"] = self._make_named_tensor_dataset(
-                    osc_df,
-                    {
-                        "osc_features": self.feature_cols["osc"],
-                        "target": self.target_cols["osc"],
-                    },
+                    scaled_dfs["osc"],
+                    osc_tensor_cols,
                 )
+                if split_name == "train": tensor_cols_for_input_dims["osc"] = osc_tensor_cols.copy()
+
+        self.input_dims = self._resolve_input_dims(
+            model_config=model_config,
+            tensor_cols_by_dataset=tensor_cols_for_input_dims,
+        )
         return prepared
 
     def save(
@@ -701,3 +703,21 @@ After running .set_split():
                     df[f"{col}_unscaled"] = raw_dfs[name][col].to_numpy()
 
             out[name] = df
+
+    def _resolve_input_dims(
+        self,
+        model_config: Dict,
+        tensor_cols_by_dataset: Dict[str, Dict[str, List[str]]],
+    ) -> Dict[str, int]:
+        input_dims = {}
+
+        rxn_cols = tensor_cols_by_dataset["reactions"]
+        input_dims["conversion"] = len(rxn_cols.get("conversion_features", []))
+
+        if model_config.get("osc_net") is not None:
+            input_dims["osc"] = len(tensor_cols_by_dataset["osc"]["osc_features"])
+
+        if model_config.get("tpr_net") is not None:
+            input_dims["tpr"] = len(tensor_cols_by_dataset["h2_tpr"]["tpr_features"])
+
+        return input_dims
