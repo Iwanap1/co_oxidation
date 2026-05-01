@@ -34,7 +34,7 @@
     },
     "cont_learn_standard_mlp": {
         "conversion_net": {
-            "hidden_dim": [],
+            "hidden_dim": [4],
             "output_dim": 1,
             "activation": null,
             "include_material_features": false
@@ -47,14 +47,16 @@
         "tpr_net": {
             "hidden_dim": [16,16],
             "output_dim": 1,
-            "activation": "ReLU"
+            "activation": "ReLU",
+            "hybridise_ramp_rate": true,
+            "kissinger_C0_init": 20.0
         },
         "hybridise_whsv": false,
         "hybridise_pressures": false
     },
     "cont_learn_hybridised_whsv": {
         "conversion_net": {
-            "hidden_dim": [],
+            "hidden_dim": [4],
             "output_dim": 1,
             "activation": null,
             "include_material_features": false
@@ -67,14 +69,16 @@
         "tpr_net": {
             "hidden_dim": [16,16],
             "output_dim": 1,
-            "activation": "ReLU"
+            "activation": "ReLU",
+            "hybridise_ramp_rate": true,
+            "kissinger_C0_init": 20.0
         },
         "hybridise_whsv": true,
         "hybridise_pressures": false
     },
     "cont_learn_hybridised_whsv_and_pressure": {
         "conversion_net": {
-            "hidden_dim": [],
+            "hidden_dim": [4],
             "output_dim": 1,
             "activation": null,
             "include_material_features": false
@@ -87,14 +91,16 @@
         "tpr_net": {
             "hidden_dim": [16,16],
             "output_dim": 1,
-            "activation": "ReLU"
+            "activation": "ReLU",
+            "hybridise_ramp_rate": true,
+            "kissinger_C0_init": 20.0
         },
         "hybridise_whsv": true,
         "hybridise_pressures": true
     },
     "cont_learn_hybridised_whsv_and_pressure_incl_mat_feats_for_conv_net": {
         "conversion_net": {
-            "hidden_dim": [],
+            "hidden_dim": [4],
             "output_dim": 1,
             "activation": null,
             "include_material_features": true,
@@ -108,7 +114,31 @@
         "tpr_net": {
             "hidden_dim": [16,16],
             "output_dim": 1,
+            "activation": "ReLU",
+            "hybridise_ramp_rate": true,
+            "kissinger_C0_init": 20.0
+        },
+        "hybridise_whsv": true,
+        "hybridise_pressures": true
+    },
+    "tpr_ramp_rate_not_hybridised": {
+        "conversion_net": {
+            "hidden_dim": [4],
+            "output_dim": 1,
+            "activation": null,
+            "include_material_features": true,
+            "included_features": "all"
+        },
+        "osc_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
             "activation": "ReLU"
+        },
+        "tpr_net": {
+            "hidden_dim": [16,16],
+            "output_dim": 1,
+            "activation": "ReLU",
+            "hybridise_ramp_rate": false
         },
         "hybridise_whsv": true,
         "hybridise_pressures": true

@@ -1,0 +1,13 @@
+[
+    {
+        "epochs": 500,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.001,
+            "weight_decay": 1e-5
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        }
+    }
+]
