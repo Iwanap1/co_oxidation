@@ -112,20 +112,20 @@ After running .set_split():
             }
 
         For reactions, possible tensors are:
-            - conversion_features
-            - whsv unscaled
-            - p_co unscaled
-            - p_o2 unscaled
-            - target
+            - conversion_features (scaled)
+            - whsv (unscaled)
+            - p_co (unscaled)
+            - p_o2 (unscaled)
+            - target (unscaled)
 
         For h2_tpr:
-            - tpr_features
-            - ramp_rate unscaled
-            - target scaled only if specified in config
+            - tpr_features (scaled)
+            - ramp_rate (scaled)
+            - target (unscaled)
 
         For osc:
-            - osc_features
-            - target scaled only if specified in config
+            - osc_features (scaled)
+            - target (unscaled)
         """
 
         prepared = {"train": {}, "test": {}}
@@ -142,9 +142,7 @@ After running .set_split():
             rxn_df = scaled_dfs["reactions"]
             raw_rxn_df = raw_dfs["reactions"]
 
-            reaction_tensor_cols = {
-                "conversion_features": conversion_cols,
-            }
+            reaction_tensor_cols = {"conversion_features": conversion_cols}
             if split_name == "train":
                 tensor_cols_for_input_dims["reactions"] = reaction_tensor_cols.copy()
 
@@ -169,25 +167,24 @@ After running .set_split():
 
             reaction_tensor_cols["target"] = self.target_cols["reactions"]
 
-            prepared[split_name]["reactions"] = self._make_named_tensor_dataset(
-                rxn_df,
-                reaction_tensor_cols,
-            )
+            prepared[split_name]["reactions"] = self._make_named_tensor_dataset(rxn_df, reaction_tensor_cols)
 
             # H2-TPR
             if model_config.get("tpr_net") is not None:
-                if "h2_tpr" not in scaled_dfs: raise KeyError("model_config contains tpr_net but no h2_tpr dataframe exists.")
+                if "h2_tpr" not in scaled_dfs:
+                    raise KeyError("model_config contains tpr_net but no h2_tpr dataframe exists.")
 
                 tpr_df = scaled_dfs["h2_tpr"]
-                raw_tpr_df = raw_dfs["h2_tpr"]
 
-                tpr_tensor_cols = {"tpr_features": self._resolve_tpr_input_cols(model_config)}
-                if split_name == "train": tensor_cols_for_input_dims["h2_tpr"] = tpr_tensor_cols.copy()
+                tpr_tensor_cols = {
+                    "tpr_features": self._resolve_tpr_input_cols(model_config)
+                }
 
-                if model_config["tpr_net"].get("hybridise_ramp_rate", False):
-                    if "ramp_rate_C_min" not in raw_tpr_df.columns: raise KeyError("hybridise_ramp_rate=True but 'ramp_rate_C_min' is missing.")
-
-                    tpr_df["ramp_rate_C_min"] = raw_tpr_df["ramp_rate_C_min"].to_numpy()
+                if model_config["tpr_net"].get("condition_tpr_with_ramp_rate", False):
+                    if "ramp_rate_C_min" not in tpr_df.columns:
+                        raise KeyError(
+                            "condition_tpr_with_ramp_rate=True but 'ramp_rate_C_min' is missing."
+                        )
                     tpr_tensor_cols["ramp_rate"] = ["ramp_rate_C_min"]
 
                 tpr_tensor_cols["target"] = self.target_cols["h2_tpr"]
@@ -197,17 +194,14 @@ After running .set_split():
                     tpr_tensor_cols,
                 )
 
+                if split_name == "train":
+                    tensor_cols_for_input_dims["h2_tpr"] = tpr_tensor_cols.copy()
+                
             # OSC
             if model_config.get("osc_net") is not None:
                 if "osc" not in scaled_dfs: raise KeyError("model_config contains osc_net but no osc dataframe exists.")
-                osc_tensor_cols = {
-                    "osc_features": self.feature_cols["osc"],
-                    "target": self.target_cols["osc"],
-                }
-                prepared[split_name]["osc"] = self._make_named_tensor_dataset(
-                    scaled_dfs["osc"],
-                    osc_tensor_cols,
-                )
+                osc_tensor_cols = { "osc_features": self.feature_cols["osc"], "target": self.target_cols["osc"]}
+                prepared[split_name]["osc"] = self._make_named_tensor_dataset(scaled_dfs["osc"], osc_tensor_cols)
                 if split_name == "train": tensor_cols_for_input_dims["osc"] = osc_tensor_cols.copy()
 
         self.input_dims = self._resolve_input_dims(
@@ -221,6 +215,7 @@ After running .set_split():
         outdir: Union[str, Path],
         save_scalers: bool = True,
         save_preprocess_stats: bool = True,
+        save_split_stats: bool = True,
         save_scaled: bool = False,
         save_unscaled: bool = False,
         save_full: bool = False,
@@ -253,6 +248,10 @@ After running .set_split():
         if save_preprocess_stats:
             with open(outdir / "preprocess_stats.json", "w") as f:
                 json.dump(self.stats, f, indent=4)
+            
+        if save_split_stats:
+            with open(outdir / "train_test_split_stats.json", "w") as f:
+                json.dump(self.split_stats, f, indent=4)
 
         if save_scalers and hasattr(self, "scalers"):
             with open(outdir / "scalers.pkl", "wb") as f:
@@ -352,13 +351,13 @@ After running .set_split():
             raise KeyError(f"{name} columns missing: {missing}")
 
     def _resolve_feature_cols(self, row_by_datapoint: bool) -> Dict[str, List[str]]:
-        material_cols = self.config["material"]["feature_cols_minus_elements"]
-
         feature_cols = {}
 
         reaction_df = self.full_dataframes["reactions"]
+        reaction_material_cols = self._resolve_material_feature_cols_for_dataset("reactions")
+
         conversion_cols = (
-            material_cols
+            reaction_material_cols
             + self.config["reactions"]["feature_cols_minus_conversion_temp"]
             + self._dopant_cols(reaction_df)
         )
@@ -366,26 +365,35 @@ After running .set_split():
         if row_by_datapoint:
             conversion_cols.append("temperature")
 
+        conversion_cols = list(dict.fromkeys(conversion_cols))
         self._check_cols(reaction_df, conversion_cols, "conversion")
         feature_cols["reactions"] = conversion_cols
 
         if "h2_tpr" in self.full_dataframes:
             tpr_df = self.full_dataframes["h2_tpr"]
+            tpr_material_cols = self._resolve_material_feature_cols_for_dataset("h2_tpr")
+
             tpr_cols = (
-                material_cols
+                tpr_material_cols
                 + self.config["h2_tpr"].get("feature_cols", [])
                 + self._dopant_cols(tpr_df)
             )
+
+            tpr_cols = list(dict.fromkeys(tpr_cols))
             self._check_cols(tpr_df, tpr_cols, "tpr")
             feature_cols["h2_tpr"] = tpr_cols
 
         if "osc" in self.full_dataframes:
             osc_df = self.full_dataframes["osc"]
+            osc_material_cols = self._resolve_material_feature_cols_for_dataset("osc")
+
             osc_cols = (
-                material_cols
+                osc_material_cols
                 + self.config["osc"].get("feature_cols", [])
                 + self._dopant_cols(osc_df)
             )
+
+            osc_cols = list(dict.fromkeys(osc_cols))
             self._check_cols(osc_df, osc_cols, "osc")
             feature_cols["osc"] = osc_cols
 
@@ -463,8 +471,8 @@ After running .set_split():
 
                 # overlapping materials follow reaction split
                 # aux-only materials containing removed metal go to test, not train
-                train_mask = overlap_train_mask | (aux_only_mask & ~metal_mask)
-                test_mask = overlap_test_mask | (aux_only_mask & metal_mask)
+                train_mask = (overlap_train_mask | aux_only_mask) & ~metal_mask
+                test_mask = overlap_test_mask | metal_mask
 
             elif self.split_method in ["Random_by_Material", "Random_by_Point", "Above_WHSV_Threshold"]:
                 # Don't need to worry about leaking entries into auxillory datasets (OSC and TPR) for any of these
@@ -490,25 +498,38 @@ After running .set_split():
 
     def _resolve_split(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         if self.split_method == "Random_by_Material":
-            train, test, split_stats = self._split_by_material(self.clean_dataframes["reactions"], test_size=self.split_value, seed=42)
+            train, test, self.split_stats = self._split_by_material(self.clean_dataframes["reactions"], test_size=self.split_value, seed=42)
         elif self.split_method == "Random_by_Point":
-            train, test, split_stats = self._split_by_point(self.clean_dataframes["reactions"], test_size=self.split_value)
+            train, test, self.split_stats = self._split_by_point(self.clean_dataframes["reactions"], test_size=self.split_value)
         elif self.split_method == "Remove_Metal":
             if self.split_value is None or not isinstance(self.split_value, str):
-                raise ValueError("For 'Remove_Metal' split method, split_value must be a string representing the metal to remove.")
-            train = self.clean_dataframes["reactions"][~self.clean_dataframes["reactions"]["_id_material"].str.contains(self.split_value, case=False)].reset_index(drop=True)
-            test = self.clean_dataframes["reactions"][self.clean_dataframes["reactions"]["_id_material"].str.contains(self.split_value, case=False)].reset_index(drop=True)
-            split_stats = {
-                "removed_metal": self.split_value,
+                raise ValueError(
+                    "For 'Remove_Metal' split method, split_value must be a string representing the metal to remove."
+                )
+
+            reaction_df = self.clean_dataframes["reactions"]
+            metal = self.split_value
+
+            if metal not in reaction_df.columns:
+                raise KeyError(
+                    f"Remove_Metal='{metal}' requires column '{metal}' in reactions dataframe."
+                )
+
+            metal_mask = pd.to_numeric(reaction_df[metal], errors="coerce").fillna(0).gt(0)
+
+            train = reaction_df.loc[~metal_mask].reset_index(drop=True)
+            test = reaction_df.loc[metal_mask].reset_index(drop=True)
+            self.split_stats = {
+                "removed_metal": metal,
                 "n_reactions_removed": len(test),
-                "n_reactions_remaining": len(train)
+                "n_reactions_remaining": len(train),
             }
         elif self.split_method == "Above_WHSV_Threshold":
             if self.split_value is None or not isinstance(self.split_value, (int, float)):
                 raise ValueError("For 'Above_WHSV_Threshold' split method, split_value must be a number representing the WHSV threshold.")
             train = self.clean_dataframes["reactions"][self.clean_dataframes["reactions"]["flow_mL_h_g"] <= self.split_value].reset_index(drop=True)
             test = self.clean_dataframes["reactions"][self.clean_dataframes["reactions"]["flow_mL_h_g"] > self.split_value].reset_index(drop=True)
-            split_stats = {
+            self.split_stats = {
                 "whsv_threshold": self.split_value,
                 "n_reactions_above_threshold": len(test),
                 "n_reactions_below_threshold": len(train)
@@ -565,7 +586,7 @@ After running .set_split():
                 continue
 
             cols = feature_cols[name] + self.target_cols.get(name, [])
-            cols = [c for c in cols if c in df.columns]
+            self._check_cols(df, cols, name)
 
             n_before = len(df)
             nan_mask = df[cols].isna().any(axis=1)
@@ -604,6 +625,9 @@ After running .set_split():
             if name not in feature_cols:
                 selected[name] = df.copy()
                 continue
+
+            required_cols = feature_cols[name] + self.target_cols[name]
+            self._check_cols(df, required_cols, name)
 
             cols = (
                 id_cols.get(name, [])
@@ -658,7 +682,28 @@ After running .set_split():
             cols = [c for c in cols if c not in ["gas_co_content", "gas_o2_content"]]
 
         return cols
-    
+
+    def _resolve_material_feature_cols_for_dataset(self, dataset_name: str) -> List[str]:
+        """
+        Dataset-specific material feature columns.
+
+        Fallback:
+            material.feature_cols_minus_elements
+
+        Override:
+            reactions.material_feature_cols
+            h2_tpr.material_feature_cols
+            osc.material_feature_cols
+        """
+        fallback = self.config["material"].get("feature_cols_minus_elements", [])
+
+        if dataset_name == "reactions":
+            section = self.config["reactions"]
+        else:
+            section = self.config.get(dataset_name, {})
+
+        return section.get("material_feature_cols", fallback)    
+
     def _make_named_tensor_dataset(self, df: pd.DataFrame, tensor_cols: Dict[str, List[str]]) -> Dict[str, Any]:
         tensors = []
         tensor_names = []
@@ -682,7 +727,7 @@ After running .set_split():
         cols = list(self.feature_cols["h2_tpr"])
         tpr_cfg = model_config.get("tpr_net") or {}
 
-        if tpr_cfg.get("hybridise_ramp_rate", False):
+        if tpr_cfg.get("condition_tpr_with_ramp_rate", False):
             cols = [c for c in cols if c != "ramp_rate_C_min"]
 
         return cols

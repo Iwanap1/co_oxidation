@@ -37,6 +37,7 @@
             "first_temp_output_col": "temp",
             "drop_cols": ["mass_catalyst_g", "temps", "pretreatment_temp", "pretreatment_time"],
             "feature_cols": ["ramp_rate_C_min"],
+            "material_feature_cols": ["calcination_temp", "calcination_time", "Sbet"],
             "target_cols": ["temp"]
         },
         "osc": {
@@ -47,6 +48,7 @@
             "tag_dynamic": true,
             "dynamic_or_total_tag_name": "is_dynamic_capacity",
             "feature_cols": [],
+            "material_feature_cols": ["calcination_temp", "calcination_time", "Sbet"],
             "target_cols": ["value_O_umol_per_g_catalyst"]
         }
     },
@@ -90,6 +92,7 @@
             "drop_cols": ["mass_catalyst_g", "temps", "pretreatment_temp", "pretreatment_time"],
             "element_attributes": ["atomic_radius", "electronegativity_pauling", "protons", "oxidation_states_one_hot", "first_ionisation_energy"],
             "feature_cols": ["ramp_rate_C_min"],
+            "material_feature_cols": ["calcination_temp", "calcination_time", "Sbet"],
             "target_cols": ["temp"]
         },
         "osc": {
@@ -100,6 +103,7 @@
             "tag_dynamic": true,
             "dynamic_or_total_tag_name": "is_dynamic_capacity",
             "element_attributes": ["atomic_radius", "electronegativity_pauling", "protons", "oxidation_states_one_hot", "first_ionisation_energy"],
+            "material_feature_cols": ["calcination_temp", "calcination_time", "Sbet"],
             "feature_cols": [],
             "target_cols": ["value_O_umol_per_g_catalyst"]
         }
