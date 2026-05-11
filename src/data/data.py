@@ -132,6 +132,8 @@ After running .set_split():
         tensor_cols_for_input_dims = {}
 
         conversion_cols = self._resolve_conversion_input_cols(model_config)
+        input_reaction_cols = (model_config.get("conversion_net", {}).get("input_reaction_cols", ["temperature"])
+)
         try:
             dfs = [("train", self.scaled_train_dfs, self.train_dataframes),("test", self.scaled_test_dfs, self.test_dataframes)]
         except:
@@ -139,35 +141,59 @@ After running .set_split():
 
         for split_name, scaled_dfs, raw_dfs in dfs:
             # Reactions
-            rxn_df = scaled_dfs["reactions"]
+            rxn_df = scaled_dfs["reactions"].copy()
             raw_rxn_df = raw_dfs["reactions"]
 
             reaction_tensor_cols = {"conversion_features": conversion_cols}
-            if split_name == "train":
-                tensor_cols_for_input_dims["reactions"] = reaction_tensor_cols.copy()
+
+            missing = [c for c in input_reaction_cols if c not in rxn_df.columns]
+            if missing:
+                raise KeyError(
+                    f"conversion_net.input_reaction_cols contains missing columns: {missing}"
+                )
+
+            if input_reaction_cols:
+                reaction_tensor_cols["reaction_inputs"] = input_reaction_cols
+
+            if model_config.get("osc_net") is not None:
+                osc_cols_for_rxn = list(self.feature_cols["osc"])
+                missing = [c for c in osc_cols_for_rxn if c not in rxn_df.columns]
+                if missing:
+                    raise KeyError(f"Reaction dataframe missing OSC input columns: {missing}")
+                reaction_tensor_cols["osc_features"] = osc_cols_for_rxn
+
+            if model_config.get("tpr_net") is not None:
+                tpr_cols_for_rxn = self._resolve_tpr_input_cols(model_config)
+                missing = [c for c in tpr_cols_for_rxn if c not in rxn_df.columns]
+                if missing:
+                    raise KeyError(f"Reaction dataframe missing TPR input columns: {missing}")
+                reaction_tensor_cols["tpr_features"] = tpr_cols_for_rxn
 
             if model_config.get("hybridise_whsv", False):
                 if "flow_mL_h_g" not in raw_rxn_df.columns:
                     raise KeyError("hybridise_whsv=True but 'flow_mL_h_g' is missing.")
-
-                rxn_df["flow_mL_h_g"] = raw_rxn_df["flow_mL_h_g"].to_numpy()
-                reaction_tensor_cols["whsv"] = ["flow_mL_h_g"]
+                rxn_df["flow_mL_h_g_unscaled"] = raw_rxn_df["flow_mL_h_g"].to_numpy()
+                reaction_tensor_cols["whsv"] = ["flow_mL_h_g_unscaled"]
 
             if model_config.get("hybridise_pressures", False):
                 pressure_cols = ["gas_co_content", "gas_o2_content"]
                 missing = [c for c in pressure_cols if c not in raw_rxn_df.columns]
-
                 if missing: raise KeyError(f"hybridise_pressures=True but pressure columns are missing: {missing}")
-
-                for c in pressure_cols:
-                    rxn_df[c] = raw_rxn_df[c].to_numpy()
-
-                reaction_tensor_cols["p_co"] = ["gas_co_content"]
-                reaction_tensor_cols["p_o2"] = ["gas_o2_content"]
+                rxn_df["gas_co_content_unscaled"] = raw_rxn_df["gas_co_content"].to_numpy()
+                rxn_df["gas_o2_content_unscaled"] = raw_rxn_df["gas_o2_content"].to_numpy()
+                reaction_tensor_cols["p_co"] = ["gas_co_content_unscaled"]
+                reaction_tensor_cols["p_o2"] = ["gas_o2_content_unscaled"]
 
             reaction_tensor_cols["target"] = self.target_cols["reactions"]
 
-            prepared[split_name]["reactions"] = self._make_named_tensor_dataset(rxn_df, reaction_tensor_cols)
+            if split_name == "train":
+                tensor_cols_for_input_dims["reactions"] = reaction_tensor_cols.copy()
+
+            prepared[split_name]["reactions"] = self._make_named_tensor_dataset(
+                rxn_df,
+                reaction_tensor_cols,
+                metadata_cols=["_id_material", "material_id", "_id_reaction", "temperature"],
+            )
 
             # H2-TPR
             if model_config.get("tpr_net") is not None:
@@ -651,8 +677,8 @@ After running .set_split():
     
     def _resolve_conversion_input_cols(self, model_config: Dict) -> List[str]:
         conv_cfg = model_config.get("conversion_net", {})
-
         include_material_features = conv_cfg.get("include_material_features", True)
+        input_reaction_cols = conv_cfg.get("input_reaction_cols", [])
 
         if not include_material_features:
             cols = []
@@ -675,12 +701,7 @@ After running .set_split():
                     "conversion_net.included_features must be either 'all' or a list of columns"
                 )
 
-        if model_config.get("hybridise_whsv", False):
-            cols = [c for c in cols if c != "flow_mL_h_g"]
-
-        if model_config.get("hybridise_pressures", False):
-            cols = [c for c in cols if c not in ["gas_co_content", "gas_o2_content"]]
-
+        cols = [c for c in cols if c not in input_reaction_cols]
         return cols
 
     def _resolve_material_feature_cols_for_dataset(self, dataset_name: str) -> List[str]:
@@ -704,7 +725,12 @@ After running .set_split():
 
         return section.get("material_feature_cols", fallback)    
 
-    def _make_named_tensor_dataset(self, df: pd.DataFrame, tensor_cols: Dict[str, List[str]]) -> Dict[str, Any]:
+    def _make_named_tensor_dataset(
+        self,
+        df: pd.DataFrame,
+        tensor_cols: Dict[str, List[str]],
+        metadata_cols: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         tensors = []
         tensor_names = []
         feature_names = {}
@@ -716,12 +742,18 @@ After running .set_split():
 
         dataset = TensorDataset(*tensors)
 
-        return {
+        out = {
             "dataset": dataset,
             "tensor_names": tensor_names,
             "feature_names": feature_names,
             "n": len(df),
         }
+
+        if metadata_cols is not None:
+            keep = [c for c in metadata_cols if c in df.columns]
+            out["metadata"] = df[keep].reset_index(drop=True).copy()
+
+        return out
     
     def _resolve_tpr_input_cols(self, model_config: Dict) -> List[str]:
         cols = list(self.feature_cols["h2_tpr"])
@@ -758,6 +790,7 @@ After running .set_split():
 
         rxn_cols = tensor_cols_by_dataset["reactions"]
         input_dims["conversion"] = len(rxn_cols.get("conversion_features", []))
+        input_dims["reaction_inputs"] = len(rxn_cols.get("reaction_inputs", []))
 
         if model_config.get("osc_net") is not None:
             input_dims["osc"] = len(tensor_cols_by_dataset["osc"]["osc_features"])

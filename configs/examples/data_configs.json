@@ -1,23 +1,25 @@
 [
     {
-        "name": "base_features",
+        "name": "base_multiphase",
         "material": {
-            "base_filter": {"phase_flag": "single"},
+            "base_filter": {"phase_flag": {"$exists": true}},
             "default_to_mean_cols": ["calcination_time"],
             "default_to_zero_cols": ["pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"],
             "cannot_be_zero_or_none": ["Sbet", "calcination_temp"],
             "allow_supported_samples": false,
             "add_synthesis_flags": false,
             "minimum_Ce_content": 0.5,
-            "convert_phase_flag_to_binary": false,
+            "convert_phase_flag_to_binary": true,
+            "phase_flag_output_col": "single_phase_binary",
             "element_min_appearances": 1,
             "element_min_papers": 1,
             "convert_features": false,
             "max_dopants": 3,
-            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time"]
+            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary"]
         },
         "reactions": {
             "base_filter": {},
+            "convert_percentages_to_fractions": true,
             "oxygen_content_in_air": 0.2,
             "convert_ghsv_to_whsv_with_assumed_density": null,
             "default_to_mean_cols": [],
@@ -71,6 +73,7 @@
         },
         "reactions": {
             "base_filter": {},
+            "convert_percentages_to_fractions": true,
             "oxygen_content_in_air": 0.2,
             "convert_ghsv_to_whsv_with_assumed_density": null,
             "default_to_mean_cols": [],

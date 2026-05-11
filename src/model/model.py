@@ -28,8 +28,8 @@ class LightOffModel(nn.Module):
         tpr_cfg = model_config.get("tpr_net")
         self.condition_tpr_with_ramp_rate = tpr_cfg is not None and tpr_cfg.get("condition_tpr_with_ramp_rate", False)
         self.include_conversion_features = conv_cfg.get("include_material_features", True)
-
-        conv_input_dim = 0
+        self.input_reaction_cols = conv_cfg.get("input_reaction_cols", [])
+        conv_input_dim = input_dims.get("reaction_inputs", 0)
 
         if self.include_conversion_features:
             conv_input_dim += input_dims["conversion"]
@@ -54,14 +54,19 @@ class LightOffModel(nn.Module):
     def forward(
         self,
         conversion_features: Optional[torch.Tensor] = None,
+        reaction_inputs: Optional[torch.Tensor] = None,
         osc_features: Optional[torch.Tensor] = None,
         tpr_features: Optional[torch.Tensor] = None,
         whsv: Optional[torch.Tensor] = None,
         p_co: Optional[torch.Tensor] = None,
         p_o2: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        
-        z = self._nn_section(conversion_features, osc_features, tpr_features)
+        z = self._nn_section(
+            conversion_features=conversion_features,
+            reaction_inputs=reaction_inputs,
+            osc_features=osc_features,
+            tpr_features=tpr_features,
+        )
         # Black-box only
         if not self.hybridise_pressures and not self.hybridise_whsv:
             return torch.sigmoid(z)
@@ -93,8 +98,14 @@ class LightOffModel(nn.Module):
 
         raise RuntimeError("Unhandled model hybridisation configuration.")
 
-    def _nn_section(self, conversion_features, osc_features, tpr_features):
+    def _nn_section(self, conversion_features, reaction_inputs, osc_features, tpr_features):
         parts = []
+
+        if self.input_reaction_cols:
+            if reaction_inputs is None:
+                raise ValueError("reaction_inputs required by conversion_net.input_reaction_cols.")
+            parts.append(reaction_inputs)
+
         if self.include_conversion_features:
             if conversion_features is None:
                 raise ValueError("conversion_features required.")

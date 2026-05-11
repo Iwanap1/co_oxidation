@@ -192,6 +192,7 @@ class Trainer:
 
             pred_conversion = model(
                 conversion_features=rxn.get("conversion_features"),
+                reaction_inputs=rxn.get("reaction_inputs"),
                 osc_features=rxn.get("osc_features"),
                 tpr_features=rxn.get("tpr_features"),
                 whsv=rxn.get("whsv"),

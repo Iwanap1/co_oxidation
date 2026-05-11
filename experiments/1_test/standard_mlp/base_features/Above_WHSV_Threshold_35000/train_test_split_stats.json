@@ -1,0 +1,5 @@
+{
+    "whsv_threshold": 35000,
+    "n_reactions_above_threshold": 228,
+    "n_reactions_below_threshold": 1630
+}

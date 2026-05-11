@@ -1,6 +1,6 @@
 from ..db import DB
 from ..constants import ELEMENTS
-from .element_attributes import Metal, Supported_Attributes, DEFAULT_OVERRIDES
+from .element_attributes import Metal, Supported_Attributes, DEFAULT_OVERRIDES, METALS
 from .featurise_elements import DopantFeaturiser
 import pandas as pd
 from typing import Tuple, Dict, List, Optional, Any
@@ -236,6 +236,8 @@ class Preprocessor:
         drop_original_synthesis_col = resolved["drop_original_synthesis_col"]
         synthesis_method_map = resolved["synthesis_method_map"]
         allowed_elements = resolved["allowed_elements"]
+        if allowed_elements is None:
+            allowed_elements = METALS
         allow_supported_samples = resolved["allow_supported_samples"]
         default_deposited_fields_to_zero = resolved["default_deposited_fields_to_zero"]
         convert_phase_flag_to_binary = resolved["convert_phase_flag_to_binary"]
@@ -644,7 +646,7 @@ class Preprocessor:
             number_of_values_defaulted_to_mean[col] = n_missing
 
             if n_missing > 0:
-                reactions_df[col] = reactions_df[col].fillna(reactions_df[col].mean())
+                reactions_df[col] = reactions_df[col].fillna(reactions_df[col].median())
 
         stats["columns_filled_with_mean"] = default_to_mean_cols
         stats["number_of_values_defaulted_to_mean"] = number_of_values_defaulted_to_mean

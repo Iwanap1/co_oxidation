@@ -23,10 +23,11 @@
     },
     "cont_learn_standard_mlp": {
         "conversion_net": {
-            "hidden_dim": [4],
+            "hidden_dim": [],
             "output_dim": 1,
             "activation": null,
-            "include_material_features": false
+            "include_material_features": false,
+            "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content", "flow_mL_h_g"]
         },
         "osc_net": {
             "hidden_dim": [16, 16],
@@ -44,10 +45,11 @@
     },
     "cont_learn_hybridised_whsv": {
         "conversion_net": {
-            "hidden_dim": [4],
+            "hidden_dim": [],
             "output_dim": 1,
             "activation": null,
-            "include_material_features": false
+            "include_material_features": false,
+            "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content"]
         },
         "osc_net": {
             "hidden_dim": [16, 16],
@@ -65,10 +67,11 @@
     },
     "cont_learn_hybridised_whsv_and_pressure": {
         "conversion_net": {
-            "hidden_dim": [4],
+            "hidden_dim": [],
             "output_dim": 1,
             "activation": null,
-            "include_material_features": false
+            "include_material_features": false,
+            "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content"]
         },
         "osc_net": {
             "hidden_dim": [16, 16],
@@ -86,11 +89,12 @@
     },
     "cont_learn_hybridised_whsv_and_pressure_incl_mat_feats_for_conv_net": {
         "conversion_net": {
-            "hidden_dim": [4],
+            "hidden_dim": [],
             "output_dim": 1,
             "activation": null,
             "include_material_features": true,
-            "included_features": "all"
+            "included_features": "all",
+            "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content"]
         },
         "osc_net": {
             "hidden_dim": [16, 16],
@@ -108,11 +112,12 @@
     },
     "tpr_ramp_rate_not_included": {
         "conversion_net": {
-            "hidden_dim": [4],
+            "hidden_dim": [],
             "output_dim": 1,
             "activation": null,
             "include_material_features": true,
-            "included_features": "all"
+            "included_features": "all",
+            "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content"]
         },
         "osc_net": {
             "hidden_dim": [16, 16],
