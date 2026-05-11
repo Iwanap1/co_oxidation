@@ -89,7 +89,11 @@ After running .set_split():
         self.scaled_train_dfs, self.scaled_test_dfs, self.scalers = self._scale_and_transform(
             train_dfs=self.train_dataframes,
             test_dfs=self.test_dataframes,
-            feature_cols=self.feature_cols
+            feature_cols=self.feature_cols,
+            target_cols={
+                "h2_tpr": self.target_cols["h2_tpr"],
+                "osc": self.target_cols["osc"],
+            },
         )
 
     def prepare_datasets(self, model_config: Dict) -> Dict[str, Dict[str, Any]]:
@@ -430,35 +434,49 @@ After running .set_split():
         train_dfs: Dict[str, pd.DataFrame],
         test_dfs: Dict[str, pd.DataFrame],
         feature_cols: Dict[str, List[str]],
-        scalers: Optional[Dict[str, Any]] = None
+        target_cols: Optional[Dict[str, List[str]]] = None,
+        scalers: Optional[Dict[str, Any]] = None,
     ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame], Dict[str, Any]]:
 
+        if target_cols is None:
+            target_cols = {}
+
         if scalers is None:
-            scalers = {}
+            scalers = {
+                "features": {},
+                "targets": {},
+            }
 
         scaled_train = {}
         scaled_test = {}
 
         for name, train_df in train_dfs.items():
-            if name not in feature_cols:
-                scaled_train[name] = train_df.copy()
-                scaled_test[name] = test_dfs[name].copy()
-                continue
-
-            cols = feature_cols[name]
-
             train_df = train_df.copy()
             test_df = test_dfs[name].copy()
 
-            scaler = scalers.get(name, StandardScaler())
+            # Scale feature columns
+            f_cols = feature_cols.get(name, [])
+            if f_cols:
+                f_scaler = scalers["features"].get(name, StandardScaler())
 
-            train_df[cols] = scaler.fit_transform(train_df[cols])
-            test_df[cols] = scaler.transform(test_df[cols])
+                train_df[f_cols] = f_scaler.fit_transform(train_df[f_cols])
+                test_df[f_cols] = f_scaler.transform(test_df[f_cols])
 
-            scalers[name] = scaler
+                scalers["features"][name] = f_scaler
+
+            # Scale selected target columns, e.g. h2_tpr temp and osc capacity
+            t_cols = target_cols.get(name, [])
+            if t_cols:
+                t_scaler = scalers["targets"].get(name, StandardScaler())
+
+                train_df[t_cols] = t_scaler.fit_transform(train_df[t_cols])
+                test_df[t_cols] = t_scaler.transform(test_df[t_cols])
+
+                scalers["targets"][name] = t_scaler
+
             scaled_train[name] = train_df
             scaled_test[name] = test_df
-            
+
         return scaled_train, scaled_test, scalers
 
     def _resolve_split_all(self) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:

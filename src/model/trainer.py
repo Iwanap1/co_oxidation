@@ -99,8 +99,23 @@ class Trainer:
                     scheduler.step()
 
             if epoch % print_status_epochs == 0:
+                train_parts = []
+                test_parts = []
+
+                for key in ["conversion", "tpr", "osc"]:
+                    if key in train_metrics:
+                        train_parts.append(f"{key}={train_metrics[key]:.4f}")
+
+                    if key in test_metrics:
+                        test_parts.append(f"{key}={test_metrics[key]:.4f}")
+
+                train_str = " | ".join(train_parts)
+                test_str = " | ".join(test_parts)
+
                 print(
                     f"epoch {epoch:04d} "
+                    f"train[{train_str}] "
+                    f"test[{test_str}] "
                     f"train_total={train_metrics['total']:.6f} "
                     f"test_total={test_metrics['total']:.6f} "
                     f"best={best_loss:.6f} "
