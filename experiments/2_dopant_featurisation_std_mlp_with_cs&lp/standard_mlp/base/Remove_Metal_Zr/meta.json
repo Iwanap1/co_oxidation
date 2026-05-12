@@ -1,0 +1,100 @@
+{
+    "config_name": "base",
+    "split_method": "Remove_Metal",
+    "split_value": "Zr",
+    "feature_cols": {
+        "reactions": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "crystallite_size_nm",
+            "lattice_parameter_A",
+            "gas_co_content",
+            "gas_o2_content",
+            "flow_mL_h_g",
+            "pretreatment_temp",
+            "pretreatment_o2_vol%",
+            "pretreatment_time_h",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Eu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Nd",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Tb",
+            "Ti",
+            "Zr",
+            "temperature"
+        ],
+        "h2_tpr": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "ramp_rate_C_min",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Eu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Nd",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Tb",
+            "Ti",
+            "Zr"
+        ],
+        "osc": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Eu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Nd",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Tb",
+            "Ti",
+            "Zr"
+        ]
+    },
+    "target_cols": {
+        "reactions": [
+            "conversion"
+        ],
+        "h2_tpr": [
+            "temp"
+        ],
+        "osc": [
+            "value_O_umol_per_g_catalyst"
+        ]
+    }
+}

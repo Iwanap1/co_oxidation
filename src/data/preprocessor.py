@@ -1968,8 +1968,25 @@ class Preprocessor:
             feature_map=self.feature_map,
         )
 
-        return dopant_processor.convert_features(
-            df,
-            leave_ce=material_cfg.get("leave_ce", True),
-            include_n_dopants=material_cfg.get("include_n_dopants", True),
+        mode = material_cfg.get("dopant_featurisation", "slots")
+
+        if mode == "slots":
+            return dopant_processor.convert_features(
+                df,
+                leave_ce=material_cfg.get("leave_ce", True),
+                include_n_dopants=material_cfg.get("include_n_dopants", True),
+                delete_old_features=material_cfg.get("delete_old_features", False),
+            )
+
+        if mode == "weighted_stats":
+            return dopant_processor.convert_features_weighted_stats(
+                df,
+                leave_ce=material_cfg.get("leave_ce", True),
+                include_n_dopants=material_cfg.get("include_n_dopants", True),
+                delete_old_features=material_cfg.get("delete_old_features", False),
+                stats=material_cfg.get("weighted_stats", ["mean", "std"]),
+            )
+
+        raise ValueError("material.dopant_featurisation must be one of: "
+            "'slots', 'weighted_stats'"
         )

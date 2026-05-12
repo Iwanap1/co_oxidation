@@ -138,3 +138,105 @@ class DopantFeaturiser:
         return metal_dict
     
 
+    def convert_features_weighted_stats(
+        self,
+        df: pd.DataFrame,
+        leave_ce: bool = True,
+        include_n_dopants: bool = True,
+        delete_old_features: bool = False,
+        stats: Optional[List[str]] = None,
+    ) -> pd.DataFrame:
+        """
+        Converts element fractions to permutation-invariant weighted dopant descriptors.
+
+        Example outputs:
+            n_dopants
+            dopant_total_fraction
+            dopant_mean_atomic_radius
+            dopant_std_atomic_radius
+            dopant_min_atomic_radius
+            dopant_max_atomic_radius
+        """
+        if stats is None:
+            stats = ["mean", "std"]
+
+        df = df.copy()
+
+        metals_in_df = [m for m in self.metals if m in df.columns]
+
+        if leave_ce and "Ce" in metals_in_df:
+            dopant_cols = [m for m in metals_in_df if m != "Ce"]
+        else:
+            dopant_cols = metals_in_df
+
+        cols_to_drop = dopant_cols.copy() if delete_old_features else []
+
+        if not leave_ce and "Ce" in metals_in_df:
+            cols_to_drop.append("Ce")
+
+        base_df = df.drop(columns=cols_to_drop)
+
+        example_attrs = next(iter(self.feature_map.values()))
+        attr_names = list(example_attrs.keys())
+
+        featurised_rows = []
+
+        for _, row in df.iterrows():
+            row_features = {}
+
+            dopants = []
+            for metal in dopant_cols:
+                frac = row.get(metal, 0.0)
+                if pd.notna(frac) and float(frac) > 0:
+                    dopants.append((metal, float(frac)))
+
+            fractions = [frac for _, frac in dopants]
+            total_fraction = float(sum(fractions))
+
+            if include_n_dopants:
+                row_features["n_dopants"] = len(dopants)
+
+            row_features["dopant_total_fraction"] = total_fraction
+
+            if len(dopants) == 0 or total_fraction <= 0:
+                for attr in attr_names:
+                    for stat in stats:
+                        row_features[f"dopant_{stat}_{attr}"] = 0.0
+
+                featurised_rows.append(row_features)
+                continue
+
+            weights = [frac / total_fraction for frac in fractions]
+
+            for attr in attr_names:
+                values = [
+                    float(self.feature_map[metal][attr])
+                    for metal, _ in dopants
+                ]
+
+                weighted_mean = sum(w * v for w, v in zip(weights, values))
+
+                if "mean" in stats:
+                    row_features[f"dopant_mean_{attr}"] = weighted_mean
+
+                if "std" in stats:
+                    weighted_var = sum(
+                        w * (v - weighted_mean) ** 2
+                        for w, v in zip(weights, values)
+                    )
+                    row_features[f"dopant_std_{attr}"] = weighted_var ** 0.5
+
+                if "min" in stats:
+                    row_features[f"dopant_min_{attr}"] = min(values)
+
+                if "max" in stats:
+                    row_features[f"dopant_max_{attr}"] = max(values)
+
+                if "range" in stats:
+                    row_features[f"dopant_range_{attr}"] = max(values) - min(values)
+
+            featurised_rows.append(row_features)
+
+        dopant_features_df = pd.DataFrame(featurised_rows, index=df.index)
+
+        return pd.concat([base_df, dopant_features_df], axis=1)

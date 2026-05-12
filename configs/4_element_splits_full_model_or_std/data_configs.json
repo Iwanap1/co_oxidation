@@ -1,6 +1,6 @@
 [
     {
-        "name": "converted",
+        "name": "converted_slot_based",
         "material": {
             "base_filter": {"phase_flag": {"$exists": true}},
             "default_to_mean_cols": ["calcination_time"],
@@ -15,6 +15,7 @@
             "element_min_appearances": 1,
             "element_min_papers": 1,
             "convert_features": true,
+            "dopant_featurisation": "slots",
             "max_dopants": 3,
             "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary"]
         },

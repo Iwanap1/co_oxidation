@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 import pandas as pd
 
-EXPERIMENT_NAME = "4.5_same_with_features_in_conv_net"
+EXPERIMENT_NAME = "2_dopant_featurisation_std_mlp_with_cs&lp"
 
 DEFAULT_SPLIT_MODES = [
     ("Random_by_Material", 0.2), 
@@ -57,7 +57,7 @@ def main():
                         data.set_split_and_scale(split_mode, split_value)
                         datasets = data.prepare_datasets(m_cfg)
                         save_dataset_debug_json(data, datasets, m_cfg, outdir)
-                        data.save(outdir, save_scalers=True, save_preprocess_stats=True, save_scaled=False, save_unscaled=True, save_full=False)
+                        data.save(outdir, save_scalers=True, save_preprocess_stats=True, save_scaled=False, save_unscaled=False, save_full=False)
                         m_cfg.update({"split_mode": split_mode, "split_value": split_value, "input_dims": data.input_dims})
                         config = {
                             "data_config": d_cfg,
