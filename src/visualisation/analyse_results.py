@@ -2,6 +2,12 @@ import pandas as pd
 from pathlib import Path
 import pymatviz as pmv
 from typing import Optional, Union
+import re
+
+
+
+def _safe_filename(s):
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(s))
 
 
 def plot_remove_metal_test_mae_ptables(
@@ -19,7 +25,10 @@ def plot_remove_metal_test_mae_ptables(
 
     if df.empty:
         return {}
-
+    
+    global_min = df[value_col].min()
+    global_max = df[value_col].max()
+    cscale_range=(global_min, global_max)
     if save_dir is not None:
         save_dir = Path(save_dir)
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -43,6 +52,7 @@ def plot_remove_metal_test_mae_ptables(
             fmt=".3f",
             colorscale=colorscale,
             colorbar={"title": value_col},
+            cscale_range=(global_min, global_max),
             show_values=True,
             gap=3,
             font_size=16,

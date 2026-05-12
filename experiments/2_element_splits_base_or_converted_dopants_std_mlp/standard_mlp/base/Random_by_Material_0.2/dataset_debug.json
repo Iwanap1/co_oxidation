@@ -2,7 +2,7 @@
     "model_config_name": null,
     "data_config_name": "base",
     "input_dims": {
-        "conversion": 19,
+        "conversion": 22,
         "reaction_inputs": 7
     },
     "feature_cols": {
@@ -21,6 +21,7 @@
             "Ce",
             "Co",
             "Cu",
+            "Eu",
             "Fe",
             "Gd",
             "Hf",
@@ -31,6 +32,8 @@
             "Pr",
             "Sm",
             "Sn",
+            "Tb",
+            "Ti",
             "Zr",
             "temperature"
         ],
@@ -44,6 +47,7 @@
             "Ce",
             "Co",
             "Cu",
+            "Eu",
             "Fe",
             "Gd",
             "Hf",
@@ -54,6 +58,8 @@
             "Pr",
             "Sm",
             "Sn",
+            "Tb",
+            "Ti",
             "Zr"
         ],
         "osc": [
@@ -65,6 +71,7 @@
             "Ce",
             "Co",
             "Cu",
+            "Eu",
             "Fe",
             "Gd",
             "Hf",
@@ -75,6 +82,8 @@
             "Pr",
             "Sm",
             "Sn",
+            "Tb",
+            "Ti",
             "Zr"
         ]
     },
@@ -91,10 +100,10 @@
     },
     "dataset_sizes": {
         "train": {
-            "reactions": 1464
+            "reactions": 2418
         },
         "test": {
-            "reactions": 413
+            "reactions": 672
         }
     },
     "tensor_names": {
@@ -125,6 +134,7 @@
                     "Ce",
                     "Co",
                     "Cu",
+                    "Eu",
                     "Fe",
                     "Gd",
                     "Hf",
@@ -135,6 +145,8 @@
                     "Pr",
                     "Sm",
                     "Sn",
+                    "Tb",
+                    "Ti",
                     "Zr"
                 ],
                 "reaction_inputs": [
@@ -162,6 +174,7 @@
                     "Ce",
                     "Co",
                     "Cu",
+                    "Eu",
                     "Fe",
                     "Gd",
                     "Hf",
@@ -172,6 +185,8 @@
                     "Pr",
                     "Sm",
                     "Sn",
+                    "Tb",
+                    "Ti",
                     "Zr"
                 ],
                 "reaction_inputs": [
@@ -193,15 +208,15 @@
         "train": {
             "reactions": {
                 "conversion_features": [
-                    1464,
-                    19
+                    2418,
+                    22
                 ],
                 "reaction_inputs": [
-                    1464,
+                    2418,
                     7
                 ],
                 "target": [
-                    1464,
+                    2418,
                     1
                 ]
             }
@@ -209,15 +224,15 @@
         "test": {
             "reactions": {
                 "conversion_features": [
-                    413,
-                    19
+                    672,
+                    22
                 ],
                 "reaction_inputs": [
-                    413,
+                    672,
                     7
                 ],
                 "target": [
-                    413,
+                    672,
                     1
                 ]
             }

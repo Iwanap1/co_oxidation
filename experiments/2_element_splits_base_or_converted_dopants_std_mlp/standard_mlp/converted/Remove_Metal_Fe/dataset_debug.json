@@ -157,7 +157,7 @@
     },
     "dataset_sizes": {
         "train": {
-            "reactions": 1717
+            "reactions": 2930
         },
         "test": {
             "reactions": 141
@@ -303,15 +303,15 @@
         "train": {
             "reactions": {
                 "conversion_features": [
-                    1717,
+                    2930,
                     41
                 ],
                 "reaction_inputs": [
-                    1717,
+                    2930,
                     7
                 ],
                 "target": [
-                    1717,
+                    2930,
                     1
                 ]
             }

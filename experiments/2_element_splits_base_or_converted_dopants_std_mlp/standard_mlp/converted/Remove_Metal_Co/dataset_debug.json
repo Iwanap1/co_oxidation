@@ -157,10 +157,10 @@
     },
     "dataset_sizes": {
         "train": {
-            "reactions": 1754
+            "reactions": 2902
         },
         "test": {
-            "reactions": 104
+            "reactions": 169
         }
     },
     "tensor_names": {
@@ -303,15 +303,15 @@
         "train": {
             "reactions": {
                 "conversion_features": [
-                    1754,
+                    2902,
                     41
                 ],
                 "reaction_inputs": [
-                    1754,
+                    2902,
                     7
                 ],
                 "target": [
-                    1754,
+                    2902,
                     1
                 ]
             }
@@ -319,15 +319,15 @@
         "test": {
             "reactions": {
                 "conversion_features": [
-                    104,
+                    169,
                     41
                 ],
                 "reaction_inputs": [
-                    104,
+                    169,
                     7
                 ],
                 "target": [
-                    104,
+                    169,
                     1
                 ]
             }

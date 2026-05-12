@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 import pandas as pd
 
-EXPERIMENT_NAME = "3_element_splits_full_model_or_std"
+EXPERIMENT_NAME = "4.5_same_with_features_in_conv_net"
 
 DEFAULT_SPLIT_MODES = [
     ("Random_by_Material", 0.2), 
@@ -99,20 +99,21 @@ def main():
                         print(f"Error in experiment with model {m_name}, data config {data_name}, split mode {split_mode} and train config {train_cfg.get('name', f'train_config_{i}')}: {e}")
                         continue
 
-    pd.DataFrame(results).to_csv(experiment_dir / "results_summary.csv", index=False)
+    results_df = pd.DataFrame(results)
+    results_df.to_csv(experiment_dir / "results_summary.csv", index=False)
     plot_remove_metal_test_mae_ptables(
-        results_df=results,
+        results_df=results_df,
         value_col="test_mae",
         group_cols=("data_config", "model_config", "train_config"),
         colorscale="Reds",
-        save_dir=experiment_dir / "Dopant_Extrapolation_MAE_Ptables",
+        save_dir=experiment_dir / "Figures/Dopant_Extrapolation_MAE_Ptables",
     )
     plot_remove_metal_test_mae_ptables(
-        results_df=results,
+        results_df=results_df,
         value_col="test_r2",
         group_cols=("data_config", "model_config", "train_config"),
         colorscale="Reds",
-        save_dir=experiment_dir / "Dopant_Extrapolation_R2_Ptables",
+        save_dir=experiment_dir / "Figures/Dopant_Extrapolation_R2_Ptables",
     )
 
 

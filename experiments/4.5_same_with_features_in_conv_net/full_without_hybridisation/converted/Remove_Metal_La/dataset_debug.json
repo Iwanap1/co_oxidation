@@ -1,0 +1,719 @@
+{
+    "model_config_name": null,
+    "data_config_name": "converted",
+    "input_dims": {
+        "conversion": 1,
+        "reaction_inputs": 7,
+        "osc": 41,
+        "tpr": 41
+    },
+    "feature_cols": {
+        "reactions": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "crystallite_size_nm",
+            "gas_co_content",
+            "gas_o2_content",
+            "flow_mL_h_g",
+            "pretreatment_temp",
+            "pretreatment_o2_vol%",
+            "pretreatment_time_h",
+            "n_dopants",
+            "dopant_1_element_fraction",
+            "dopant_1_atomic_radius",
+            "dopant_1_electronegativity_pauling",
+            "dopant_1_protons",
+            "dopant_1_can_be_1",
+            "dopant_1_can_be_2",
+            "dopant_1_can_be_3",
+            "dopant_1_can_be_4",
+            "dopant_1_can_be_5",
+            "dopant_1_can_be_6",
+            "dopant_1_can_be_7",
+            "dopant_1_first_ionisation_energy",
+            "dopant_2_element_fraction",
+            "dopant_2_atomic_radius",
+            "dopant_2_electronegativity_pauling",
+            "dopant_2_protons",
+            "dopant_2_can_be_1",
+            "dopant_2_can_be_2",
+            "dopant_2_can_be_3",
+            "dopant_2_can_be_4",
+            "dopant_2_can_be_5",
+            "dopant_2_can_be_6",
+            "dopant_2_can_be_7",
+            "dopant_2_first_ionisation_energy",
+            "dopant_3_element_fraction",
+            "dopant_3_atomic_radius",
+            "dopant_3_electronegativity_pauling",
+            "dopant_3_protons",
+            "dopant_3_can_be_1",
+            "dopant_3_can_be_2",
+            "dopant_3_can_be_3",
+            "dopant_3_can_be_4",
+            "dopant_3_can_be_5",
+            "dopant_3_can_be_6",
+            "dopant_3_can_be_7",
+            "dopant_3_first_ionisation_energy",
+            "temperature"
+        ],
+        "h2_tpr": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "ramp_rate_C_min",
+            "n_dopants",
+            "dopant_1_element_fraction",
+            "dopant_1_atomic_radius",
+            "dopant_1_electronegativity_pauling",
+            "dopant_1_protons",
+            "dopant_1_can_be_1",
+            "dopant_1_can_be_2",
+            "dopant_1_can_be_3",
+            "dopant_1_can_be_4",
+            "dopant_1_can_be_5",
+            "dopant_1_can_be_6",
+            "dopant_1_can_be_7",
+            "dopant_1_first_ionisation_energy",
+            "dopant_2_element_fraction",
+            "dopant_2_atomic_radius",
+            "dopant_2_electronegativity_pauling",
+            "dopant_2_protons",
+            "dopant_2_can_be_1",
+            "dopant_2_can_be_2",
+            "dopant_2_can_be_3",
+            "dopant_2_can_be_4",
+            "dopant_2_can_be_5",
+            "dopant_2_can_be_6",
+            "dopant_2_can_be_7",
+            "dopant_2_first_ionisation_energy",
+            "dopant_3_element_fraction",
+            "dopant_3_atomic_radius",
+            "dopant_3_electronegativity_pauling",
+            "dopant_3_protons",
+            "dopant_3_can_be_1",
+            "dopant_3_can_be_2",
+            "dopant_3_can_be_3",
+            "dopant_3_can_be_4",
+            "dopant_3_can_be_5",
+            "dopant_3_can_be_6",
+            "dopant_3_can_be_7",
+            "dopant_3_first_ionisation_energy"
+        ],
+        "osc": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "n_dopants",
+            "dopant_1_element_fraction",
+            "dopant_1_atomic_radius",
+            "dopant_1_electronegativity_pauling",
+            "dopant_1_protons",
+            "dopant_1_can_be_1",
+            "dopant_1_can_be_2",
+            "dopant_1_can_be_3",
+            "dopant_1_can_be_4",
+            "dopant_1_can_be_5",
+            "dopant_1_can_be_6",
+            "dopant_1_can_be_7",
+            "dopant_1_first_ionisation_energy",
+            "dopant_2_element_fraction",
+            "dopant_2_atomic_radius",
+            "dopant_2_electronegativity_pauling",
+            "dopant_2_protons",
+            "dopant_2_can_be_1",
+            "dopant_2_can_be_2",
+            "dopant_2_can_be_3",
+            "dopant_2_can_be_4",
+            "dopant_2_can_be_5",
+            "dopant_2_can_be_6",
+            "dopant_2_can_be_7",
+            "dopant_2_first_ionisation_energy",
+            "dopant_3_element_fraction",
+            "dopant_3_atomic_radius",
+            "dopant_3_electronegativity_pauling",
+            "dopant_3_protons",
+            "dopant_3_can_be_1",
+            "dopant_3_can_be_2",
+            "dopant_3_can_be_3",
+            "dopant_3_can_be_4",
+            "dopant_3_can_be_5",
+            "dopant_3_can_be_6",
+            "dopant_3_can_be_7",
+            "dopant_3_first_ionisation_energy"
+        ]
+    },
+    "target_cols": {
+        "reactions": [
+            "conversion"
+        ],
+        "h2_tpr": [
+            "temp"
+        ],
+        "osc": [
+            "value_O_umol_per_g_catalyst"
+        ]
+    },
+    "dataset_sizes": {
+        "train": {
+            "reactions": 2517,
+            "h2_tpr": 126,
+            "osc": 164
+        },
+        "test": {
+            "reactions": 176,
+            "h2_tpr": 18,
+            "osc": 39
+        }
+    },
+    "tensor_names": {
+        "train": {
+            "reactions": [
+                "conversion_features",
+                "reaction_inputs",
+                "osc_features",
+                "tpr_features",
+                "target"
+            ],
+            "h2_tpr": [
+                "tpr_features",
+                "ramp_rate",
+                "target"
+            ],
+            "osc": [
+                "osc_features",
+                "target"
+            ]
+        },
+        "test": {
+            "reactions": [
+                "conversion_features",
+                "reaction_inputs",
+                "osc_features",
+                "tpr_features",
+                "target"
+            ],
+            "h2_tpr": [
+                "tpr_features",
+                "ramp_rate",
+                "target"
+            ],
+            "osc": [
+                "osc_features",
+                "target"
+            ]
+        }
+    },
+    "tensor_feature_names": {
+        "train": {
+            "reactions": {
+                "conversion_features": [
+                    "crystallite_size_nm"
+                ],
+                "reaction_inputs": [
+                    "temperature",
+                    "gas_co_content",
+                    "gas_o2_content",
+                    "flow_mL_h_g",
+                    "pretreatment_temp",
+                    "pretreatment_o2_vol%",
+                    "pretreatment_time_h"
+                ],
+                "osc_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "tpr_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "target": [
+                    "conversion"
+                ]
+            },
+            "h2_tpr": {
+                "tpr_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "ramp_rate": [
+                    "ramp_rate_C_min"
+                ],
+                "target": [
+                    "temp"
+                ]
+            },
+            "osc": {
+                "osc_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "target": [
+                    "value_O_umol_per_g_catalyst"
+                ]
+            }
+        },
+        "test": {
+            "reactions": {
+                "conversion_features": [
+                    "crystallite_size_nm"
+                ],
+                "reaction_inputs": [
+                    "temperature",
+                    "gas_co_content",
+                    "gas_o2_content",
+                    "flow_mL_h_g",
+                    "pretreatment_temp",
+                    "pretreatment_o2_vol%",
+                    "pretreatment_time_h"
+                ],
+                "osc_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "tpr_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "target": [
+                    "conversion"
+                ]
+            },
+            "h2_tpr": {
+                "tpr_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "ramp_rate": [
+                    "ramp_rate_C_min"
+                ],
+                "target": [
+                    "temp"
+                ]
+            },
+            "osc": {
+                "osc_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "n_dopants",
+                    "dopant_1_element_fraction",
+                    "dopant_1_atomic_radius",
+                    "dopant_1_electronegativity_pauling",
+                    "dopant_1_protons",
+                    "dopant_1_can_be_1",
+                    "dopant_1_can_be_2",
+                    "dopant_1_can_be_3",
+                    "dopant_1_can_be_4",
+                    "dopant_1_can_be_5",
+                    "dopant_1_can_be_6",
+                    "dopant_1_can_be_7",
+                    "dopant_1_first_ionisation_energy",
+                    "dopant_2_element_fraction",
+                    "dopant_2_atomic_radius",
+                    "dopant_2_electronegativity_pauling",
+                    "dopant_2_protons",
+                    "dopant_2_can_be_1",
+                    "dopant_2_can_be_2",
+                    "dopant_2_can_be_3",
+                    "dopant_2_can_be_4",
+                    "dopant_2_can_be_5",
+                    "dopant_2_can_be_6",
+                    "dopant_2_can_be_7",
+                    "dopant_2_first_ionisation_energy",
+                    "dopant_3_element_fraction",
+                    "dopant_3_atomic_radius",
+                    "dopant_3_electronegativity_pauling",
+                    "dopant_3_protons",
+                    "dopant_3_can_be_1",
+                    "dopant_3_can_be_2",
+                    "dopant_3_can_be_3",
+                    "dopant_3_can_be_4",
+                    "dopant_3_can_be_5",
+                    "dopant_3_can_be_6",
+                    "dopant_3_can_be_7",
+                    "dopant_3_first_ionisation_energy"
+                ],
+                "target": [
+                    "value_O_umol_per_g_catalyst"
+                ]
+            }
+        }
+    },
+    "tensor_shapes": {
+        "train": {
+            "reactions": {
+                "conversion_features": [
+                    2517,
+                    1
+                ],
+                "reaction_inputs": [
+                    2517,
+                    7
+                ],
+                "osc_features": [
+                    2517,
+                    41
+                ],
+                "tpr_features": [
+                    2517,
+                    41
+                ],
+                "target": [
+                    2517,
+                    1
+                ]
+            },
+            "h2_tpr": {
+                "tpr_features": [
+                    126,
+                    41
+                ],
+                "ramp_rate": [
+                    126,
+                    1
+                ],
+                "target": [
+                    126,
+                    1
+                ]
+            },
+            "osc": {
+                "osc_features": [
+                    164,
+                    41
+                ],
+                "target": [
+                    164,
+                    1
+                ]
+            }
+        },
+        "test": {
+            "reactions": {
+                "conversion_features": [
+                    176,
+                    1
+                ],
+                "reaction_inputs": [
+                    176,
+                    7
+                ],
+                "osc_features": [
+                    176,
+                    41
+                ],
+                "tpr_features": [
+                    176,
+                    41
+                ],
+                "target": [
+                    176,
+                    1
+                ]
+            },
+            "h2_tpr": {
+                "tpr_features": [
+                    18,
+                    41
+                ],
+                "ramp_rate": [
+                    18,
+                    1
+                ],
+                "target": [
+                    18,
+                    1
+                ]
+            },
+            "osc": {
+                "osc_features": [
+                    39,
+                    41
+                ],
+                "target": [
+                    39,
+                    1
+                ]
+            }
+        }
+    }
+}

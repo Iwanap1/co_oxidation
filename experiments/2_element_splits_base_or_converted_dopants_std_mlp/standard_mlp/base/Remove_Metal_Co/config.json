@@ -17,9 +17,7 @@
             ],
             "cannot_be_zero_or_none": [
                 "Sbet",
-                "calcination_temp",
-                "crystallite_size_nm",
-                "lattice_parameter_A"
+                "calcination_temp"
             ],
             "allowed_elements": [
                 "Ce",
@@ -36,7 +34,10 @@
                 "Ni",
                 "Hf",
                 "Sn",
-                "Pr"
+                "Pr",
+                "Eu",
+                "Ti",
+                "Tb"
             ],
             "allow_supported_samples": false,
             "add_synthesis_flags": false,
@@ -174,7 +175,7 @@
         "split_mode": "Remove_Metal",
         "split_value": "Co",
         "input_dims": {
-            "conversion": 19,
+            "conversion": 22,
             "reaction_inputs": 7
         }
     },
@@ -208,6 +209,19 @@
                 "weight": 0.1
             }
         },
-        "eval_critereon": null
+        "eval_critereon": {
+            "conversion": {
+                "name": "MSELoss",
+                "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.0
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 0.0
+            }
+        }
     }
 }
