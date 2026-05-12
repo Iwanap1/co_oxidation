@@ -1,0 +1,2 @@
+_id,material_id,Al,Sc,Ti,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Sr,Y,Zr,Nb,Sn,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Ho,Yb,Lu,Hf,Bi,Pm,Sbet,calcination_temp,calcination_time,single_phase_binary,ramp_rate_C_min,temp
+69cd305329cce59b64a17875,69cd305329cce59b64a17875,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.896814404432133,0.0,0.0,0.0,0.0,0.10318559556786704,0.0,0.0,0.0,0.0,0.0,0.0,0.0,96.0,300.0,2.0,1,10.0,450.0

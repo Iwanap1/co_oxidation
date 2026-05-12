@@ -1,0 +1,5 @@
+[
+    ["Random_by_Material", 0.2], 
+    ["Remove_Metal", "Fe"], 
+    ["Above_WHSV_Threshold", 35000]
+]

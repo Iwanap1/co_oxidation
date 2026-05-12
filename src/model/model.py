@@ -73,7 +73,7 @@ class LightOffModel(nn.Module):
         
         # Hybridised WHSV branch
         if self.hybridise_whsv and not self.hybridise_pressures:
-            k_app = F.softplus(z)
+            k_app = torch.exp(z) # z is treated as log(k_app)
             tau = 1.0 / (whsv + 1e-8)
             x = 1.0 - torch.exp(-k_app * tau) # Simple first order PFR model
             return x
@@ -85,7 +85,7 @@ class LightOffModel(nn.Module):
                     "whsv, p_co, and p_o2 are required when hybridise_pressures=True."
                 )
 
-            k_app = F.softplus(z)
+            k_app = torch.exp(z) # z is treated as log(k_app)
             tau = 1.0 / (whsv + 1e-8)
 
             xmax = torch.clamp(

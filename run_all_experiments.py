@@ -2,12 +2,14 @@ import json, os
 from src.db import DB
 from src.model import LightOffModel, Trainer, ModelAnalyser
 from src.data import Preprocessor, Data
+from src.visualisation.analyse_results import plot_remove_metal_test_mae_ptables
 from pathlib import Path
 import torch
 import pandas as pd
 
-EXPERIMENT_NAME = "base_or_converted_features_std_mlp"
-SPLIT_MODES = [
+EXPERIMENT_NAME = "3_element_splits_full_model_or_std"
+
+DEFAULT_SPLIT_MODES = [
     ("Random_by_Material", 0.2), 
     ("Remove_Metal", "Fe"), 
     ("Above_WHSV_Threshold", 35000)
@@ -21,6 +23,11 @@ def main():
     model_cfgs = _load_json(f"configs/{EXPERIMENT_NAME}/model_configs.json")
     train_cfgs = _load_json(f"configs/{EXPERIMENT_NAME}/training_configs.json")
     results = []
+    try: 
+        splits = _load_json(f"configs/{EXPERIMENT_NAME}/splits.json")
+    except:
+        print("Using default split modes because no splits.json found in config directory.")
+        splits = DEFAULT_SPLIT_MODES
 
     for d_cfg in data_cfgs:
         data_name = d_cfg.get("name", "unnamed")
@@ -32,12 +39,12 @@ def main():
         )
 
         for m_name, m_cfg in model_cfgs.items():
-            for split_mode, split_value in SPLIT_MODES:
+            for split_mode, split_value in splits:
                 for i, train_cfg in enumerate(train_cfgs):
                     try:
                         tail = f"/train_config_{i}" if len(train_cfgs) > 1 else ""
                         parts = [m_name, data_name, f"{split_mode}_{split_value}"]
-                        print("/".join(parts) + tail)
+                        print("\n", "/".join(parts) + tail)
 
                         if tail:
                             parts.append(tail)
@@ -66,9 +73,25 @@ def main():
                         trainer.save_train_history(outdir, save_graph=True, save_csv=False)
                         analyser = ModelAnalyser(best_model, datasets)
                         metrics = analyser.conversion_metrics()
+
                         for split, vals in metrics.items():
                             for metric, value in vals.items():
                                 result[f"{split}_{metric}"] = value
+
+                        # Reaction dataset sizes
+                        train_rxn = data.train_dataframes["reactions"]
+                        test_rxn = data.test_dataframes["reactions"]
+
+                        # Point counts
+                        result["train_points"] = len(train_rxn)
+                        result["test_points"] = len(test_rxn)
+
+                        # Unique material counts
+                        material_col = "_id_material"
+
+                        result["train_materials"] = train_rxn[material_col].nunique()
+                        result["test_materials"] = test_rxn[material_col].nunique()
+
                         analyser.parity_plots(outdir)
                         analyser.lightoff_curve_plots(outdir / "lightoff_curves", n=12, split="test")
                         results.append(result)
@@ -77,6 +100,21 @@ def main():
                         continue
 
     pd.DataFrame(results).to_csv(experiment_dir / "results_summary.csv", index=False)
+    plot_remove_metal_test_mae_ptables(
+        results_df=results,
+        value_col="test_mae",
+        group_cols=("data_config", "model_config", "train_config"),
+        colorscale="Reds",
+        save_dir=experiment_dir / "Dopant_Extrapolation_MAE_Ptables",
+    )
+    plot_remove_metal_test_mae_ptables(
+        results_df=results,
+        value_col="test_r2",
+        group_cols=("data_config", "model_config", "train_config"),
+        colorscale="Reds",
+        save_dir=experiment_dir / "Dopant_Extrapolation_R2_Ptables",
+    )
+
 
 def _load_json(file_path):
     with open(file_path, "r") as f:

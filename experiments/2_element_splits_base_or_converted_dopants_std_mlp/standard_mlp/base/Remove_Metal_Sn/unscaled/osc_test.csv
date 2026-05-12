@@ -1,0 +1,3 @@
+_id,material_id,Al,Sc,Ti,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Sr,Y,Zr,Nb,Sn,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Ho,Yb,Lu,Hf,Bi,Pm,Sbet,calcination_temp,calcination_time,single_phase_binary,value_O_umol_per_g_catalyst
+69cd2ffb29cce59b64a17715,69cd2ffb29cce59b64a17715,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.33,0.0,0.67,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,82.9,550.0,5.0,1,876.0
+69cd301e29cce59b64a17796,69cd301e29cce59b64a17796,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.43,0.0,0.07,0.0,0.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,24.0,1000.0,20.0,1,1067.0

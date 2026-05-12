@@ -454,23 +454,33 @@ After running .set_split():
             train_df = train_df.copy()
             test_df = test_dfs[name].copy()
 
-            # Scale feature columns
             f_cols = feature_cols.get(name, [])
             if f_cols:
-                f_scaler = scalers["features"].get(name, StandardScaler())
+                if len(train_df) == 0:
+                    raise ValueError(
+                        f"[{name}] Cannot fit feature scaler because train split has 0 rows."
+                    )
 
+                f_scaler = scalers["features"].get(name, StandardScaler())
                 train_df[f_cols] = f_scaler.fit_transform(train_df[f_cols])
-                test_df[f_cols] = f_scaler.transform(test_df[f_cols])
+
+                if len(test_df) > 0:
+                    test_df[f_cols] = f_scaler.transform(test_df[f_cols])
 
                 scalers["features"][name] = f_scaler
 
-            # Scale selected target columns, e.g. h2_tpr temp and osc capacity
             t_cols = target_cols.get(name, [])
             if t_cols:
-                t_scaler = scalers["targets"].get(name, StandardScaler())
+                if len(train_df) == 0:
+                    raise ValueError(
+                        f"[{name}] Cannot fit target scaler because train split has 0 rows."
+                    )
 
+                t_scaler = scalers["targets"].get(name, StandardScaler())
                 train_df[t_cols] = t_scaler.fit_transform(train_df[t_cols])
-                test_df[t_cols] = t_scaler.transform(test_df[t_cols])
+
+                if len(test_df) > 0:
+                    test_df[t_cols] = t_scaler.transform(test_df[t_cols])
 
                 scalers["targets"][name] = t_scaler
 

@@ -188,8 +188,17 @@ class Trainer:
     ):
         reaction_loader = loaders["reactions"]
 
-        tpr_iter = cycle(loaders["h2_tpr"]) if "h2_tpr" in loaders else None
-        osc_iter = cycle(loaders["osc"]) if "osc" in loaders else None
+        tpr_iter = (
+            cycle(loaders["h2_tpr"])
+            if "h2_tpr" in loaders and len(loaders["h2_tpr"].dataset) > 0
+            else None
+        )
+
+        osc_iter = (
+            cycle(loaders["osc"])
+            if "osc" in loaders and len(loaders["osc"].dataset) > 0
+            else None
+        )
 
         totals = {}
         n_steps = 0
