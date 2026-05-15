@@ -1,11 +1,11 @@
 [
     {
-        "name": "converted_slot_based",
+        "name": "converted_weighted_method_mean_std_min_and_max",
         "material": {
             "base_filter": {"phase_flag": {"$exists": true}},
             "default_to_mean_cols": ["calcination_time"],
             "default_to_zero_cols": ["pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"],
-            "cannot_be_zero_or_none": ["Sbet", "calcination_temp"],
+            "cannot_be_zero_or_none": ["Sbet", "calcination_temp", "crystallite_size_nm", "lattice_parameter_A"],
             "allowed_elements": ["Ce","Mn","Cu","Gd","Zr","Bi","Sm","Co","Fe","Nd","La","Ni", "Hf", "Sn", "Pr", "Eu", "Ti", "Tb"],
             "allow_supported_samples": false,
             "add_synthesis_flags": false,
@@ -15,9 +15,10 @@
             "element_min_appearances": 1,
             "element_min_papers": 1,
             "convert_features": true,
-            "dopant_featurisation": "slots",
+            "dopant_featurisation": "weighted_stats",
+            "weighted_stats": ["mean", "std", "min", "max"],
             "max_dopants": 3,
-            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary"]
+            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary", "crystallite_size_nm", "lattice_parameter_A"]
         },
         "reactions": {
             "base_filter": {},
@@ -48,12 +49,13 @@
         },
         "osc": {
             "base_filter": {},
-            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw"],
+            "cannot_be_zero_or_none": ["value_O_umol_per_g_catalyst", "value_raw", "temperature"],
             "default_to_zero_cols": ["h2_vol%", "co_vol%", "o2_vol%"],
             "allowed_experiment_classes": ["a", "b", "c", "d"],
             "tag_dynamic": true,
             "dynamic_or_total_tag_name": "is_dynamic_capacity",
             "feature_cols": [],
+            "direct_input_cols": ["temperature"],
             "element_attributes": ["atomic_radius", "electronegativity_pauling", "protons", "oxidation_states_one_hot", "first_ionisation_energy"],
             "material_feature_cols": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary"],
             "target_cols": ["value_O_umol_per_g_catalyst"]

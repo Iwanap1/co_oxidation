@@ -3,10 +3,11 @@ from typing import List, Dict, Tuple
 import json, os, hashlib, shutil
 from pathlib import Path
 from bson import ObjectId
+from copy import deepcopy
 
 class Migrator:
     def __init__(self, db: DB, microscopy_dir="db/microscopy_images", staging_dir="db/migrations/staged_microscopy", migration_failure_dir="db/migrations/failures"):
-        self.db = DB
+        self.db = db
         self.microscopy_dir = Path(microscopy_dir)
         self.staging_dir = Path(staging_dir)
         self.staged_images = set(os.listdir(self.staging_dir))
@@ -229,7 +230,7 @@ class Migrator:
         for u in updates:
             try:
                 coll_name = u.pop("collection")
-                coll = self.database.collections[coll_name]
+                coll = self.db.collections[coll_name]
                 _id = ObjectId(u.pop("_id"))
                 res = coll.find_one_and_update({"_id": _id}, {"$set": u})
             except Exception as e:
@@ -300,7 +301,7 @@ class Migrator:
     def upload_characterisation(self, entry: Dict, collection_name: str, doi: str, material_id: ObjectId):
         # upload O2_TPD, H2_TPR, CO2_TPD or OSC
         try:
-            coll = self.database.collections[collection_name]
+            coll = self.db.collections[collection_name]
             entry.update({"doi": doi, "material_id": material_id})
             res = coll.insert_one(entry)
             if res.inserted_id:
@@ -314,7 +315,7 @@ class Migrator:
 
     def upload_oscs(self, osc_entries: List[Dict], material_id: ObjectId, doi: str):
         try:
-            coll = self.database.collections["osc"]
+            coll = self.db.collections["osc"]
             successes = 0
             failures = []
             for osc_entry in osc_entries:
@@ -335,7 +336,7 @@ class Migrator:
         for entry in update_by_filter_entries:
             try:
                 coll_name = entry.pop("collection")
-                coll = self.database.collections[coll_name]
+                coll = self.db.collections[coll_name]
                 filter_ = entry.pop("filter")
                 update = entry.pop("update")
                 res = coll.update_many(filter_, update)
@@ -349,3 +350,114 @@ class Migrator:
                 failed_updates.append((entry, "No documents matched the filter"))
 
         return successes, failed_updates
+
+
+    def backfill_subcreations_by_fingerprint(self, file_path: str):
+        data = self.load_file(file_path)
+        root_name = Path(file_path).stem
+
+        successes = {
+            "reactions": 0,
+            "h2_tpr_peaks": 0,
+            "o2_tpd_peaks": 0,
+            "co2_tpd_peaks": 0,
+            "osc": 0,
+        }
+        failures = []
+
+        for raw_entry in data.get("create", []):
+            entry = deepcopy(raw_entry)
+
+            reactions = entry.pop("reactions", [])
+            h2_tpr = entry.pop("h2_tpr_peaks", {})
+            o2_tpd = entry.pop("o2_tpd_peaks", {})
+            co2_tpd = entry.pop("co2_tpd_peaks", {})
+            oscs = entry.pop("osc_entries", [])
+
+            fp = self.fingerprint(entry)
+            matches = list(self.materials_coll.find({"fingerprint": fp}))
+
+            if len(matches) != 1:
+                failures.append((
+                    raw_entry,
+                    f"Expected exactly 1 material with fingerprint {fp}, found {len(matches)}"
+                ))
+                continue
+
+            material = matches[0]
+            material_id = material["_id"]
+            doi = material["doi"]
+
+            for r in reactions:
+                r = deepcopy(r)
+                r.update({"material_id": material_id, "doi": doi})
+
+                # avoids duplicate exact same reaction if you rerun this
+                if self.reactions_coll.find_one({
+                    "material_id": material_id,
+                    "doi": doi,
+                    "temps": r.get("temps"),
+                    "conversion": r.get("conversion"),
+                }):
+                    continue
+
+                try:
+                    res = self.reactions_coll.insert_one(r)
+                    if res.inserted_id:
+                        successes["reactions"] += 1
+                except Exception as e:
+                    failures.append((r, repr(e)))
+
+            for char_entry, coll_name in [
+                (h2_tpr, "h2_tpr_peaks"),
+                (o2_tpd, "o2_tpd_peaks"),
+                (co2_tpd, "co2_tpd_peaks"),
+            ]:
+                if char_entry != {} and char_entry.get("temps", False):
+                    doc = deepcopy(char_entry)
+                    doc.update({"material_id": material_id, "doi": doi})
+
+                    # avoids duplicate exact same characterisation if rerun
+                    if self.db.collections[coll_name].find_one({
+                        "material_id": material_id,
+                        "doi": doi,
+                        "temps": doc.get("temps"),
+                    }):
+                        continue
+
+                    try:
+                        res = self.db.collections[coll_name].insert_one(doc)
+                        if res.inserted_id:
+                            successes[coll_name] += 1
+                    except Exception as e:
+                        failures.append((doc, repr(e)))
+
+            for osc in oscs:
+                doc = deepcopy(osc)
+                doc.update({"material_id": material_id, "doi": doi})
+
+                if self.db.collections["osc"].find_one({
+                    "material_id": material_id,
+                    "doi": doi,
+                    "value_raw": doc.get("value_raw"),
+                    "temperature": doc.get("temperature"),
+                    "method": doc.get("method"),
+                    "measurement_class": doc.get("measurement_class"),
+                }):
+                    continue
+
+                try:
+                    res = self.db.collections["osc"].insert_one(doc)
+                    if res.inserted_id:
+                        successes["osc"] += 1
+                except Exception as e:
+                    failures.append((doc, repr(e)))
+
+        print("Backfill successes:", successes)
+
+        if failures:
+            failure_path = root_name + "_backfill_subcreation_failures.json"
+            print(f"Logging backfill failures to {self.failure_dir / failure_path}")
+            self.save_failures(failures, failure_path)
+
+        return successes, failures

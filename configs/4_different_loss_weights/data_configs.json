@@ -1,6 +1,6 @@
 [
     {
-        "name": "converted",
+        "name": "converted_weighted_method_mean_std_min_and_max",
         "material": {
             "base_filter": {"phase_flag": {"$exists": true}},
             "default_to_mean_cols": ["calcination_time"],
@@ -15,8 +15,10 @@
             "element_min_appearances": 1,
             "element_min_papers": 1,
             "convert_features": true,
+            "dopant_featurisation": "weighted_stats",
+            "weighted_stats": ["mean", "std", "min", "max"],
             "max_dopants": 3,
-            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary", "crystallite_size_nm"]
+            "feature_cols_minus_elements": ["Sbet", "calcination_temp", "calcination_time", "single_phase_binary", "crystallite_size_nm", "lattice_parameter_A"]
         },
         "reactions": {
             "base_filter": {},

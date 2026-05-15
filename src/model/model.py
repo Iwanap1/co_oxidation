@@ -34,9 +34,14 @@ class LightOffModel(nn.Module):
         if self.include_conversion_features:
             conv_input_dim += input_dims["conversion"]
 
+        self.osc_direct_inputs = osc_cfg.get("direct_inputs", []) if osc_cfg is not None else []
+
         if osc_cfg is not None:
             self.osc_net = self._make_mlp(input_dims["osc"], osc_cfg)
-            self.osc_head = nn.Linear(osc_cfg["output_dim"], 1)
+
+            osc_head_input_dim = osc_cfg["output_dim"] + input_dims.get("osc_direct_inputs", 0)
+            self.osc_head = nn.Linear(osc_head_input_dim, 1)
+
             conv_input_dim += osc_cfg["output_dim"]
 
         if tpr_cfg is not None:
@@ -158,8 +163,18 @@ class LightOffModel(nn.Module):
 
         return self.tpr_head(z_tpr)
     
-    def predict_osc(self, osc_features: torch.Tensor) -> torch.Tensor:
+    def predict_osc(
+        self,
+        osc_features: torch.Tensor,
+        osc_direct_inputs: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         z_osc = self.encode_osc(osc_features)
+
+        if self.osc_direct_inputs:
+            if osc_direct_inputs is None:
+                raise ValueError("osc_direct_inputs required when osc_net.direct_inputs is set.")
+            z_osc = torch.cat([z_osc, osc_direct_inputs], dim=-1)
+
         return self.osc_head(z_osc)
     
     def encode_tpr(self, tpr_features: torch.Tensor) -> torch.Tensor:

@@ -1,0 +1,97 @@
+[
+  {
+    "doi": "10.1016/j.apcata.2022.118565",
+    "name": "Fe0.67Ce0.5O2",
+    "Ce": 0.5,
+    "Fe": 0.67,
+    "deposit": null,
+    "Sbet": 36.3,
+    "calcination_temp": 600,
+    "calcination_time": 4,
+    "Dpore": 27.9,
+    "Vtotal": 0.25,
+    "calcination_flowing_gas": 1,
+    "calcination_reactive_gas": null,
+    "synthesis_para": "The solid solutions were synthesized by hydrothermal method. In a typical process, 8 mL of NaOH (6 M) aqueous solution was dropwise added into 88 mL of cerium nitrate (Ce(NO3)3\u22c56 H2O) and the aqueous solution of second metal (0.1 M, Fe(NO3)3\u22c59 H2O, Ni(NO3)2\u22c56 H2O, Mn(NO3)2\u22c56 H2O and Ti(C4H9O)4) under vigious stirring. The solution was then transferred into a Teflon lined Autoclave to proceed the hydrothermal treatment for 48 h at 90 \u00b0C. After that, the suspension was cooled down to room temperature and filtered. The solid was washed with deionized water and ethanol for several times, dried overnight at 60 \u00b0C and finally calcined at 600 \u00b0C for 4 h in air flow to get the catalysts which were named as Mn+(4\u20134x)/nCexO2 (here x = 0.5 for Fe, Mn and Ti, x = 0.975 for Ni).",
+    "synthesis": "hydrothermal",
+    "description": "solid solution",
+    "particle_size_nm": null,
+    "crystallite_size_nm": 1.7,
+    "phase_types": "Fluorite & Fe2O3",
+    "phase_flag": "multi",
+    "microscopy": true,
+    "image_path": "400_TEM_100nm.png",
+    "morphology": "nanorod",
+    "pretreatment_temp": null,
+    "pretreatment_o2_vol%": null,
+    "pretreatment_time_h": null,
+    "hierarchical": false,
+    "lattice_parameter_A": 5.416,
+    "reactions": [],
+    "osc_entries": [
+      {
+        "value_raw": 8.48,
+        "temperature": 800,
+        "units_raw": "mmol H2 g^-1",
+        "measurement_class": "b",
+        "method": "H2_TPR",
+        "pulse_duration_min": null,
+        "pulse_volume_ml": null,
+        "basis": "g_catalyst",
+        "species_basis": "H2_equiv",
+        "measure": "red_cons",
+        "h2_vol%": 5,
+        "co_vol%": null,
+        "o2_vol%": null,
+        "value_O_umol_per_g_catalyst": 8480
+      }
+    ],
+    "h2_tpr_peaks": {
+      "temps": [
+        402,
+        553,
+        686
+      ],
+      "h2_vol%": 5,
+      "flow_rate_mL_min": null,
+      "mass_catalyst_g": 0.05,
+      "pretreatment_temp": 300,
+      "pretreatment_time": 3,
+      "pretreatment_oxidising": false,
+      "start_temp": null,
+      "ramp_rate_C_min": 10
+    },
+    "o2_tpd_peaks": {
+      "temps": [
+        131,
+        216
+      ],
+      "mass_catalyst_g": null,
+      "pretreatment_temp": 200,
+      "pretreatment_time": 2,
+      "pretreatment_gas_type": "inert",
+      "adsorption_o2_vol%": 10,
+      "adsorption_flow_ml_min": null,
+      "adsorption_temp": 50,
+      "adsorption_time": null,
+      "ramp_rate_C_min": 10
+    },
+    "co2_tpd_peaks": {
+      "temps": [
+        226,
+        428,
+        612
+      ],
+      "mass_catalyst_g": null,
+      "pretreatment_temp": 200,
+      "pretreatment_time": 2,
+      "pretreatment_gas_type": "inert",
+      "adsorption_co2_vol%": 10,
+      "adsorption_flow_ml_min": null,
+      "adsorption_temp": 50,
+      "adsorption_time": null,
+      "ramp_rate_C_min": 10
+    },
+    "failed_because": "Invalid Image Path"
+  }
+]

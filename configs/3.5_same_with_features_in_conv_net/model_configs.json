@@ -5,7 +5,7 @@
             "output_dim": 1,
             "activation": null,
             "include_material_features": true,
-            "included_features": ["crystallite_size_nm"],
+            "included_features": ["crystallite_size_nm", "lattice_parameter_A"],
             "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content", "flow_mL_h_g", "pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"]
         },
         "osc_net": {
