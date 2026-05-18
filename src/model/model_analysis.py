@@ -72,6 +72,7 @@ class ModelAnalyser:
         elif task == "osc":
             pred = self.model.predict_osc(
                 osc_features=data["osc_features"],
+                osc_direct_inputs=data.get("osc_direct_inputs"),
             )
             true = data["target"]
 

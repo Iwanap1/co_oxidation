@@ -160,7 +160,12 @@ After running .set_split():
             # If OSC net is enabled, reaction rows need OSC encoder inputs
             # so conversion can use z_osc. Do NOT include OSC direct inputs here.
             if model_config.get("osc_net") is not None:
-                osc_cols_for_rxn = list(self.feature_cols["osc"])
+                osc_direct_cols = model_config.get("osc_net", {}).get("direct_inputs", [])
+
+                osc_cols_for_rxn = [
+                    c for c in self.feature_cols["osc"]
+                    if c not in osc_direct_cols
+                ]
 
                 missing = [c for c in osc_cols_for_rxn if c not in rxn_df.columns]
                 if missing:
@@ -263,12 +268,15 @@ After running .set_split():
                 osc_cfg = model_config.get("osc_net", {})
                 osc_direct_cols = osc_cfg.get("direct_inputs", [])
 
+                osc_feature_cols = [
+                    c for c in self.feature_cols["osc"]
+                    if c not in osc_direct_cols
+                ]
+
                 osc_tensor_cols = {
-                    "osc_features": self.feature_cols["osc"],
+                    "osc_features": osc_feature_cols,
                 }
 
-                # Direct OSC inputs are only used for OSC auxiliary prediction,
-                # not for reaction conversion prediction.
                 if osc_direct_cols:
                     missing = [c for c in osc_direct_cols if c not in osc_df.columns]
                     if missing:
@@ -475,6 +483,7 @@ After running .set_split():
             osc_cols = (
                 osc_material_cols
                 + self.config["osc"].get("feature_cols", [])
+                + self.config["osc"].get("direct_input_cols", [])
                 + self._composition_feature_cols(osc_df)
             )
 

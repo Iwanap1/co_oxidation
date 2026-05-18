@@ -80,6 +80,9 @@
         },
         "o2_tpd_peaks": {
             "temps": [],
+            "T_surface": null,
+            "T_beta": null,
+            "T_bulk": null,
             "mass_catalyst_g": null,
             "pretreatment_temp": null,
             "pretreatment_time": null,

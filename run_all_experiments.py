@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 import pandas as pd
 
-EXPERIMENT_NAME = "2_dopant_featurisation_std_mlp_with_cs&lp"
+EXPERIMENT_NAME = "3_element_splits_full_model_or_std"
 
 DEFAULT_SPLIT_MODES = [
     ("Random_by_Material", 0.2), 

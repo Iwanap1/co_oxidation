@@ -14,7 +14,7 @@ class Trainer:
     def __init__(self, training_cfg: Dict[str, Dict]):
         self.cfg = deepcopy(training_cfg)
         self.train_critereon = CustomLoss(training_cfg["train_critereon"])
-        if training_cfg.get("best_model_critereon"):
+        if training_cfg.get("eval_critereon"):
             self.eval_critereon = CustomLoss(training_cfg["eval_critereon"])
         else:
             self.eval_critereon = self.train_critereon
@@ -247,7 +247,10 @@ class Trainer:
                     device=device,
                 )
 
-                predictions["osc"] = model.predict_osc(osc_features=osc["osc_features"])
+                predictions["osc"] = model.predict_osc(
+                    osc_features=osc["osc_features"],
+                    osc_direct_inputs=osc.get("osc_direct_inputs"),
+                )
                 batch_data["osc"] = osc
 
             losses = critereon(predictions, batch_data)

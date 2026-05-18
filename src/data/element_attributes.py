@@ -6,7 +6,8 @@ Metal = Literal[
     'Al', 'Sc', 'Ti', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn',
     'Ga', 'Sr', 'Y', 'Zr', 'Nb', 'Sn', 'La', 'Ce',
     'Pr', 'Nd', 'Sm', 'Eu', 'Gd', 'Tb', 'Ho', 'Yb', 'Lu',
-    'Hf', 'Bi', "Pm"
+    'Hf', 'Bi', "Pm",
+    "Ag"
 ]
 
 METALS = list(Metal.__args__)

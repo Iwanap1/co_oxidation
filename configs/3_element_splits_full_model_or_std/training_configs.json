@@ -1,6 +1,6 @@
 [
     {
-        "epochs": 200,
+        "epochs": 300,
         "patience": null,
         "optimiser": {
             "name": "AdamW",

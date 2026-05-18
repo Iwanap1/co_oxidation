@@ -1,6 +1,6 @@
 [
     {
-        "epochs": 1000,
+        "epochs": 200,
         "patience": null,
         "optimiser": {
             "name": "AdamW",
@@ -16,19 +16,14 @@
             "drop_last": false
         },
         "train_critereon": {
-            "conversion": {
-                "name": "MSELoss",
-                "weight": 1.0
-            },
-            "tpr": {
-                "name": "MSELoss",
-                "weight": 0.1
-            },
-            "osc": {
-                "name": "MSELoss",
-                "weight": 0.1
-            }
+            "conversion": {"name": "MSELoss","weight": 1.0},
+            "tpr": {"name": "MSELoss", "weight": 0.1},
+            "osc": {"name": "MSELoss","weight": 0.1}
         },
-        "eval_critereon": null
+        "eval_critereon": {
+            "conversion": {"name": "MSELoss", "weight": 1.0},
+            "tpr": {"name": "MSELoss", "weight": 0.0},
+            "osc": {"name": "MSELoss", "weight": 0.0}
+        }
     }
 ]
