@@ -4,6 +4,7 @@ from pathlib import Path
 import torch
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+import numpy as np
 
 from .model import LightOffModel
 
@@ -56,6 +57,7 @@ class ModelAnalyser:
                 reaction_inputs=data.get("reaction_inputs"),
                 osc_features=data.get("osc_features"),
                 tpr_features=data.get("tpr_features"),
+                tpd_features=data.get("tpd_features"),
                 whsv=data.get("whsv"),
                 p_co=data.get("p_co"),
                 p_o2=data.get("p_o2"),
@@ -75,11 +77,25 @@ class ModelAnalyser:
                 osc_direct_inputs=data.get("osc_direct_inputs"),
             )
             true = data["target"]
+        
+        elif task == "o2_tpd":
+            pred = self.model.predict_tpd(
+                tpd_features=data["tpd_features"],
+                tpd_direct_inputs=data.get("tpd_direct_inputs"),
+            )
+            true = data["target"]
 
         else:
             raise ValueError(f"Unknown task: {task}")
 
-        return true.detach().cpu().flatten(), pred.detach().cpu().flatten()
+        true = true.detach().cpu()
+        pred = pred.detach().cpu()
+
+        if true.ndim == 1 or true.shape[-1] == 1:
+            true = true.flatten()
+            pred = pred.flatten()
+
+        return true, pred
 
     def conversion_metrics(self) -> Dict[str, Dict[str, float]]:
         results = self._metrics_for_task("reactions")
@@ -102,20 +118,33 @@ class ModelAnalyser:
             y_true = self.predictions[split][task]["y_true"].numpy()
             y_pred = self.predictions[split][task]["y_pred"].numpy()
 
-            mse = mean_squared_error(y_true, y_pred)
+            # mask NaNs (important for O2-TPD)
+            mask = ~np.isnan(y_true)
+
+            if mask.sum() == 0:
+                continue
+
+            y_true_masked = y_true[mask]
+            y_pred_masked = y_pred[mask]
+
+            mse = mean_squared_error(y_true_masked, y_pred_masked)
 
             results[split] = {
-                "r2": float(r2_score(y_true, y_pred)),
+                "r2": float(r2_score(y_true_masked, y_pred_masked)),
                 "mse": float(mse),
-                "mae": float(mean_absolute_error(y_true, y_pred)),
+                "mae": float(mean_absolute_error(y_true_masked, y_pred_masked)),
             }
 
         return results
+    
+
+    def tpd_metrics(self) -> Dict[str, Dict[str, float]]:
+        return self._metrics_for_task("o2_tpd")
 
     def parity_plots(
         self,
         outdir: Union[str, Path],
-        tasks=("reactions", "h2_tpr", "osc"),
+        tasks=("reactions", "h2_tpr", "osc", "o2_tpd"),
         title_prefix: str = "",
     ):
         outdir = Path(outdir)
@@ -136,20 +165,44 @@ class ModelAnalyser:
                 y_true = self.predictions[split][task]["y_true"]
                 y_pred = self.predictions[split][task]["y_pred"]
 
-                all_vals.append(y_true)
-                all_vals.append(y_pred)
+                if y_true.ndim == 2:
+                    for i in range(y_true.shape[1]):
+                        mask = ~torch.isnan(y_true[:, i])
 
-                if task == "reactions" and hasattr(self, "stats"):
-                    label = f"{split} (R²={self.stats[split]['r2']:.3f})"
-                else: 
-                    label = split
+                        if mask.sum() == 0:
+                            continue
 
-                ax.scatter(
-                    y_true,
-                    y_pred,
-                    alpha=0.6,
-                    label=label,
-                )
+                        yt = y_true[mask, i]
+                        yp = y_pred[mask, i]
+
+                        all_vals.append(yt)
+                        all_vals.append(yp)
+
+                        ax.scatter(
+                            yt,
+                            yp,
+                            alpha=0.6,
+                            label=f"{split} output {i}",
+                        )
+                else:
+                    if task == "reactions" and hasattr(self, "stats"):
+                        label = f"{split} (R²={self.stats[split]['r2']:.3f})"
+                    else: 
+                        label = split
+                    mask = ~torch.isnan(y_true)
+
+                    yt = y_true[mask]
+                    yp = y_pred[mask]
+
+                    all_vals.append(yt)
+                    all_vals.append(yp)
+
+                    ax.scatter(
+                        yt,
+                        yp,
+                        alpha=0.6,
+                        label=label,
+                    )
 
             vals = torch.cat(all_vals)
             min_val = float(vals.min())
@@ -163,6 +216,7 @@ class ModelAnalyser:
                 "reactions": "Conversion",
                 "h2_tpr": "H2-TPR",
                 "osc": "OSC",
+                "o2_tpd": "O2-TPD",
             }.get(task, task)
 
             ax.set_title(f"{title_prefix} {task_title} parity".strip())

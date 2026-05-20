@@ -48,6 +48,8 @@ class Trainer:
         epochs_without_improvement = 0
         patience = self.cfg.get("patience", None)
         for epoch in range(epochs):
+            self.train_critereon.set_epoch(epoch)
+            self.eval_critereon.set_epoch(epoch)
             model.train()
 
             train_metrics = self._run_epoch(
@@ -102,7 +104,7 @@ class Trainer:
                 train_parts = []
                 test_parts = []
 
-                for key in ["conversion", "tpr", "osc"]:
+                for key in ["conversion", "tpr", "osc", "tpd"]:
                     if key in train_metrics:
                         train_parts.append(f"{key}={train_metrics[key]:.4f}")
 
@@ -154,6 +156,8 @@ class Trainer:
         self._add_group_for_optimiser("conversion", [model.conversion_net], group_cfg, used_param_ids, param_groups)
         self._add_group_for_optimiser("osc", [model.osc_net, getattr(model, "osc_head", None)], group_cfg, used_param_ids, param_groups)
         self._add_group_for_optimiser("tpr", [model.tpr_net, getattr(model, "tpr_head", None)], group_cfg, used_param_ids, param_groups)
+        self._add_group_for_optimiser( "tpd", [model.tpd_net, getattr(model, "tpd_head", None)], group_cfg, used_param_ids, param_groups)
+
         remaining_params = [
             p for p in model.parameters()
             if p.requires_grad and id(p) not in used_param_ids
@@ -200,6 +204,11 @@ class Trainer:
             else None
         )
 
+        tpd_iter = (
+            cycle(loaders["o2_tpd"])
+            if "o2_tpd" in loaders and len(loaders["o2_tpd"].dataset) > 0
+            else None
+        )
         totals = {}
         n_steps = 0
 
@@ -219,6 +228,7 @@ class Trainer:
                 reaction_inputs=rxn.get("reaction_inputs"),
                 osc_features=rxn.get("osc_features"),
                 tpr_features=rxn.get("tpr_features"),
+                tpd_features=rxn.get("tpd_features"),
                 whsv=rxn.get("whsv"),
                 p_co=rxn.get("p_co"),
                 p_o2=rxn.get("p_o2"),
@@ -252,6 +262,22 @@ class Trainer:
                     osc_direct_inputs=osc.get("osc_direct_inputs"),
                 )
                 batch_data["osc"] = osc
+
+            if tpd_iter is not None:
+                tpd_batch = next(tpd_iter)
+
+                tpd = self._batch_to_named_dict(
+                    tpd_batch,
+                    datasets[split]["o2_tpd"]["tensor_names"],
+                    device=device,
+                )
+
+                predictions["tpd"] = model.predict_tpd(
+                    tpd_features=tpd["tpd_features"],
+                    tpd_direct_inputs=tpd.get("tpd_direct_inputs"),
+                )
+
+                batch_data["o2_tpd"] = tpd
 
             losses = critereon(predictions, batch_data)
 
@@ -336,6 +362,8 @@ class Trainer:
             branches.append("tpr")
         if "train_osc" in hist.columns:
             branches.append("osc")
+        if "train_tpd" in hist.columns:
+            branches.append("tpd")
 
         if not branches:
             raise ValueError("No branch losses found in history.")

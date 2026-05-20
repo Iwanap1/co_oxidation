@@ -1886,6 +1886,36 @@ class Preprocessor:
 
         return osc_df, stats
 
+    def preprocess_o2_tpd_peaks(self, tpd_df: pd.DataFrame, config: Optional[Dict] = None) -> Tuple[pd.DataFrame, Dict]:
+        basic_preprocess, stats = self.preprocess_tpd_peaks(tpd_df, config=config, config_section="o2_tpd")
+        target_cols = config.get("o2_tpd", {}).get("target_cols", [])
+        length_before = len(basic_preprocess)
+
+        presence_cols = [col for col in target_cols if col.endswith("_present")]
+        for col in presence_cols:
+            basic_preprocess[col] = pd.to_numeric(basic_preprocess[col], errors="coerce").astype("Int64")
+        if presence_cols: basic_preprocess = basic_preprocess.dropna(subset=presence_cols)
+
+        other_cols = [c for c in target_cols if c in ["T_beta", "T_surface", "T_bulk"]]
+        if other_cols: basic_preprocess = basic_preprocess.dropna(subset=other_cols)
+
+        if "T_chemisorbed_weak_present" in target_cols and "T_chemisorbed_weak" in target_cols:
+            # remove rows with missing T_chemisorbed_weak where weak is present
+            basic_preprocess = basic_preprocess[~((basic_preprocess["T_chemisorbed_weak_present"] == 1) & basic_preprocess["T_chemisorbed_weak"].isna())]
+        elif "T_chemisorbed_weak" in target_cols:
+            basic_preprocess = basic_preprocess[~basic_preprocess["T_chemisorbed_weak"].isna()]
+        
+        if "T_chemisorbed_strong_present" in target_cols and "T_chemisorbed_strong" in target_cols:
+            basic_preprocess = basic_preprocess[~((basic_preprocess["T_chemisorbed_strong_present"] == 1) & basic_preprocess["T_chemisorbed_strong"].isna())]
+        elif "T_chemisorbed_strong" in target_cols:
+            basic_preprocess = basic_preprocess[~basic_preprocess["T_chemisorbed_strong"].isna()]
+        
+        stats["additional_rows_dropped_due_to_target_col_requirements"] = length_before - len(basic_preprocess)
+        stats["total_rows_after_all_preprocessing"] = len(basic_preprocess)
+
+        return basic_preprocess, stats
+        
+
     def merge_characterisation_with_materials(
         self,
         materials_df: pd.DataFrame,
@@ -1990,3 +2020,4 @@ class Preprocessor:
         raise ValueError("material.dopant_featurisation must be one of: "
             "'slots', 'weighted_stats'"
         )
+    
