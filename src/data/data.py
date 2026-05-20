@@ -40,6 +40,7 @@ After running .set_split():
             "reactions": self.config["reactions"].get("target_cols", ["conversion"]),
             "h2_tpr": self.config["h2_tpr"].get("target_cols", ["temp"]), 
             "osc": self.config["osc"].get("target_cols", ["value_O_umol_per_g_catalyst"]),
+            "o2_tpd": self.config["o2_tpd"].get("target_cols", ["T_beta"])
         }
         self.full_dataframes, self.stats = self._prepare_merged_dataframes_from_config(row_by_datapoint=row_by_datapoint)
         self.global_element_cols = self._resolve_global_element_cols()
@@ -93,6 +94,7 @@ After running .set_split():
             target_cols={
                 "h2_tpr": self.target_cols["h2_tpr"],
                 "osc": self.target_cols["osc"],
+                "o2_tpd": self.target_cols["o2_tpd"],
             },
         )
 
@@ -188,6 +190,22 @@ After running .set_split():
 
                 reaction_tensor_cols["tpr_features"] = tpr_cols_for_rxn
 
+            if model_config.get("tpd_net") is not None:
+                tpd_direct_cols = model_config.get("tpd_net", {}).get("direct_input_cols", [])
+
+                tpd_cols_for_rxn = [
+                    c for c in self.feature_cols["o2_tpd"]
+                    if c not in tpd_direct_cols
+                ]
+
+                missing = [c for c in tpd_cols_for_rxn if c not in rxn_df.columns]
+                if missing:
+                    raise KeyError(
+                        f"Reaction dataframe missing TPD input columns: {missing}"
+                    )
+
+                reaction_tensor_cols["tpd_features"] = tpd_cols_for_rxn
+
             # Physical WHSV tensor stays unscaled
             if model_config.get("hybridise_whsv", False):
                 if "flow_mL_h_g" not in raw_rxn_df.columns:
@@ -255,6 +273,44 @@ After running .set_split():
 
                 if split_name == "train":
                     tensor_cols_for_input_dims["h2_tpr"] = tpr_tensor_cols.copy()
+
+
+            # O2-TPD
+            if model_config.get("tpd_net") is not None:
+                if "o2_tpd" not in scaled_dfs:
+                    raise KeyError(
+                        "model_config contains tpd_net but no o2_tpd dataframe exists."
+                    )
+
+                tpd_df = scaled_dfs["o2_tpd"].copy()
+
+                tpd_cfg = model_config.get("tpd_net", {})
+                direct_cols = tpd_cfg.get("direct_input_cols", [])
+
+                tpd_feature_cols = self._resolve_tpd_input_cols(model_config)
+
+                tpd_tensor_cols = {
+                    "tpd_features": tpd_feature_cols,
+                }
+
+                if direct_cols:
+                    missing = [c for c in direct_cols if c not in tpd_df.columns]
+                    if missing:
+                        raise KeyError(
+                            f"tpd_net.direct_input_cols contains missing O2-TPD columns: {missing}"
+                        )
+
+                    tpd_tensor_cols["tpd_direct_inputs"] = direct_cols
+
+                tpd_tensor_cols["target"] = self.target_cols["o2_tpd"]
+
+                prepared[split_name]["o2_tpd"] = self._make_named_tensor_dataset(
+                    tpd_df,
+                    tpd_tensor_cols,
+                )
+
+                if split_name == "train":
+                    tensor_cols_for_input_dims["o2_tpd"] = tpd_tensor_cols.copy()
 
             # OSC
             if model_config.get("osc_net") is not None:
@@ -388,13 +444,7 @@ After running .set_split():
         preprocessed["reactions"], preprocessing_stats["reactions"] = self.preprocessor.preprocess_reactions(base_dfs["reactions"],config=self.config)
         preprocessed["h2_tpr"], preprocessing_stats["h2_tpr"] = self.preprocessor.preprocess_h2_tpr_peaks(base_dfs["h2_tpr_peaks"],config=self.config)
         preprocessed["osc"], preprocessing_stats["osc"] = self.preprocessor.preprocess_osc(base_dfs["osc"],config=self.config)
-
-        if self.config.get("o2_tpd_peaks") is not None:
-            preprocessed["o2_tpd"], preprocessing_stats["o2_tpd"] = self.preprocessor.preprocess_tpd_peaks(base_dfs["o2_tpd_peaks"],config=self.config,config_section="o2_tpd_peaks")
-        
-        if self.config.get("co2_tpd_peaks") is not None:
-            preprocessed["co2_tpd"], preprocessing_stats["co2_tpd"] = self.preprocessor.preprocess_tpd_peaks(base_dfs["co2_tpd_peaks"],config=self.config,config_section="co2_tpd_peaks")
-
+        preprocessed["o2_tpd"], preprocessing_stats["o2_tpd"] = self.preprocessor.preprocess_o2_tpd_peaks(base_dfs["o2_tpd_peaks"],config=self.config)
         merge_stats = {}
         niche_element_stats = {}
         results = {"all_materials": materials_df}
@@ -490,6 +540,20 @@ After running .set_split():
             osc_cols = list(dict.fromkeys(osc_cols))
             self._check_cols(osc_df, osc_cols, "osc")
             feature_cols["osc"] = osc_cols
+
+        if "o2_tpd" in self.full_dataframes:
+            tpd_df = self.full_dataframes["o2_tpd"]
+            tpd_material_cols = self._resolve_material_feature_cols_for_dataset("o2_tpd")
+
+            tpd_cols = (
+                tpd_material_cols
+                + self.config["o2_tpd"].get("feature_cols", [])
+                + self._composition_feature_cols(tpd_df)
+            )
+
+            tpd_cols = list(dict.fromkeys(tpd_cols))
+            self._check_cols(tpd_df, tpd_cols, "o2_tpd")
+            feature_cols["o2_tpd"] = tpd_cols
 
         return feature_cols
 
@@ -592,8 +656,23 @@ After running .set_split():
                 train_mask = (overlap_train_mask | aux_only_mask) & ~metal_mask
                 test_mask = overlap_test_mask | metal_mask
 
-            elif self.split_method in ["Random_by_Material", "Random_by_Point", "Above_WHSV_Threshold"]:
-                # Don't need to worry about leaking entries into auxillory datasets (OSC and TPR) for any of these
+            elif self.split_method == "Random_by_Material":
+                train_mask = overlap_train_mask.copy()
+                test_mask = overlap_test_mask.copy()
+
+                aux_only_ids = pd.Series(material_ids.loc[aux_only_mask].unique())
+
+                if len(aux_only_ids) > 0:
+                    aux_train_ids, aux_test_ids = train_test_split(
+                        aux_only_ids,
+                        test_size=self.split_value,
+                        random_state=42,
+                    )
+
+                    train_mask |= material_ids.isin(aux_train_ids)
+                    test_mask |= material_ids.isin(aux_test_ids)
+
+            elif self.split_method in ["Random_by_Point", "Above_WHSV_Threshold"]:
                 train_mask = overlap_train_mask | aux_only_mask
                 test_mask = overlap_test_mask
 
@@ -703,7 +782,10 @@ After running .set_split():
                 cleaned[name] = df
                 continue
 
-            cols = feature_cols[name] + self.target_cols.get(name, [])
+            if name == "o2_tpd":
+                cols = feature_cols[name]
+            else:
+                cols = feature_cols[name] + self.target_cols.get(name, [])
             self._check_cols(df, cols, name)
 
             n_before = len(df)
@@ -735,6 +817,7 @@ After running .set_split():
             "reactions": ["_id_material", "material_id", "_id_reaction"] + METALS,
             "h2_tpr": ["_id", "material_id"] + METALS,
             "osc": ["_id", "material_id"] + METALS,
+            "o2_tpd": ["_id", "material_id"] + METALS,
         }
 
         selected = {}
@@ -855,6 +938,14 @@ After running .set_split():
             cols = [c for c in cols if c != "ramp_rate_C_min"]
 
         return cols
+    
+    def _resolve_tpd_input_cols(self, model_config: Dict) -> List[str]:
+        cols = list(self.feature_cols["o2_tpd"])
+        tpd_cfg = model_config.get("tpd_net") or {}
+        direct_inputs = tpd_cfg.get("direct_input_cols", [])
+        cols = [c for c in cols if c not in direct_inputs]
+
+        return cols
 
     def _restore_unscaled_physical_cols(
         self,
@@ -890,6 +981,11 @@ After running .set_split():
 
         if model_config.get("tpr_net") is not None:
             input_dims["tpr"] = len(tensor_cols_by_dataset["h2_tpr"]["tpr_features"])
+
+        if model_config.get("tpd_net") is not None:
+            input_dims["tpd"] = len(tensor_cols_by_dataset["o2_tpd"]["tpd_features"])
+            input_dims["tpd_direct_inputs"] = len(tensor_cols_by_dataset["o2_tpd"].get("tpd_direct_inputs", []))
+            input_dims["tpd_target"] = len(tensor_cols_by_dataset["o2_tpd"]["target"])
 
         return input_dims
         

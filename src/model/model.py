@@ -22,10 +22,12 @@ class LightOffModel(nn.Module):
 
         self.osc_net = None
         self.tpr_net = None
+        self.tpd_net = None
 
         conv_cfg = model_config["conversion_net"]
         osc_cfg = model_config.get("osc_net")
         tpr_cfg = model_config.get("tpr_net")
+        tpd_cfg = model_config.get("tpd_net")
         self.condition_tpr_with_ramp_rate = tpr_cfg is not None and tpr_cfg.get("condition_tpr_with_ramp_rate", False)
         self.include_conversion_features = conv_cfg.get("include_material_features", True)
         self.input_reaction_cols = conv_cfg.get("input_reaction_cols", [])
@@ -54,6 +56,26 @@ class LightOffModel(nn.Module):
             self.tpr_head = nn.Linear(tpr_head_input_dim, 1)
             conv_input_dim += tpr_cfg["output_dim"]
 
+        self.tpd_direct_inputs = (
+            tpd_cfg.get("direct_input_cols", [])
+            if tpd_cfg is not None else []
+        )
+
+        if tpd_cfg is not None:
+            self.tpd_net = self._make_mlp(input_dims["tpd"], tpd_cfg)
+
+            tpd_head_input_dim = (
+                tpd_cfg["output_dim"]
+                + input_dims.get("tpd_direct_inputs", 0)
+            )
+
+            self.tpd_head = nn.Linear(
+                tpd_head_input_dim,
+                input_dims["tpd_target"]
+            )
+
+            conv_input_dim += tpd_cfg["output_dim"]
+
         self.conversion_net = self._make_mlp(conv_input_dim, conv_cfg)
 
     def forward(
@@ -62,15 +84,19 @@ class LightOffModel(nn.Module):
         reaction_inputs: Optional[torch.Tensor] = None,
         osc_features: Optional[torch.Tensor] = None,
         tpr_features: Optional[torch.Tensor] = None,
+        tpd_features: Optional[torch.Tensor] = None,
         whsv: Optional[torch.Tensor] = None,
         p_co: Optional[torch.Tensor] = None,
         p_o2: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
+        
+
         z = self._nn_section(
             conversion_features=conversion_features,
             reaction_inputs=reaction_inputs,
             osc_features=osc_features,
             tpr_features=tpr_features,
+            tpd_features=tpd_features,
         )
         # Black-box only
         if not self.hybridise_pressures and not self.hybridise_whsv:
@@ -103,7 +129,7 @@ class LightOffModel(nn.Module):
 
         raise RuntimeError("Unhandled model hybridisation configuration.")
 
-    def _nn_section(self, conversion_features, reaction_inputs, osc_features, tpr_features):
+    def _nn_section(self, conversion_features, reaction_inputs, osc_features, tpr_features, tpd_features):
         parts = []
 
         if self.input_reaction_cols:
@@ -125,6 +151,11 @@ class LightOffModel(nn.Module):
             if tpr_features is None:
                 raise ValueError("tpr_features required when tpr_net is enabled.")
             parts.append(self.encode_tpr(tpr_features))
+
+        if self.tpd_net is not None:
+            if tpd_features is None:
+                raise ValueError("tpd_features required when tpd_net is enabled.")
+            parts.append(self.encode_tpd(tpd_features))
 
         if not parts:
             raise ValueError("No inputs to conversion_net.")
@@ -177,6 +208,22 @@ class LightOffModel(nn.Module):
 
         return self.osc_head(z_osc)
     
+    def predict_tpd(
+        self,
+        tpd_features: torch.Tensor,
+        tpd_direct_inputs: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        z_tpd = self.encode_tpd(tpd_features)
+
+        if self.tpd_direct_inputs:
+            if tpd_direct_inputs is None:
+                raise ValueError(
+                    "tpd_direct_inputs required when tpd_net.direct_input_cols is set."
+                )
+            z_tpd = torch.cat([z_tpd, tpd_direct_inputs], dim=-1)
+
+        return self.tpd_head(z_tpd)
+    
     def encode_tpr(self, tpr_features: torch.Tensor) -> torch.Tensor:
         if self.tpr_net is None:
             raise ValueError("tpr_net is not enabled.")
@@ -186,3 +233,9 @@ class LightOffModel(nn.Module):
         if self.osc_net is None:
             raise ValueError("osc_net is not enabled.")
         return self.osc_net(osc_features)
+    
+    def encode_tpd(
+        self,
+        tpd_features: torch.Tensor,
+    ) -> torch.Tensor:
+        return self.tpd_net(tpd_features)
