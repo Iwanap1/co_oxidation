@@ -17,5 +17,6 @@
     ["Remove_Metal", "Eu"], 
     ["Remove_Metal", "Tb"], 
     ["Remove_Metal", "Ti"], 
-    ["Remove_Metal", "Ag"]
+    ["Remove_Metal", "Ag"], 
+    ["Remove_Metal", "Y"]
 ]

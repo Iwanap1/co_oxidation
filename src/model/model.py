@@ -1,122 +1,160 @@
-from typing import List, Dict, Optional
-import torch.nn as nn
-import torch
-from torch.utils.data import TensorDataset
-import torch.nn.functional as F
+from typing import Dict, Optional
 
+import torch
+import torch.nn as nn
+from .mlp_and_branches import MLP, Branch
 
 class LightOffModel(nn.Module):
+    """
+    Generic multi-branch light-off model.
+
+    Main conversion input:
+        conversion_features
+        reaction_inputs
+        encoded auxiliary branch latents
+
+    Auxiliary branches:
+        configured dynamically from model_config.
+    """
+
+    BRANCH_SPECS = {
+        "osc": {
+            "config_key": "osc_net",
+            "feature_tensor": "osc_features",
+            "direct_tensor": "osc_direct_inputs",
+            "input_dim_key": "osc",
+            "target_dim_key": "osc_target",
+            "direct_dim_key": "osc_direct_inputs",
+        },
+        "tpr": {
+            "config_key": "tpr_net",
+            "feature_tensor": "tpr_features",
+            "direct_tensor": "tpr_direct_inputs",
+            "input_dim_key": "tpr",
+            "target_dim_key": "tpr_target",
+            "direct_dim_key": "tpr_direct_inputs",
+        },
+        "tpd": {
+            "config_key": "tpd_net",
+            "feature_tensor": "tpd_features",
+            "direct_tensor": "tpd_direct_inputs",
+            "input_dim_key": "tpd",
+            "target_dim_key": "tpd_target",
+            "direct_dim_key": "tpd_direct_inputs",
+        },
+        "xps": {
+            "config_key": "xps_net",
+            "feature_tensor": "xps_features",
+            "direct_tensor": "xps_direct_inputs",
+            "input_dim_key": "xps",
+            "target_dim_key": "xps_target",
+            "direct_dim_key": "xps_direct_inputs",
+        }
+    }
+
     def __init__(
         self,
         input_dims: Dict[str, int],
         model_config: Dict,
-    ) -> None:
+    ):
         super().__init__()
 
+        self.input_dims = input_dims
         self.model_config = model_config
+
         self.hybridise_whsv = model_config.get("hybridise_whsv", False)
         self.hybridise_pressures = model_config.get("hybridise_pressures", False)
 
         if self.hybridise_pressures and not self.hybridise_whsv:
             raise ValueError("Pressure hybridisation requires WHSV hybridisation.")
 
-        self.osc_net = None
-        self.tpr_net = None
-        self.tpd_net = None
-
         conv_cfg = model_config["conversion_net"]
-        osc_cfg = model_config.get("osc_net")
-        tpr_cfg = model_config.get("tpr_net")
-        tpd_cfg = model_config.get("tpd_net")
-        self.condition_tpr_with_ramp_rate = tpr_cfg is not None and tpr_cfg.get("condition_tpr_with_ramp_rate", False)
-        self.include_conversion_features = conv_cfg.get("include_material_features", True)
+
+        self.include_conversion_features = conv_cfg.get(
+            "include_material_features",
+            True,
+        )
         self.input_reaction_cols = conv_cfg.get("input_reaction_cols", [])
-        conv_input_dim = input_dims.get("reaction_inputs", 0)
+
+        conv_input_dim = 0
+
+        if self.input_reaction_cols:
+            conv_input_dim += input_dims.get("reaction_inputs", 0)
 
         if self.include_conversion_features:
             conv_input_dim += input_dims["conversion"]
 
-        self.osc_direct_inputs = osc_cfg.get("direct_inputs", []) if osc_cfg is not None else []
+        self.branches = nn.ModuleDict()
 
-        if osc_cfg is not None:
-            self.osc_net = self._make_mlp(input_dims["osc"], osc_cfg)
+        for branch_name, spec in self.BRANCH_SPECS.items():
+            branch_cfg = model_config.get(spec["config_key"])
 
-            osc_head_input_dim = osc_cfg["output_dim"] + input_dims.get("osc_direct_inputs", 0)
-            self.osc_head = nn.Linear(osc_head_input_dim, 1)
+            if branch_cfg is None:
+                continue
 
-            conv_input_dim += osc_cfg["output_dim"]
+            branch = Branch(
+                name=branch_name,
+                input_dim=input_dims[spec["input_dim_key"]],
+                target_dim=input_dims[spec["target_dim_key"]],
+                direct_input_dim=input_dims.get(spec["direct_dim_key"], 0),
+                cfg=branch_cfg,
+            )
 
-        if tpr_cfg is not None:
-            self.tpr_net = self._make_mlp(input_dims["tpr"], tpr_cfg)
+            self.branches[branch_name] = branch
+            conv_input_dim += branch.latent_dim
 
-            tpr_head_input_dim = tpr_cfg["output_dim"]
-            if self.condition_tpr_with_ramp_rate:
-                tpr_head_input_dim += 1
-
-            self.tpr_head = nn.Linear(tpr_head_input_dim, 1)
-            conv_input_dim += tpr_cfg["output_dim"]
-
-        self.tpd_direct_inputs = (
-            tpd_cfg.get("direct_input_cols", [])
-            if tpd_cfg is not None else []
+        conv_cfg = dict(conv_cfg)
+        self.conversion_net = MLP(
+            input_dim=conv_input_dim,
+            cfg=conv_cfg,
         )
 
-        if tpd_cfg is not None:
-            self.tpd_net = self._make_mlp(input_dims["tpd"], tpd_cfg)
-
-            tpd_head_input_dim = (
-                tpd_cfg["output_dim"]
-                + input_dims.get("tpd_direct_inputs", 0)
-            )
-
-            self.tpd_head = nn.Linear(
-                tpd_head_input_dim,
-                input_dims["tpd_target"]
-            )
-
-            conv_input_dim += tpd_cfg["output_dim"]
-
-        self.conversion_net = self._make_mlp(conv_input_dim, conv_cfg)
+    @property
+    def active_branches(self):
+        return list(self.branches.keys())
 
     def forward(
         self,
         conversion_features: Optional[torch.Tensor] = None,
         reaction_inputs: Optional[torch.Tensor] = None,
-        osc_features: Optional[torch.Tensor] = None,
-        tpr_features: Optional[torch.Tensor] = None,
-        tpd_features: Optional[torch.Tensor] = None,
         whsv: Optional[torch.Tensor] = None,
         p_co: Optional[torch.Tensor] = None,
         p_o2: Optional[torch.Tensor] = None,
+        **branch_feature_tensors,
     ) -> torch.Tensor:
-        
+        """
+        branch_feature_tensors can contain:
+            osc_features
+            tpr_features
+            tpd_features
+            xps_features later
+        """
 
-        z = self._nn_section(
+        z = self._conversion_latent(
             conversion_features=conversion_features,
             reaction_inputs=reaction_inputs,
-            osc_features=osc_features,
-            tpr_features=tpr_features,
-            tpd_features=tpd_features,
+            branch_feature_tensors=branch_feature_tensors,
         )
-        # Black-box only
+
         if not self.hybridise_pressures and not self.hybridise_whsv:
             return torch.sigmoid(z)
-        
-        # Hybridised WHSV branch
+
         if self.hybridise_whsv and not self.hybridise_pressures:
-            k_app = torch.exp(z) # z is treated as log(k_app)
+            if whsv is None:
+                raise ValueError("whsv is required when hybridise_whsv=True.")
+
+            k_app = torch.exp(z)
             tau = 1.0 / (whsv + 1e-8)
-            x = 1.0 - torch.exp(-k_app * tau) # Simple first order PFR model
-            return x
-        
-        # Hybridised WHSV + pressure branch
+            return 1.0 - torch.exp(-k_app * tau)
+
         if self.hybridise_whsv and self.hybridise_pressures:
             if whsv is None or p_co is None or p_o2 is None:
                 raise ValueError(
-                    "whsv, p_co, and p_o2 are required when hybridise_pressures=True."
+                    "whsv, p_co, and p_o2 are required when "
+                    "hybridise_pressures=True."
                 )
 
-            k_app = torch.exp(z) # z is treated as log(k_app)
+            k_app = torch.exp(z)
             tau = 1.0 / (whsv + 1e-8)
 
             xmax = torch.clamp(
@@ -129,12 +167,19 @@ class LightOffModel(nn.Module):
 
         raise RuntimeError("Unhandled model hybridisation configuration.")
 
-    def _nn_section(self, conversion_features, reaction_inputs, osc_features, tpr_features, tpd_features):
+    def _conversion_latent(
+        self,
+        conversion_features: Optional[torch.Tensor],
+        reaction_inputs: Optional[torch.Tensor],
+        branch_feature_tensors: Dict[str, torch.Tensor],
+    ) -> torch.Tensor:
         parts = []
 
         if self.input_reaction_cols:
             if reaction_inputs is None:
-                raise ValueError("reaction_inputs required by conversion_net.input_reaction_cols.")
+                raise ValueError(
+                    "reaction_inputs required by conversion_net.input_reaction_cols."
+                )
             parts.append(reaction_inputs)
 
         if self.include_conversion_features:
@@ -142,20 +187,18 @@ class LightOffModel(nn.Module):
                 raise ValueError("conversion_features required.")
             parts.append(conversion_features)
 
-        if self.osc_net is not None:
-            if osc_features is None:
-                raise ValueError("osc_features required when osc_net is enabled.")
-            parts.append(self.encode_osc(osc_features))
+        for branch_name, branch in self.branches.items():
+            spec = self.BRANCH_SPECS[branch_name]
+            tensor_name = spec["feature_tensor"]
 
-        if self.tpr_net is not None:
-            if tpr_features is None:
-                raise ValueError("tpr_features required when tpr_net is enabled.")
-            parts.append(self.encode_tpr(tpr_features))
+            features = branch_feature_tensors.get(tensor_name)
 
-        if self.tpd_net is not None:
-            if tpd_features is None:
-                raise ValueError("tpd_features required when tpd_net is enabled.")
-            parts.append(self.encode_tpd(tpd_features))
+            if features is None:
+                raise ValueError(
+                    f"{tensor_name} required because {branch_name} branch is enabled."
+                )
+
+            parts.append(branch.encode(features))
 
         if not parts:
             raise ValueError("No inputs to conversion_net.")
@@ -163,79 +206,16 @@ class LightOffModel(nn.Module):
         x = torch.cat(parts, dim=-1)
         return self.conversion_net(x)
 
-    def _make_mlp(self, input_dim: int, net_config: Dict) -> nn.Sequential:
-        layers = []
-        prev = input_dim
-
-        activation_name = net_config.get("activation")
-        activation_cls = getattr(nn, activation_name) if activation_name else None
-
-        for h in net_config.get("hidden_dim", []):
-            layers.append(nn.Linear(prev, h))
-            if activation_cls is not None:
-                layers.append(activation_cls())
-            prev = h
-
-        layers.append(nn.Linear(prev, net_config["output_dim"]))
-        return nn.Sequential(*layers)
-    
-
-    def predict_tpr(
+    def predict_branch(
         self,
-        tpr_features: torch.Tensor,
-        ramp_rate: Optional[torch.Tensor] = None,
+        branch_name: str,
+        features: torch.Tensor,
+        direct_inputs: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        z_tpr = self.encode_tpr(tpr_features)
+        if branch_name not in self.branches:
+            raise ValueError(f"Branch '{branch_name}' is not enabled.")
 
-        if self.condition_tpr_with_ramp_rate:
-            if ramp_rate is None:
-                raise ValueError("ramp_rate required when hybridise_ramp_rate=True.")
-            z_tpr = torch.cat([z_tpr, ramp_rate], dim=-1)
-
-        return self.tpr_head(z_tpr)
-    
-    def predict_osc(
-        self,
-        osc_features: torch.Tensor,
-        osc_direct_inputs: Optional[torch.Tensor] = None,
-    ) -> torch.Tensor:
-        z_osc = self.encode_osc(osc_features)
-
-        if self.osc_direct_inputs:
-            if osc_direct_inputs is None:
-                raise ValueError("osc_direct_inputs required when osc_net.direct_inputs is set.")
-            z_osc = torch.cat([z_osc, osc_direct_inputs], dim=-1)
-
-        return self.osc_head(z_osc)
-    
-    def predict_tpd(
-        self,
-        tpd_features: torch.Tensor,
-        tpd_direct_inputs: Optional[torch.Tensor] = None,
-    ) -> torch.Tensor:
-        z_tpd = self.encode_tpd(tpd_features)
-
-        if self.tpd_direct_inputs:
-            if tpd_direct_inputs is None:
-                raise ValueError(
-                    "tpd_direct_inputs required when tpd_net.direct_input_cols is set."
-                )
-            z_tpd = torch.cat([z_tpd, tpd_direct_inputs], dim=-1)
-
-        return self.tpd_head(z_tpd)
-    
-    def encode_tpr(self, tpr_features: torch.Tensor) -> torch.Tensor:
-        if self.tpr_net is None:
-            raise ValueError("tpr_net is not enabled.")
-        return self.tpr_net(tpr_features)
-
-    def encode_osc(self, osc_features: torch.Tensor) -> torch.Tensor:
-        if self.osc_net is None:
-            raise ValueError("osc_net is not enabled.")
-        return self.osc_net(osc_features)
-    
-    def encode_tpd(
-        self,
-        tpd_features: torch.Tensor,
-    ) -> torch.Tensor:
-        return self.tpd_net(tpd_features)
+        return self.branches[branch_name].predict(
+            features=features,
+            direct_inputs=direct_inputs,
+        )

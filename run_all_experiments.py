@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 import pandas as pd
 
-EXPERIMENT_NAME = "3_different_o2_targets"
+EXPERIMENT_NAME = "3_full_model"
 
 DEFAULT_SPLIT_MODES = [
     ("Random_by_Material", 0.2), 

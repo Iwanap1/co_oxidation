@@ -104,7 +104,7 @@ class Trainer:
                 train_parts = []
                 test_parts = []
 
-                for key in ["conversion", "tpr", "osc", "tpd"]:
+                for key in ["conversion", "tpr", "osc", "tpd", "xps"]:
                     if key in train_metrics:
                         train_parts.append(f"{key}={train_metrics[key]:.4f}")
 
@@ -154,9 +154,9 @@ class Trainer:
         used_param_ids = set()
 
         self._add_group_for_optimiser("conversion", [model.conversion_net], group_cfg, used_param_ids, param_groups)
-        self._add_group_for_optimiser("osc", [model.osc_net, getattr(model, "osc_head", None)], group_cfg, used_param_ids, param_groups)
-        self._add_group_for_optimiser("tpr", [model.tpr_net, getattr(model, "tpr_head", None)], group_cfg, used_param_ids, param_groups)
-        self._add_group_for_optimiser( "tpd", [model.tpd_net, getattr(model, "tpd_head", None)], group_cfg, used_param_ids, param_groups)
+
+        for branch_name, branch in model.branches.items():
+            self._add_group_for_optimiser(branch_name, [branch], group_cfg, used_param_ids, param_groups)
 
         remaining_params = [
             p for p in model.parameters()
@@ -179,7 +179,6 @@ class Trainer:
         scheduler_cls = getattr(schedulers, scheduler_name)
         return scheduler_cls(optimiser, **sched_cfg)
                 
-
     def _run_epoch(
         self,
         model: LightOffModel,
@@ -209,6 +208,12 @@ class Trainer:
             if "o2_tpd" in loaders and len(loaders["o2_tpd"].dataset) > 0
             else None
         )
+
+        xps_iter = (
+            cycle(loaders["xps"])
+            if "xps" in loaders and len(loaders["xps"].dataset) > 0
+            else None
+        )
         totals = {}
         n_steps = 0
 
@@ -229,6 +234,7 @@ class Trainer:
                 osc_features=rxn.get("osc_features"),
                 tpr_features=rxn.get("tpr_features"),
                 tpd_features=rxn.get("tpd_features"),
+                xps_features=rxn.get("xps_features"),
                 whsv=rxn.get("whsv"),
                 p_co=rxn.get("p_co"),
                 p_o2=rxn.get("p_o2"),
@@ -242,10 +248,14 @@ class Trainer:
                     datasets[split]["h2_tpr"]["tensor_names"],
                     device=device,
                 )
+                tpr_direct = tpr.get("tpr_direct_inputs")
+                if tpr_direct is None:
+                    tpr_direct = tpr.get("ramp_rate")
 
-                predictions["tpr"] = model.predict_tpr(
-                    tpr_features=tpr["tpr_features"],
-                    ramp_rate=tpr.get("ramp_rate"),
+                predictions["tpr"] = model.predict_branch(
+                    "tpr",
+                    features=tpr["tpr_features"],
+                    direct_inputs=tpr_direct,
                 )
                 batch_data["h2_tpr"] = tpr
 
@@ -256,10 +266,10 @@ class Trainer:
                     datasets[split]["osc"]["tensor_names"],
                     device=device,
                 )
-
-                predictions["osc"] = model.predict_osc(
-                    osc_features=osc["osc_features"],
-                    osc_direct_inputs=osc.get("osc_direct_inputs"),
+                predictions["osc"] = model.predict_branch(
+                    "osc",
+                    features=osc["osc_features"],
+                    direct_inputs=osc.get("osc_direct_inputs"),
                 )
                 batch_data["osc"] = osc
 
@@ -271,13 +281,29 @@ class Trainer:
                     datasets[split]["o2_tpd"]["tensor_names"],
                     device=device,
                 )
+                predictions["tpd"] = model.predict_branch(
+                    "tpd",
+                    features=tpd["tpd_features"],
+                    direct_inputs=tpd.get("tpd_direct_inputs"),
+                )
+                batch_data["o2_tpd"] = tpd
 
-                predictions["tpd"] = model.predict_tpd(
-                    tpd_features=tpd["tpd_features"],
-                    tpd_direct_inputs=tpd.get("tpd_direct_inputs"),
+            if xps_iter is not None:
+                xps_batch = next(xps_iter)
+
+                xps = self._batch_to_named_dict(
+                    xps_batch,
+                    datasets[split]["xps"]["tensor_names"],
+                    device=device,
                 )
 
-                batch_data["o2_tpd"] = tpd
+                predictions["xps"] = model.predict_branch(
+                    "xps",
+                    features=xps["xps_features"],
+                    direct_inputs=xps.get("xps_direct_inputs"),
+                )
+
+                batch_data["xps"] = xps
 
             losses = critereon(predictions, batch_data)
 
@@ -336,6 +362,7 @@ class Trainer:
             param_groups.append(group)
 
     def save_train_history(self, outdir, save_graph=True, save_csv=False):
+        import math
         import matplotlib.pyplot as plt
 
         if not hasattr(self, "history") or len(self.history) == 0:
@@ -355,25 +382,28 @@ class Trainer:
         if not save_graph:
             return
 
-        branches = []
-        if "train_conversion" in hist.columns:
-            branches.append("conversion")
-        if "train_tpr" in hist.columns:
-            branches.append("tpr")
-        if "train_osc" in hist.columns:
-            branches.append("osc")
-        if "train_tpd" in hist.columns:
-            branches.append("tpd")
+        branches = [
+            c.replace("train_", "")
+            for c in hist.columns
+            if c.startswith("train_") and c != "train_total"
+        ]
 
         if not branches:
             raise ValueError("No branch losses found in history.")
 
         n = len(branches)
+        ncols = 2 if n > 1 else 1
+        nrows = math.ceil(n / ncols)
 
-        fig, axes = plt.subplots(n, 1, figsize=(10, 4 * n), sharex=True)
+        fig, axes = plt.subplots(
+            nrows,
+            ncols,
+            figsize=(7 * ncols, 4 * nrows),
+            sharex=True,
+            squeeze=False,
+        )
 
-        if n == 1:
-            axes = [axes]
+        axes = axes.flatten()
 
         for ax, branch in zip(axes, branches):
             train_col = f"train_{branch}"
@@ -390,7 +420,7 @@ class Trainer:
                     x=self.best_epoch,
                     linestyle="--",
                     linewidth=2,
-                    label=f"Epoch {self.best_epoch} (best)"
+                    label=f"Epoch {self.best_epoch} (best)",
                 )
 
             ax.set_title(branch.upper())
@@ -398,7 +428,11 @@ class Trainer:
             ax.legend()
             ax.grid(True, alpha=0.3)
 
-        axes[-1].set_xlabel("Epoch")
+        for ax in axes[n:]:
+            ax.axis("off")
+
+        for ax in axes[-ncols:]:
+            ax.set_xlabel("Epoch")
 
         plt.tight_layout()
 
