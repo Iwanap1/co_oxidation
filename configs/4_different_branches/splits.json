@@ -1,0 +1,21 @@
+[
+    ["Random_by_Material", 0.2],
+    ["Remove_Metal", "Fe"], 
+    ["Remove_Metal", "Mn"], 
+    ["Remove_Metal", "Cu"], 
+    ["Remove_Metal", "Zr"], 
+    ["Remove_Metal", "Co"], 
+    ["Remove_Metal", "Ni"], 
+    ["Remove_Metal", "Sn"], 
+    ["Remove_Metal", "Gd"], 
+    ["Remove_Metal", "Bi"], 
+    ["Remove_Metal", "Sm"], 
+    ["Remove_Metal", "Nd"], 
+    ["Remove_Metal", "Hf"], 
+    ["Remove_Metal", "Pr"], 
+    ["Remove_Metal", "La"], 
+    ["Remove_Metal", "Eu"], 
+    ["Remove_Metal", "Tb"], 
+    ["Remove_Metal", "Ti"],
+    ["Remove_Metal", "Ag"]
+]

@@ -16,6 +16,7 @@ class DB:
             "osc": self.db["osc"],
             "o2_tpd_peaks": self.db["o2_tpd_peaks"],
             "co2_tpd_peaks": self.db["co2_tpd_peaks"],
+            "xps": self.db["xps"],
         }
 
     def close(self):

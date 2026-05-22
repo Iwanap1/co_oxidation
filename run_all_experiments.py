@@ -115,6 +115,7 @@ def main():
         colorscale="Reds",
         save_dir=experiment_dir / "Figures/Dopant_Extrapolation_R2_Ptables",
     )
+    db.close()
 
 
 def _load_json(file_path):

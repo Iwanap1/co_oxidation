@@ -4,15 +4,7 @@
         "name": "",
         "Ce": null,
         "Cu": null,
-        "deposit": {
-            "Au": 0,
-            "wt.%": 0,
-            "oxide": false,
-            "calcination_temp": null,
-            "calcination_time": null,
-            "crystal_observed": false,
-            "diameter_nm": null
-        },
+        "deposit": null,
         "calcination_temp" : null,
         "calcination_time" : null,
         "calcination_flowing_gas" : null,
@@ -97,17 +89,14 @@
             "adsorption_time": null,
             "ramp_rate_C_min": null
         },
-        "co2_tpd_peaks": {
-            "temps": [],
-            "mass_catalyst_g": null,
-            "pretreatment_temp": null,
-            "pretreatment_time": null,
-            "pretreatment_gas_type": "inert / reducing",
-            "adsorption_co2_vol%": null,
-            "adsorption_flow_ml_min": null,
-            "adsorption_temp": null,
-            "adsorption_time": null,
-            "ramp_rate_C_min": null
+        "xps_entries": {
+            "O_beta_frac_3_peaks": null,
+            "O_beta_frac_2_peaks": null,
+            "O_alpha_BE": null,
+            "O_beta_BE": null,
+            "O_gamma_BE": null,
+            "Ce3_fraction": null,
+            "Ce_u3_BE": null
         }
     },
     {

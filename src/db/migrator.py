@@ -25,7 +25,7 @@ class Migrator:
         create_from_existing = data.get("create_from_existing", [])
         self.check_uniques(create, check_ids=False)
         self.check_uniques(update, check_ids=True)
-        created_materials, created_reactions, created_h2_tpr, created_co2_tpd, created_o2_tpd, created_osc, failures, subcreation_failures = self.run_creations(create)
+        created_materials, created_reactions, created_h2_tpr, created_co2_tpd, created_o2_tpd, created_osc, created_xps, failures, subcreation_failures = self.run_creations(create)
 
 
         print(f"Created {created_materials} new materials")
@@ -41,6 +41,7 @@ class Migrator:
         print(f"Created {created_co2_tpd} new CO2 TPDs")
         print(f"Created {created_o2_tpd} new O2 TPDs")
         print(f"Created {created_osc} new OSC entries")
+        print(f"Created {created_xps} XPS entries")
 
 
 
@@ -50,12 +51,13 @@ class Migrator:
             failure_path = root_name + "_update_failures.json"
             self.save_failures(failed_updates, failure_path)
 
-        failed_creations, failed_subcreations2, h2_tpr_successes, o2_tpd_successes, co2_tpd_successes, osc_successes = self.create_from_existing(create_from_existing)
+        failed_creations, failed_subcreations2, h2_tpr_successes, o2_tpd_successes, co2_tpd_successes, osc_successes, xps_successes = self.create_from_existing(create_from_existing)
         subcreation_failures.extend(failed_subcreations2)
         print(f"Created {h2_tpr_successes} H2 TPRs from existing materials")
         print(f"Created {co2_tpd_successes} CO2 TPDs from existing materials")
         print(f"Created {o2_tpd_successes} O2 TPDs from existing materials")
-        print(f"Created {osc_successes} OSC entries from existing materials")        
+        print(f"Created {osc_successes} OSC entries from existing materials")
+        print(f"Created {xps_successes} XPS entries from existing materials")        
 
         n_rxn_failures = len(subcreation_failures)
         print(f"Failed to insert {n_rxn_failures} new reactions or characterisations into the DB.")
@@ -119,6 +121,7 @@ class Migrator:
         created_o2_tpd = 0
         created_co2_tpd = 0
         created_osc = 0
+        created_xps = 0
         for entry in creations:
             image_path = entry.get("image_path", "")
             if not (image_path == "" or image_path is None) and image_path not in self.staged_images:
@@ -130,6 +133,7 @@ class Migrator:
             o2_tpd = entry.pop("o2_tpd_peaks", {})
             co2_tpd = entry.pop("co2_tpd_peaks", {})
             oscs = entry.pop("osc_entries", [])
+            xps_entries = entry.pop("xps_entries", {})
 
             entry["fingerprint"] = self.fingerprint(entry)
             if self.materials_coll.find_one({"fingerprint": entry["fingerprint"]}):
@@ -185,7 +189,11 @@ class Migrator:
             subcreation_failures.extend(osc_failures)
             created_osc += n_inserted
 
-        return created_materials, created_reactions, created_h2_tpr, created_co2_tpd, created_o2_tpd, created_osc, failures, subcreation_failures
+            n_inserted, xps_failures = self.upload_xps_entries(xps_entries, _id, entry["doi"])
+            subcreation_failures.extend(xps_failures)
+            created_xps += n_inserted
+
+        return created_materials, created_reactions, created_h2_tpr, created_co2_tpd, created_o2_tpd, created_osc, created_xps, failures, subcreation_failures
     
 
     def fingerprint(self, doc):
@@ -252,6 +260,7 @@ class Migrator:
         o2_tpd_successes = 0
         co2_tpd_successes = 0
         osc_successes = 0
+        xps_successes = 0
 
         for entry in creations:
             try:
@@ -291,11 +300,16 @@ class Migrator:
                 osc_successes += n_inserted
                 failed_subcreations.extend(failures)
 
-            except:
-                failed_creations.append(entry)
+                xps_entries = entry.get("xps_entries", {})
+                n_inserted, failures = self.upload_xps_entries(xps_entries, material_id, doi)
+                xps_successes += n_inserted
+                failed_subcreations.extend(failures)
+
+            except Exception as e:
+                failed_creations.append((entry, repr(e)))
                 continue
 
-        return failed_creations, failed_subcreations, h2_tpr_successes, o2_tpd_successes, co2_tpd_successes, osc_successes
+        return failed_creations, failed_subcreations, h2_tpr_successes, o2_tpd_successes, co2_tpd_successes, osc_successes, xps_successes
         
         
     def upload_characterisation(self, entry: Dict, collection_name: str, doi: str, material_id: ObjectId):
@@ -330,6 +344,47 @@ class Migrator:
         except Exception as e:
             return 0, osc_entries
         
+
+    def upload_xps_entries(self, xps_entries, material_id: ObjectId, doi: str):
+        """Upload one or more XPS entries linked to a material.
+
+        The migration JSON currently uses a single dict under `xps_entries`,
+        but this also accepts a list of dicts in case a future paper has
+        multiple XPS measurements for the same material. Empty dicts and
+        all-null entries are skipped.
+        """
+        if xps_entries in ({}, [], None):
+            return 0, []
+
+        if isinstance(xps_entries, dict):
+            xps_entries = [xps_entries]
+
+        successes = 0
+        failures = []
+        coll = self.db.collections["xps"]
+
+        for xps_entry in xps_entries:
+            if not isinstance(xps_entry, dict):
+                failures.append(({"xps_entries": xps_entry}, "XPS entry must be a dict"))
+                continue
+
+            if not any(v is not None for v in xps_entry.values()):
+                continue
+
+            doc = deepcopy(xps_entry)
+            doc.update({"doi": doi, "material_id": material_id})
+
+            try:
+                res = coll.insert_one(doc)
+                if res.inserted_id:
+                    successes += 1
+                else:
+                    failures.append((doc, "insertion error"))
+            except Exception as e:
+                failures.append((doc, repr(e)))
+
+        return successes, failures
+
     def update_all_by_filter(self, update_by_filter_entries: List[Dict]):
         failed_updates = []
         successes = 0
@@ -362,6 +417,7 @@ class Migrator:
             "o2_tpd_peaks": 0,
             "co2_tpd_peaks": 0,
             "osc": 0,
+            "xps": 0,
         }
         failures = []
 
@@ -373,6 +429,7 @@ class Migrator:
             o2_tpd = entry.pop("o2_tpd_peaks", {})
             co2_tpd = entry.pop("co2_tpd_peaks", {})
             oscs = entry.pop("osc_entries", [])
+            xps_entries = entry.pop("xps_entries", {})
 
             fp = self.fingerprint(entry)
             matches = list(self.materials_coll.find({"fingerprint": fp}))
@@ -452,6 +509,11 @@ class Migrator:
                         successes["osc"] += 1
                 except Exception as e:
                     failures.append((doc, repr(e)))
+
+
+            n_inserted, xps_failures = self.upload_xps_entries(xps_entries, material_id, doi)
+            successes["xps"] += n_inserted
+            failures.extend(xps_failures)
 
         print("Backfill successes:", successes)
 

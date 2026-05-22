@@ -1,6 +1,6 @@
 from src.db import Migrator, DB
 
-file_path = "src/db/migrations/18-5-26.json"
+file_path = "src/db/migrations/20-5-26.json"
 
 db = DB()
 migrator = Migrator(
