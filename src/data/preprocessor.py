@@ -31,6 +31,7 @@ class Preprocessor:
             otpd_filter = config.get("o2_tpd", {}).get("base_filter", None)
             cotpd_filter = config.get("co2_tpd", {}).get("base_filter", None)
             osc_filter = config.get("osc", {}).get("base_filter", None)
+            xps_filter = config.get("xps", {}).get("base_filter", None)
             return {
                 "materials": pd.DataFrame(list(self.database.collections["materials"].find(mat_filter))),
                 "reactions": pd.DataFrame(list(self.database.collections["reactions"].find(rxn_filter))) if rxn_filter is not None else None,
@@ -38,6 +39,7 @@ class Preprocessor:
                 "o2_tpd_peaks": pd.DataFrame(list(self.database.collections["o2_tpd_peaks"].find(otpd_filter))) if otpd_filter is not None else None,
                 "co2_tpd_peaks": pd.DataFrame(list(self.database.collections["co2_tpd_peaks"].find(cotpd_filter))) if cotpd_filter is not None else None,
                 "osc": pd.DataFrame(list(self.database.collections["osc"].find(osc_filter))) if osc_filter is not None else None,
+                "xps": pd.DataFrame(list(self.database.collections["xps"].find(xps_filter))) if xps_filter is not None else None,
             }
 
         if base_material_filter is None:     
@@ -1915,7 +1917,6 @@ class Preprocessor:
 
         return basic_preprocess, stats
         
-
     def merge_characterisation_with_materials(
         self,
         materials_df: pd.DataFrame,
@@ -2021,3 +2022,35 @@ class Preprocessor:
             "'slots', 'weighted_stats'"
         )
     
+    def preprocess_xps(self, xps_df: pd.DataFrame, config: Optional[Dict] = None):
+        cfg = config.get("xps", {}) if config else {}
+
+        xps_df = xps_df.copy()
+        xps_df.replace("", pd.NA, inplace=True)
+
+        target_cols = cfg.get("target_cols", [])
+        direct_cols = cfg.get("direct_inputs", [])
+        feature_cols = cfg.get("feature_cols", [])
+
+        required = ["material_id"] + target_cols + direct_cols + feature_cols
+        existing_required = [c for c in required if c in xps_df.columns]
+
+        n_before = len(xps_df)
+        xps_df = xps_df.dropna(subset=["material_id"] + target_cols).copy()
+
+        for c in target_cols + direct_cols + feature_cols:
+            if c in xps_df.columns:
+                xps_df[c] = pd.to_numeric(xps_df[c], errors="coerce")
+
+        xps_df = xps_df.dropna(subset=target_cols).copy()
+
+        stats = {
+            "total_rows_before_preprocessing": n_before,
+            "total_rows_after_preprocessing": len(xps_df),
+            "total_rows_dropped": n_before - len(xps_df),
+            "target_cols": target_cols,
+            "direct_inputs": direct_cols,
+            "feature_cols": feature_cols,
+        }
+
+        return xps_df, stats

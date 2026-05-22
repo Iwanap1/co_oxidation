@@ -24,7 +24,6 @@ class DopantFeaturiser:
         else:
             self.feature_map = feature_map
 
-    
     def convert_features(self, df: pd.DataFrame, leave_ce: bool = True, include_n_dopants: bool=True, delete_old_features: bool=False) -> pd.DataFrame:
         """Converts metal-wise concentrations to dopant features"""
         df = df.copy()
@@ -100,7 +99,6 @@ class DopantFeaturiser:
 
         return pd.concat([base_df, dopant_features_df], axis=1)
         
-    
     def get_feature_map(self) -> Dict[Metal, Dict[Supported_Attributes, float]]:
         feature_map = {}
         for metal_string in self.metals:
@@ -110,7 +108,6 @@ class DopantFeaturiser:
                 metal_dict = self._resolve_attribute(metal, metal_dict, attr)
             feature_map[metal_string] = metal_dict
         return feature_map
-
 
     def _resolve_attribute(self, metal: Element, metal_dict: Dict[str, float], attr: str):
         override = self.overrides.get(metal.symbol, {}).get(attr, None)
@@ -137,7 +134,6 @@ class DopantFeaturiser:
             raise NotImplementedError(f"Cannot process Element attribute '{attr}' of metal {metal.symbol} because it does not exist as a custom function or a mendeleev.models.Element attribute, or does not exist for this metal.")
         return metal_dict
     
-
     def convert_features_weighted_stats(
         self,
         df: pd.DataFrame,

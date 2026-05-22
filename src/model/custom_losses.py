@@ -11,12 +11,14 @@ class CustomLoss:
         self.tpr_loss_fn = self._make_loss(self.cfg.get("tpr", {"name": "MSELoss"}))
         self.osc_loss_fn = self._make_loss(self.cfg.get("osc", {"name": "MSELoss"}))
         self.tpd_loss_fn = self._make_loss(self.cfg.get("tpd", {"name": "MSELoss"}))
+        self.xps_loss_fn = self._make_loss(self.cfg.get("xps", {"name": "MSELoss"}))
 
         self.base_weights = {
             "conversion": self.cfg.get("conversion", {}).get("weight", 1.0),
             "tpr": self.cfg.get("tpr", {}).get("weight", 0.0),
             "osc": self.cfg.get("osc", {}).get("weight", 0.0),
             "tpd": self.cfg.get("tpd", {}).get("weight", 0.0),
+            "xps": self.cfg.get("xps", {}).get("weight", 0.0)
         }
 
         self.decays = {
@@ -24,6 +26,7 @@ class CustomLoss:
             "tpr": self.cfg.get("tpr", {}).get("decay", 1.0),
             "osc": self.cfg.get("osc", {}).get("decay", 1.0),
             "tpd": self.cfg.get("tpd", {}).get("decay", 1.0),
+            "xps": self.cfg.get("xps", {}).get("decay", 1.0)
         }
 
         self.current_epoch = 0
@@ -86,6 +89,12 @@ class CustomLoss:
             loss = self.tpd_loss_fn(predictions["tpd"], y)
             losses["tpd"] = loss
             total = total + self.weight("tpd") * loss
+        
+        if "xps" in predictions:
+            y = data["xps"]["target"]
+            loss = self.xps_loss_fn(predictions["xps"], y)
+            losses["xps"] = loss
+            total = total + self.weight("xps") * loss
 
         losses["total"] = total
         return losses

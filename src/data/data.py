@@ -14,7 +14,37 @@ import torch
 
 SplitMethod = Literal["Random_by_Material", "Random_by_Point", "Remove_Metal", "Above_WHSV_Threshold"]
 
+
+
 class Data:
+    BRANCH_DATASETS = {
+        "tpr": {
+            "model_key": "tpr_net",
+            "dataset": "h2_tpr",
+            "features_tensor": "tpr_features",
+            "direct_tensor": "tpr_direct_inputs",
+        },
+        "tpd": {
+            "model_key": "tpd_net",
+            "dataset": "o2_tpd",
+            "features_tensor": "tpd_features",
+            "direct_tensor": "tpd_direct_inputs",
+        },
+        "osc": {
+            "model_key": "osc_net",
+            "dataset": "osc",
+            "features_tensor": "osc_features",
+            "direct_tensor": "osc_direct_inputs",
+        },
+        "xps": {
+            "model_key": "xps_net",
+            "dataset": "xps",
+            "features_tensor": "xps_features",
+            "direct_tensor": "xps_direct_inputs",
+        },
+    }
+
+
     def __init__(self, 
         preprocessor: Preprocessor, 
         data_config: Dict, 
@@ -40,6 +70,7 @@ After running .set_split():
             "reactions": self.config["reactions"].get("target_cols", ["conversion"]),
             "h2_tpr": self.config["h2_tpr"].get("target_cols", ["temp"]), 
             "osc": self.config["osc"].get("target_cols", ["value_O_umol_per_g_catalyst"]),
+            "xps": self.config["xps"].get("target_cols", ["O_ads_fraction"]),
             "o2_tpd": self.config["o2_tpd"].get("target_cols", ["T_beta"])
         }
         self.full_dataframes, self.stats = self._prepare_merged_dataframes_from_config(row_by_datapoint=row_by_datapoint)
@@ -91,11 +122,7 @@ After running .set_split():
             train_dfs=self.train_dataframes,
             test_dfs=self.test_dataframes,
             feature_cols=self.feature_cols,
-            target_cols={
-                "h2_tpr": self.target_cols["h2_tpr"],
-                "osc": self.target_cols["osc"],
-                "o2_tpd": self.target_cols["o2_tpd"],
-            },
+            target_cols=self.target_cols
         )
 
     def prepare_datasets(self, model_config: Dict) -> Dict[str, Dict[str, Any]]:
@@ -161,50 +188,14 @@ After running .set_split():
 
             # If OSC net is enabled, reaction rows need OSC encoder inputs
             # so conversion can use z_osc. Do NOT include OSC direct inputs here.
-            if model_config.get("osc_net") is not None:
-                osc_direct_cols = model_config.get("osc_net", {}).get("direct_inputs", [])
-
-                osc_cols_for_rxn = [
-                    c for c in self.feature_cols["osc"]
-                    if c not in osc_direct_cols
-                ]
-
-                missing = [c for c in osc_cols_for_rxn if c not in rxn_df.columns]
-                if missing:
-                    raise KeyError(
-                        f"Reaction dataframe missing OSC input columns: {missing}"
+            for branch_name in self.BRANCH_DATASETS:
+                if self._branch_enabled(branch_name, model_config):
+                    self._add_branch_features_to_reactions(
+                        branch_name=branch_name,
+                        model_config=model_config,
+                        rxn_df=rxn_df,
+                        reaction_tensor_cols=reaction_tensor_cols,
                     )
-
-                reaction_tensor_cols["osc_features"] = osc_cols_for_rxn
-
-            # If TPR net is enabled, reaction rows need TPR encoder inputs
-            # so conversion can use z_tpr. Do NOT include ramp rate here.
-            if model_config.get("tpr_net") is not None:
-                tpr_cols_for_rxn = self._resolve_tpr_input_cols(model_config)
-
-                missing = [c for c in tpr_cols_for_rxn if c not in rxn_df.columns]
-                if missing:
-                    raise KeyError(
-                        f"Reaction dataframe missing TPR input columns: {missing}"
-                    )
-
-                reaction_tensor_cols["tpr_features"] = tpr_cols_for_rxn
-
-            if model_config.get("tpd_net") is not None:
-                tpd_direct_cols = model_config.get("tpd_net", {}).get("direct_input_cols", [])
-
-                tpd_cols_for_rxn = [
-                    c for c in self.feature_cols["o2_tpd"]
-                    if c not in tpd_direct_cols
-                ]
-
-                missing = [c for c in tpd_cols_for_rxn if c not in rxn_df.columns]
-                if missing:
-                    raise KeyError(
-                        f"Reaction dataframe missing TPD input columns: {missing}"
-                    )
-
-                reaction_tensor_cols["tpd_features"] = tpd_cols_for_rxn
 
             # Physical WHSV tensor stays unscaled
             if model_config.get("hybridise_whsv", False):
@@ -243,114 +234,18 @@ After running .set_split():
                 metadata_cols=["_id_material", "material_id", "_id_reaction", "temperature"],
             )
 
-            # H2-TPR
-            if model_config.get("tpr_net") is not None:
-                if "h2_tpr" not in scaled_dfs:
-                    raise KeyError(
-                        "model_config contains tpr_net but no h2_tpr dataframe exists."
+            for branch_name in self.BRANCH_DATASETS:
+                if self._branch_enabled(branch_name, model_config):
+                    branch_tensor_cols = self._make_branch_tensor_dataset(
+                        branch_name=branch_name,
+                        model_config=model_config,
+                        scaled_dfs=scaled_dfs,
+                        prepared_split=prepared[split_name],
                     )
 
-                tpr_df = scaled_dfs["h2_tpr"].copy()
-
-                tpr_tensor_cols = {
-                    "tpr_features": self._resolve_tpr_input_cols(model_config),
-                }
-
-                if model_config["tpr_net"].get("condition_tpr_with_ramp_rate", False):
-                    if "ramp_rate_C_min" not in tpr_df.columns:
-                        raise KeyError(
-                            "condition_tpr_with_ramp_rate=True but 'ramp_rate_C_min' is missing."
-                        )
-
-                    tpr_tensor_cols["ramp_rate"] = ["ramp_rate_C_min"]
-
-                tpr_tensor_cols["target"] = self.target_cols["h2_tpr"]
-
-                prepared[split_name]["h2_tpr"] = self._make_named_tensor_dataset(
-                    tpr_df,
-                    tpr_tensor_cols,
-                )
-
-                if split_name == "train":
-                    tensor_cols_for_input_dims["h2_tpr"] = tpr_tensor_cols.copy()
-
-
-            # O2-TPD
-            if model_config.get("tpd_net") is not None:
-                if "o2_tpd" not in scaled_dfs:
-                    raise KeyError(
-                        "model_config contains tpd_net but no o2_tpd dataframe exists."
-                    )
-
-                tpd_df = scaled_dfs["o2_tpd"].copy()
-
-                tpd_cfg = model_config.get("tpd_net", {})
-                direct_cols = tpd_cfg.get("direct_input_cols", [])
-
-                tpd_feature_cols = self._resolve_tpd_input_cols(model_config)
-
-                tpd_tensor_cols = {
-                    "tpd_features": tpd_feature_cols,
-                }
-
-                if direct_cols:
-                    missing = [c for c in direct_cols if c not in tpd_df.columns]
-                    if missing:
-                        raise KeyError(
-                            f"tpd_net.direct_input_cols contains missing O2-TPD columns: {missing}"
-                        )
-
-                    tpd_tensor_cols["tpd_direct_inputs"] = direct_cols
-
-                tpd_tensor_cols["target"] = self.target_cols["o2_tpd"]
-
-                prepared[split_name]["o2_tpd"] = self._make_named_tensor_dataset(
-                    tpd_df,
-                    tpd_tensor_cols,
-                )
-
-                if split_name == "train":
-                    tensor_cols_for_input_dims["o2_tpd"] = tpd_tensor_cols.copy()
-
-            # OSC
-            if model_config.get("osc_net") is not None:
-                if "osc" not in scaled_dfs:
-                    raise KeyError(
-                        "model_config contains osc_net but no osc dataframe exists."
-                    )
-
-                osc_df = scaled_dfs["osc"].copy()
-
-                osc_cfg = model_config.get("osc_net", {})
-                osc_direct_cols = osc_cfg.get("direct_inputs", [])
-
-                osc_feature_cols = [
-                    c for c in self.feature_cols["osc"]
-                    if c not in osc_direct_cols
-                ]
-
-                osc_tensor_cols = {
-                    "osc_features": osc_feature_cols,
-                }
-
-                if osc_direct_cols:
-                    missing = [c for c in osc_direct_cols if c not in osc_df.columns]
-                    if missing:
-                        raise KeyError(
-                            f"osc_net.direct_inputs contains missing OSC columns: {missing}"
-                        )
-
-                    osc_tensor_cols["osc_direct_inputs"] = osc_direct_cols
-
-                osc_tensor_cols["target"] = self.target_cols["osc"]
-
-                prepared[split_name]["osc"] = self._make_named_tensor_dataset(
-                    osc_df,
-                    osc_tensor_cols,
-                )
-
-                if split_name == "train":
-                    tensor_cols_for_input_dims["osc"] = osc_tensor_cols.copy()
+                    if split_name == "train":
+                        dataset_name = self._branch_dataset_name(branch_name)
+                        tensor_cols_for_input_dims[dataset_name] = branch_tensor_cols.copy()
 
         self.input_dims = self._resolve_input_dims(
             model_config=model_config,
@@ -445,6 +340,7 @@ After running .set_split():
         preprocessed["h2_tpr"], preprocessing_stats["h2_tpr"] = self.preprocessor.preprocess_h2_tpr_peaks(base_dfs["h2_tpr_peaks"],config=self.config)
         preprocessed["osc"], preprocessing_stats["osc"] = self.preprocessor.preprocess_osc(base_dfs["osc"],config=self.config)
         preprocessed["o2_tpd"], preprocessing_stats["o2_tpd"] = self.preprocessor.preprocess_o2_tpd_peaks(base_dfs["o2_tpd_peaks"],config=self.config)
+        preprocessed["xps"], preprocessing_stats["xps"] = (self.preprocessor.preprocess_xps(base_dfs["xps"], config=self.config))
         merge_stats = {}
         niche_element_stats = {}
         results = {"all_materials": materials_df}
@@ -519,6 +415,7 @@ After running .set_split():
             tpr_cols = (
                 tpr_material_cols
                 + self.config["h2_tpr"].get("feature_cols", [])
+                + self.config["h2_tpr"].get("direct_inputs", [])
                 + self._composition_feature_cols(tpr_df)
             )
 
@@ -533,7 +430,7 @@ After running .set_split():
             osc_cols = (
                 osc_material_cols
                 + self.config["osc"].get("feature_cols", [])
-                + self.config["osc"].get("direct_input_cols", [])
+                + self.config["osc"].get("direct_inputs", [])
                 + self._composition_feature_cols(osc_df)
             )
 
@@ -548,12 +445,28 @@ After running .set_split():
             tpd_cols = (
                 tpd_material_cols
                 + self.config["o2_tpd"].get("feature_cols", [])
+                + self.config["o2_tpd"].get("direct_inputs", [])
                 + self._composition_feature_cols(tpd_df)
             )
 
             tpd_cols = list(dict.fromkeys(tpd_cols))
             self._check_cols(tpd_df, tpd_cols, "o2_tpd")
             feature_cols["o2_tpd"] = tpd_cols
+
+        if "xps" in self.full_dataframes:
+            xps_df = self.full_dataframes["xps"]
+            xps_material_cols = self._resolve_material_feature_cols_for_dataset("xps")
+
+            xps_cols = (
+                xps_material_cols
+                + self.config["xps"].get("feature_cols", [])
+                + self.config["xps"].get("direct_inputs", [])
+                + self._composition_feature_cols(xps_df)
+            )
+
+            xps_cols = list(dict.fromkeys(xps_cols))
+            self._check_cols(xps_df, xps_cols, "xps")
+            feature_cols["xps"] = xps_cols
 
         return feature_cols
 
@@ -603,14 +516,14 @@ After running .set_split():
                     raise ValueError(
                         f"[{name}] Cannot fit target scaler because train split has 0 rows."
                     )
+                if name != "reactions":
+                    t_scaler = scalers["targets"].get(name, StandardScaler())
+                    train_df[t_cols] = t_scaler.fit_transform(train_df[t_cols])
 
-                t_scaler = scalers["targets"].get(name, StandardScaler())
-                train_df[t_cols] = t_scaler.fit_transform(train_df[t_cols])
+                    if len(test_df) > 0:
+                        test_df[t_cols] = t_scaler.transform(test_df[t_cols])
 
-                if len(test_df) > 0:
-                    test_df[t_cols] = t_scaler.transform(test_df[t_cols])
-
-                scalers["targets"][name] = t_scaler
+                    scalers["targets"][name] = t_scaler
 
             scaled_train[name] = train_df
             scaled_test[name] = test_df
@@ -818,6 +731,7 @@ After running .set_split():
             "h2_tpr": ["_id", "material_id"] + METALS,
             "osc": ["_id", "material_id"] + METALS,
             "o2_tpd": ["_id", "material_id"] + METALS,
+            "xps": ["_id", "material_id"] + METALS,
         }
 
         selected = {}
@@ -930,23 +844,6 @@ After running .set_split():
 
         return out
     
-    def _resolve_tpr_input_cols(self, model_config: Dict) -> List[str]:
-        cols = list(self.feature_cols["h2_tpr"])
-        tpr_cfg = model_config.get("tpr_net") or {}
-
-        if tpr_cfg.get("condition_tpr_with_ramp_rate", False):
-            cols = [c for c in cols if c != "ramp_rate_C_min"]
-
-        return cols
-    
-    def _resolve_tpd_input_cols(self, model_config: Dict) -> List[str]:
-        cols = list(self.feature_cols["o2_tpd"])
-        tpd_cfg = model_config.get("tpd_net") or {}
-        direct_inputs = tpd_cfg.get("direct_input_cols", [])
-        cols = [c for c in cols if c not in direct_inputs]
-
-        return cols
-
     def _restore_unscaled_physical_cols(
         self,
         scaled_dfs: Dict[str, pd.DataFrame],
@@ -954,38 +851,38 @@ After running .set_split():
         cols_by_dataset: Dict[str, List[str]],
     ) -> Dict[str, pd.DataFrame]:
         out = {}
-
         for name, df in scaled_dfs.items():
             df = df.copy()
-
             for col in cols_by_dataset.get(name, []):
                 if col in df.columns and col in raw_dfs[name].columns:
                     df[f"{col}_unscaled"] = raw_dfs[name][col].to_numpy()
 
             out[name] = df
+        return out
 
     def _resolve_input_dims(
         self,
         model_config: Dict,
         tensor_cols_by_dataset: Dict[str, Dict[str, List[str]]],
     ) -> Dict[str, int]:
-        input_dims = {}
 
-        rxn_cols = tensor_cols_by_dataset["reactions"]
-        input_dims["conversion"] = len(rxn_cols.get("conversion_features", []))
-        input_dims["reaction_inputs"] = len(rxn_cols.get("reaction_inputs", []))
-        input_dims["osc_direct_inputs"] = len(tensor_cols_by_dataset.get("osc", {}).get("osc_direct_inputs", []))
+        input_dims = {
+            "conversion": len(tensor_cols_by_dataset["reactions"].get("conversion_features", [])),
+            "reaction_inputs": len(tensor_cols_by_dataset["reactions"].get("reaction_inputs", [])),
+        }
 
-        if model_config.get("osc_net") is not None:
-            input_dims["osc"] = len(tensor_cols_by_dataset["osc"]["osc_features"])
+        for branch_name, spec in self.BRANCH_DATASETS.items():
+            if not self._branch_enabled(branch_name, model_config):
+                continue
 
-        if model_config.get("tpr_net") is not None:
-            input_dims["tpr"] = len(tensor_cols_by_dataset["h2_tpr"]["tpr_features"])
+            dataset_name = spec["dataset"]
+            tensor_cols = tensor_cols_by_dataset[dataset_name]
 
-        if model_config.get("tpd_net") is not None:
-            input_dims["tpd"] = len(tensor_cols_by_dataset["o2_tpd"]["tpd_features"])
-            input_dims["tpd_direct_inputs"] = len(tensor_cols_by_dataset["o2_tpd"].get("tpd_direct_inputs", []))
-            input_dims["tpd_target"] = len(tensor_cols_by_dataset["o2_tpd"]["target"])
+            input_dims[branch_name] = len(tensor_cols[spec["features_tensor"]])
+            input_dims[f"{branch_name}_direct_inputs"] = len(
+                tensor_cols.get(spec["direct_tensor"], [])
+            )
+            input_dims[f"{branch_name}_target"] = len(tensor_cols["target"])
 
         return input_dims
         
@@ -1022,3 +919,86 @@ After running .set_split():
                     df[el] = 0.0
 
             self.full_dataframes[name] = df
+
+    def _branch_enabled(self, branch_name: str, model_config: Dict) -> bool:
+        return model_config.get(self.BRANCH_DATASETS[branch_name]["model_key"]) is not None
+
+    def _branch_cfg(self, branch_name: str, model_config: Dict) -> Dict:
+        return model_config.get(self.BRANCH_DATASETS[branch_name]["model_key"], {}) or {}
+
+    def _branch_dataset_name(self, branch_name: str) -> str:
+        return self.BRANCH_DATASETS[branch_name]["dataset"]
+
+    def _branch_direct_cols(self, branch_name: str, model_config: Dict) -> List[str]:
+        return self._branch_cfg(branch_name, model_config).get("direct_inputs", [])
+
+    def _resolve_branch_feature_cols(self, branch_name: str, model_config: Dict) -> List[str]:
+        dataset_name = self._branch_dataset_name(branch_name)
+        direct_cols = self._branch_direct_cols(branch_name, model_config)
+
+        return [
+            c for c in self.feature_cols[dataset_name]
+            if c not in direct_cols
+        ]
+
+    def _add_branch_features_to_reactions(
+        self,
+        branch_name: str,
+        model_config: Dict,
+        rxn_df: pd.DataFrame,
+        reaction_tensor_cols: Dict[str, List[str]],
+    ) -> None:
+        spec = self.BRANCH_DATASETS[branch_name]
+
+        feature_cols = self._resolve_branch_feature_cols(branch_name, model_config)
+
+        missing = [c for c in feature_cols if c not in rxn_df.columns]
+        if missing:
+            raise KeyError(
+                f"Reaction dataframe missing {branch_name.upper()} input columns: {missing}"
+            )
+
+        reaction_tensor_cols[spec["features_tensor"]] = feature_cols
+
+    def _make_branch_tensor_dataset(
+        self,
+        branch_name: str,
+        model_config: Dict,
+        scaled_dfs: Dict[str, pd.DataFrame],
+        prepared_split: Dict[str, Any],
+    ) -> Dict[str, List[str]]:
+        spec = self.BRANCH_DATASETS[branch_name]
+        dataset_name = spec["dataset"]
+
+        if dataset_name not in scaled_dfs:
+            raise KeyError(
+                f"model_config contains {spec['model_key']} but no {dataset_name} dataframe exists."
+            )
+
+        df = scaled_dfs[dataset_name].copy()
+
+        feature_cols = self._resolve_branch_feature_cols(branch_name, model_config)
+        direct_cols = self._branch_direct_cols(branch_name, model_config)
+
+        tensor_cols = {
+            spec["features_tensor"]: feature_cols,
+        }
+
+        if direct_cols:
+            missing = [c for c in direct_cols if c not in df.columns]
+            if missing:
+                raise KeyError(
+                    f"{spec['model_key']}.direct_inputs contains missing columns: {missing}"
+                )
+
+            tensor_cols[spec["direct_tensor"]] = direct_cols
+
+        tensor_cols["target"] = self.target_cols[dataset_name]
+
+        prepared_split[dataset_name] = self._make_named_tensor_dataset(
+            df,
+            tensor_cols,
+        )
+
+        return tensor_cols
+    

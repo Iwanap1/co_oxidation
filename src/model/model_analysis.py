@@ -58,6 +58,7 @@ class ModelAnalyser:
                 osc_features=data.get("osc_features"),
                 tpr_features=data.get("tpr_features"),
                 tpd_features=data.get("tpd_features"),
+                xps_features=data.get("xps_features"),
                 whsv=data.get("whsv"),
                 p_co=data.get("p_co"),
                 p_o2=data.get("p_o2"),
@@ -65,24 +66,19 @@ class ModelAnalyser:
             true = data["target"]
 
         elif task == "h2_tpr":
-            pred = self.model.predict_tpr(
-                tpr_features=data["tpr_features"],
-                ramp_rate=data.get("ramp_rate"),
-            )
+            pred = self.model.predict_branch("tpr", features=data["tpr_features"], direct_inputs=data.get("tpr_direct_inputs"))
             true = data["target"]
 
         elif task == "osc":
-            pred = self.model.predict_osc(
-                osc_features=data["osc_features"],
-                osc_direct_inputs=data.get("osc_direct_inputs"),
-            )
+            pred = self.model.predict_branch("osc", features=data["osc_features"], direct_inputs=data.get("osc_direct_inputs"))
             true = data["target"]
         
         elif task == "o2_tpd":
-            pred = self.model.predict_tpd(
-                tpd_features=data["tpd_features"],
-                tpd_direct_inputs=data.get("tpd_direct_inputs"),
-            )
+            pred = self.model.predict_branch("tpd", features=data["tpd_features"], direct_inputs=data.get("tpd_direct_inputs"))
+            true = data["target"]
+
+        elif task == "xps":
+            pred = self.model.predict_branch("xps", features=data["xps_features"], direct_inputs=data.get("xps_direct_inputs"))
             true = data["target"]
 
         else:
@@ -137,14 +133,16 @@ class ModelAnalyser:
 
         return results
     
-
+    def xps_metrics(self):
+        return self._metrics_for_task("xps")
+    
     def tpd_metrics(self) -> Dict[str, Dict[str, float]]:
         return self._metrics_for_task("o2_tpd")
 
     def parity_plots(
         self,
         outdir: Union[str, Path],
-        tasks=("reactions", "h2_tpr", "osc", "o2_tpd"),
+        tasks=("reactions", "h2_tpr", "osc", "o2_tpd", "xps"),
         title_prefix: str = "",
     ):
         outdir = Path(outdir)
@@ -217,6 +215,7 @@ class ModelAnalyser:
                 "h2_tpr": "H2-TPR",
                 "osc": "OSC",
                 "o2_tpd": "O2-TPD",
+                "xps": "XPS"
             }.get(task, task)
 
             ax.set_title(f"{title_prefix} {task_title} parity".strip())
