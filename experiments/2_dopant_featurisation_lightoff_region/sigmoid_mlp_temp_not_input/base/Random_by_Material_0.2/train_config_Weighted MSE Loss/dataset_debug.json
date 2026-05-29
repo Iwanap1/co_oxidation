@@ -1,0 +1,319 @@
+{
+    "model_config_name": null,
+    "data_config_name": "base",
+    "input_dims": {
+        "conversion": 26,
+        "reaction_inputs": 6
+    },
+    "feature_cols": {
+        "reactions": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "crystallite_size_nm",
+            "lattice_parameter_A",
+            "solid_state",
+            "sol_gel",
+            "pyrolysis",
+            "hydrothermal",
+            "precipitation",
+            "gas_co_content",
+            "gas_o2_content",
+            "flow_mL_h_g",
+            "pretreatment_temp",
+            "pretreatment_o2_vol%",
+            "pretreatment_time_h",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Ti",
+            "Zr",
+            "temperature"
+        ],
+        "h2_tpr": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "ramp_rate_C_min",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Ti",
+            "Zr"
+        ],
+        "osc": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "temperature",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Ti",
+            "Zr"
+        ],
+        "o2_tpd": [
+            "Sbet",
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "solid_state",
+            "sol_gel",
+            "pyrolysis",
+            "hydrothermal",
+            "precipitation",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Ti",
+            "Zr"
+        ],
+        "xps": [
+            "calcination_temp",
+            "calcination_time",
+            "single_phase_binary",
+            "solid_state",
+            "sol_gel",
+            "pyrolysis",
+            "hydrothermal",
+            "precipitation",
+            "Bi",
+            "Ce",
+            "Co",
+            "Cu",
+            "Fe",
+            "Gd",
+            "Hf",
+            "La",
+            "Mn",
+            "Ni",
+            "Pr",
+            "Sm",
+            "Sn",
+            "Ti",
+            "Zr"
+        ]
+    },
+    "target_cols": {
+        "reactions": [
+            "conversion"
+        ],
+        "h2_tpr": [
+            "temp"
+        ],
+        "osc": [
+            "value_O_umol_per_g_catalyst"
+        ],
+        "xps": [
+            "Ce3_fraction"
+        ],
+        "o2_tpd": [
+            "T_beta"
+        ]
+    },
+    "dataset_sizes": {
+        "train": {
+            "reactions": 1084
+        },
+        "test": {
+            "reactions": 267
+        }
+    },
+    "tensor_names": {
+        "train": {
+            "reactions": [
+                "conversion_features",
+                "temperature",
+                "reaction_inputs",
+                "target"
+            ]
+        },
+        "test": {
+            "reactions": [
+                "conversion_features",
+                "temperature",
+                "reaction_inputs",
+                "target"
+            ]
+        }
+    },
+    "tensor_feature_names": {
+        "train": {
+            "reactions": {
+                "conversion_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "crystallite_size_nm",
+                    "lattice_parameter_A",
+                    "solid_state",
+                    "sol_gel",
+                    "pyrolysis",
+                    "hydrothermal",
+                    "precipitation",
+                    "Bi",
+                    "Ce",
+                    "Co",
+                    "Cu",
+                    "Fe",
+                    "Gd",
+                    "Hf",
+                    "La",
+                    "Mn",
+                    "Ni",
+                    "Pr",
+                    "Sm",
+                    "Sn",
+                    "Ti",
+                    "Zr"
+                ],
+                "temperature": [
+                    "temperature"
+                ],
+                "reaction_inputs": [
+                    "gas_co_content",
+                    "gas_o2_content",
+                    "flow_mL_h_g",
+                    "pretreatment_temp",
+                    "pretreatment_o2_vol%",
+                    "pretreatment_time_h"
+                ],
+                "target": [
+                    "conversion"
+                ]
+            }
+        },
+        "test": {
+            "reactions": {
+                "conversion_features": [
+                    "Sbet",
+                    "calcination_temp",
+                    "calcination_time",
+                    "single_phase_binary",
+                    "crystallite_size_nm",
+                    "lattice_parameter_A",
+                    "solid_state",
+                    "sol_gel",
+                    "pyrolysis",
+                    "hydrothermal",
+                    "precipitation",
+                    "Bi",
+                    "Ce",
+                    "Co",
+                    "Cu",
+                    "Fe",
+                    "Gd",
+                    "Hf",
+                    "La",
+                    "Mn",
+                    "Ni",
+                    "Pr",
+                    "Sm",
+                    "Sn",
+                    "Ti",
+                    "Zr"
+                ],
+                "temperature": [
+                    "temperature"
+                ],
+                "reaction_inputs": [
+                    "gas_co_content",
+                    "gas_o2_content",
+                    "flow_mL_h_g",
+                    "pretreatment_temp",
+                    "pretreatment_o2_vol%",
+                    "pretreatment_time_h"
+                ],
+                "target": [
+                    "conversion"
+                ]
+            }
+        }
+    },
+    "tensor_shapes": {
+        "train": {
+            "reactions": {
+                "conversion_features": [
+                    1084,
+                    26
+                ],
+                "temperature": [
+                    1084,
+                    1
+                ],
+                "reaction_inputs": [
+                    1084,
+                    6
+                ],
+                "target": [
+                    1084,
+                    1
+                ]
+            }
+        },
+        "test": {
+            "reactions": {
+                "conversion_features": [
+                    267,
+                    26
+                ],
+                "temperature": [
+                    267,
+                    1
+                ],
+                "reaction_inputs": [
+                    267,
+                    6
+                ],
+                "target": [
+                    267,
+                    1
+                ]
+            }
+        }
+    }
+}

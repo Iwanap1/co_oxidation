@@ -1,0 +1,190 @@
+[
+    {
+        "name": "MSE Loss",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-6
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 64,
+            "shuffle": true,
+            "drop_last": false
+        },
+        "train_critereon": {
+                "conversion": {
+                "name": "MSELoss",
+                "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 0.1
+            }
+        },
+        "eval_critereon": {
+            "conversion": {
+            "name": "MSELoss",
+            "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.0
+            },
+            "osc": {
+                "name": "MSELoss", 
+                "weight": 0.0
+            }
+        }
+    },
+    {
+        "name": "Weighted MSE Loss",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-6
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 64,
+            "shuffle": true,
+            "drop_last": false
+        },
+        "train_critereon": {
+                "conversion": {
+                "name": "EdgeWeightedMSELoss",
+                "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 0.1
+            }
+        },
+        "eval_critereon": {
+            "conversion": {
+            "name": "MSELoss",
+            "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.0
+            },
+            "osc": {
+                "name": "MSELoss", 
+                "weight": 0.0
+            }
+        }
+    },
+    {
+        "name": "Stronger Weighting",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-6
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 64,
+            "shuffle": true,
+            "drop_last": false
+        },
+        "train_critereon": {
+                "conversion": {
+                "name": "EdgeWeightedMSELoss",
+                "weight": 1.0,
+                "alpha": 10.0,
+                "power": 2.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 0.1
+            }
+        },
+        "eval_critereon": {
+            "conversion": {
+            "name": "MSELoss",
+            "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.0
+            },
+            "osc": {
+                "name": "MSELoss", 
+                "weight": 0.0
+            }
+        }
+    },
+    {
+        "name": "Extreme Weighting",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-6
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 64,
+            "shuffle": true,
+            "drop_last": false
+        },
+        "train_critereon": {
+                "conversion": {
+                "name": "EdgeWeightedMSELoss",
+                "weight": 1.0,
+                "alpha": 20.0,
+                "power": 4.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 0.1
+            }
+        },
+        "eval_critereon": {
+            "conversion": {
+            "name": "MSELoss",
+            "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 0.0
+            },
+            "osc": {
+                "name": "MSELoss", 
+                "weight": 0.0
+            }
+        }
+    }
+]

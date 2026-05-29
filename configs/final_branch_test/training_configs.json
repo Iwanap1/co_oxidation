@@ -1,0 +1,68 @@
+[
+    {
+        "name": "full_branch_weight",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-5
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 128,
+            "shuffle": true,
+            "drop_last": false,
+            "training_mode": "reaction_minibatch_aux_full"
+        },
+        "train_critereon": {
+            "conversion": {"name": "EdgeWeightedMSELoss", "weight": 1.0, "alpha": 10.0, "power": 2.0},
+            "tpr": {"name": "MSELoss", "weight": 1, "decay": 1},
+            "osc": {"name": "MSELoss","weight": 1, "decay": 1},
+            "tpd": {"name": "AutoMaskedMSELoss", "weight": 1, "decay": 1},
+            "xps": {"name": "MSELoss", "weight": 1, "decay": 1}
+        },
+        "eval_critereon": {
+            "conversion": {"name": "MSELoss", "weight": 1.0},
+            "tpr": {"name": "MSELoss", "weight": 0.0},
+            "osc": {"name": "MSELoss", "weight": 0.0},
+            "tpd": {"name": "AutoMaskedMSELoss", "weight": 0.0},
+            "xps": {"name": "MSELoss", "weight": 0.00}
+        }
+    },
+    {
+        "name": "branch_weighted_eval",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-5
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 128,
+            "shuffle": true,
+            "drop_last": false,
+            "training_mode": "reaction_minibatch_aux_full"
+        },
+        "train_critereon": {
+            "conversion": {"name": "EdgeWeightedMSELoss", "weight": 1.0, "alpha": 10.0, "power": 2.0},
+            "tpr": {"name": "MSELoss", "weight": 1, "decay": 1},
+            "osc": {"name": "MSELoss","weight": 1, "decay": 1},
+            "tpd": {"name": "AutoMaskedMSELoss", "weight": 1, "decay": 1},
+            "xps": {"name": "MSELoss", "weight": 1, "decay": 1}
+        },
+        "eval_critereon": {
+            "conversion": {"name": "MSELoss", "weight": 1.0},
+            "tpr": {"name": "MSELoss", "weight": 1, "decay": 1},
+            "osc": {"name": "MSELoss","weight": 1, "decay": 1},
+            "tpd": {"name": "AutoMaskedMSELoss", "weight": 1, "decay": 1},
+            "xps": {"name": "MSELoss", "weight": 1, "decay": 1}
+        }
+    }
+]

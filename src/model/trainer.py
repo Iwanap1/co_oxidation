@@ -178,8 +178,41 @@ class Trainer:
 
         scheduler_cls = getattr(schedulers, scheduler_name)
         return scheduler_cls(optimiser, **sched_cfg)
-                
+    
+
     def _run_epoch(
+        self,
+        model: LightOffModel,
+        loaders: Dict[str, DataLoader],
+        datasets,
+        split,
+        optimiser: Any,
+        device,
+        critereon: CustomLoss,
+    ):
+        mode = self.cfg.get("dataloader", {}).get(
+            "training_mode",
+            "fully_minibatched",
+        )
+
+        if mode == "fully_minibatched":
+            return self._run_epoch_fully_minibatched(
+                model, loaders, datasets, split, optimiser, device, critereon
+            )
+
+        if mode == "full_batch":
+            return self._run_epoch_full_batch(
+                model, loaders, datasets, split, optimiser, device, critereon
+            )
+
+        if mode == "reaction_minibatch_aux_full":
+            return self._run_epoch_reaction_minibatch_aux_full(
+                model, loaders, datasets, split, optimiser, device, critereon
+            )
+
+        raise ValueError(f"Unknown training_mode: {mode}")
+                
+    def _run_epoch_fully_minibatched(
         self,
         model: LightOffModel,
         loaders: Dict[str, DataLoader],
@@ -231,6 +264,7 @@ class Trainer:
             pred_conversion = model(
                 conversion_features=rxn.get("conversion_features"),
                 reaction_inputs=rxn.get("reaction_inputs"),
+                temperature=rxn.get("temperature"),
                 osc_features=rxn.get("osc_features"),
                 tpr_features=rxn.get("tpr_features"),
                 tpd_features=rxn.get("tpd_features"),
@@ -319,24 +353,189 @@ class Trainer:
 
         return {k: v / max(n_steps, 1) for k, v in totals.items()}
 
+    def _run_epoch_full_batch(
+        self,
+        model,
+        loaders,
+        datasets,
+        split,
+        optimiser,
+        device,
+        critereon,
+    ):
+        if optimiser is not None:
+            optimiser.zero_grad()
+
+        predictions = {}
+        batch_data = {}
+
+        for task, loader in loaders.items():
+            if len(loader.dataset) == 0:
+                continue
+
+            batch = next(iter(loader))
+
+            data = self._batch_to_named_dict(
+                batch,
+                datasets[split][task]["tensor_names"],
+                device=device,
+            )
+
+            pred_key, pred = self._predict_for_task(model, task, data)
+
+            predictions[pred_key] = pred
+            batch_data[task] = data
+
+        losses = critereon(predictions, batch_data)
+
+        if optimiser is not None:
+            losses["total"].backward()
+            optimiser.step()
+
+        return {k: float(v.detach().cpu()) for k, v in losses.items()}
+
+
+    def _run_epoch_reaction_minibatch_aux_full(
+        self,
+        model,
+        loaders,
+        datasets,
+        split,
+        optimiser,
+        device,
+        critereon,
+    ):
+        reaction_loader = loaders["reactions"]
+
+        aux_full_batches = {}
+
+        for task, loader in loaders.items():
+            if task == "reactions":
+                continue
+
+            if len(loader.dataset) == 0:
+                continue
+
+            batch = next(iter(loader))
+            aux_full_batches[task] = self._batch_to_named_dict(
+                batch,
+                datasets[split][task]["tensor_names"],
+                device=device,
+            )
+
+        totals = {}
+        n_steps = 0
+
+        for rxn_batch in reaction_loader:
+            if optimiser is not None:
+                optimiser.zero_grad()
+
+            rxn = self._batch_to_named_dict(
+                rxn_batch,
+                datasets[split]["reactions"]["tensor_names"],
+                device=device,
+            )
+
+            predictions = {}
+            batch_data = {"reactions": rxn}
+
+            pred_key, pred = self._predict_for_task(model, "reactions", rxn)
+            predictions[pred_key] = pred
+
+            for task, aux_data in aux_full_batches.items():
+                pred_key, pred = self._predict_for_task(model, task, aux_data)
+                predictions[pred_key] = pred
+                batch_data[task] = aux_data
+
+            losses = critereon(predictions, batch_data)
+
+            if optimiser is not None:
+                losses["total"].backward()
+                optimiser.step()
+
+            for k, v in losses.items():
+                totals[k] = totals.get(k, 0.0) + float(v.detach().cpu())
+
+            n_steps += 1
+
+        return {k: v / n_steps for k, v in totals.items()}
+
+
     def _make_dataloaders(self, datasets, split: str, shuffle: bool = None):
         loader_cfg = self.cfg.get("dataloader", {})
-        batch_size = loader_cfg.get("batch_size", 32)
 
         if shuffle is None:
             shuffle = loader_cfg.get("shuffle", split == "train")
 
         drop_last = loader_cfg.get("drop_last", False)
 
-        return {
-            name: DataLoader(
-                ds_info["dataset"],
+        mode = loader_cfg.get(
+            "training_mode",
+            "fully_minibatched",
+        )
+
+        default_batch_size = loader_cfg.get("batch_size", 32)
+
+        loaders = {}
+
+        for task, dataset_info in datasets[split].items():
+
+            dataset = dataset_info["dataset"]
+
+            if len(dataset) == 0:
+                continue
+
+            # determine batch size
+            if mode == "full_batch":
+                batch_size = len(dataset)
+
+            elif (
+                mode == "reaction_minibatch_aux_full"
+                and task != "reactions"
+            ):
+                batch_size = len(dataset)
+
+            else:
+                batch_size = default_batch_size
+
+            loaders[task] = DataLoader(
+                dataset,
                 batch_size=batch_size,
-                shuffle=shuffle,
+                shuffle=shuffle if task == "reactions" else False,
                 drop_last=drop_last,
             )
-            for name, ds_info in datasets[split].items()
+
+        return loaders
+
+    def _predict_for_task(self, model, task, batch_dict):
+        if task == "reactions":
+            return "conversion", model(
+                conversion_features=batch_dict.get("conversion_features"),
+                reaction_inputs=batch_dict.get("reaction_inputs"),
+                temperature =batch_dict.get("temperature"),
+                osc_features=batch_dict.get("osc_features"),
+                tpr_features=batch_dict.get("tpr_features"),
+                tpd_features=batch_dict.get("tpd_features"),
+                xps_features=batch_dict.get("xps_features"),
+                whsv=batch_dict.get("whsv"),
+                p_co=batch_dict.get("p_co"),
+                p_o2=batch_dict.get("p_o2"),
+            )
+
+        branch_map = {
+            "h2_tpr": ("tpr", "tpr_features", "tpr_direct_inputs"),
+            "osc": ("osc", "osc_features", "osc_direct_inputs"),
+            "o2_tpd": ("tpd", "tpd_features", "tpd_direct_inputs"),
+            "xps": ("xps", "xps_features", "xps_direct_inputs"),
         }
+
+        branch_name, feature_key, direct_key = branch_map[task]
+
+        return branch_name, model.predict_branch(
+            branch_name,
+            features=batch_dict[feature_key],
+            direct_inputs=batch_dict.get(direct_key),
+        )
 
     def _batch_to_named_dict(self, batch, tensor_names, device):
         return {

@@ -1,0 +1,20 @@
+{
+    "no_branching": {
+        "conversion_net": {
+            "mode": "sigmoid_curve",
+            "input_temperature": false,
+            "hidden_dim": [16, 16, 16],
+            "output_dim": 2,
+            "activation": "SiLU",
+            "include_material_features": true,
+            "included_features": "all",
+            "input_reaction_cols": ["temperature", "gas_co_content", "gas_o2_content", "flow_mL_h_g", "pretreatment_temp", "pretreatment_o2_vol%", "pretreatment_time_h"]
+        },
+        "osc_net": null,
+        "tpd_net": null,
+        "tpr_net": null,
+        "xps_net": null,
+        "hybridise_whsv": false,
+        "hybridise_pressures": false
+    }
+}

@@ -69,6 +69,7 @@ class LightOffModel(nn.Module):
             raise ValueError("Pressure hybridisation requires WHSV hybridisation.")
 
         conv_cfg = model_config["conversion_net"]
+        self.conversion_mode = conv_cfg.get("mode", "direct")
 
         self.include_conversion_features = conv_cfg.get(
             "include_material_features",
@@ -117,6 +118,7 @@ class LightOffModel(nn.Module):
         self,
         conversion_features: Optional[torch.Tensor] = None,
         reaction_inputs: Optional[torch.Tensor] = None,
+        temperature: Optional[torch.Tensor] = None,
         whsv: Optional[torch.Tensor] = None,
         p_co: Optional[torch.Tensor] = None,
         p_o2: Optional[torch.Tensor] = None,
@@ -137,7 +139,23 @@ class LightOffModel(nn.Module):
         )
 
         if not self.hybridise_pressures and not self.hybridise_whsv:
-            return torch.sigmoid(z)
+            if self.conversion_mode == "direct":
+                return torch.sigmoid(z)
+
+            if self.conversion_mode == "sigmoid_curve":
+                if temperature is None:
+                    raise ValueError("temperature required for sigmoid_curve mode.")
+
+                T = temperature
+
+                T50 = z[:, 0:1]
+                log_slope = z[:, 1:2]
+
+                slope = torch.nn.functional.softplus(log_slope) + 1e-6
+
+                return torch.sigmoid(slope * (T - T50))
+
+            raise ValueError(f"Unknown conversion_mode: {self.conversion_mode}")
 
         if self.hybridise_whsv and not self.hybridise_pressures:
             if whsv is None:

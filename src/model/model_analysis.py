@@ -55,6 +55,7 @@ class ModelAnalyser:
             pred = self.model(
                 conversion_features=data.get("conversion_features"),
                 reaction_inputs=data.get("reaction_inputs"),
+                temperature=data.get("temperature"),
                 osc_features=data.get("osc_features"),
                 tpr_features=data.get("tpr_features"),
                 tpd_features=data.get("tpd_features"),
@@ -198,6 +199,7 @@ class ModelAnalyser:
                     ax.scatter(
                         yt,
                         yp,
+                        s=10,
                         alpha=0.6,
                         label=label,
                     )

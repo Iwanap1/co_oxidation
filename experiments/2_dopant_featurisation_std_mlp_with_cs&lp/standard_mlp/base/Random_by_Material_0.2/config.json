@@ -31,32 +31,34 @@
                 "Sm",
                 "Co",
                 "Fe",
-                "Nd",
                 "La",
                 "Ni",
                 "Hf",
                 "Sn",
                 "Pr",
-                "Eu",
-                "Ti",
-                "Tb"
+                "Ti"
             ],
             "allow_supported_samples": false,
-            "add_synthesis_flags": false,
+            "add_synthesis_flags": true,
             "minimum_Ce_content": 0.5,
             "convert_phase_flag_to_binary": true,
             "phase_flag_output_col": "single_phase_binary",
             "element_min_appearances": 1,
             "element_min_papers": 1,
             "convert_features": false,
-            "max_dopants": 3,
+            "max_dopants": 4,
             "feature_cols_minus_elements": [
                 "Sbet",
                 "calcination_temp",
                 "calcination_time",
                 "single_phase_binary",
                 "crystallite_size_nm",
-                "lattice_parameter_A"
+                "lattice_parameter_A",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
             ]
         },
         "reactions": {
@@ -120,11 +122,43 @@
                 "temp"
             ]
         },
-        "osc": {
+        "o2_tpd": {
             "base_filter": {},
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": [],
+            "default_to_zero_cols": [],
+            "direct_inputs": [],
+            "feature_cols": [],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "material_feature_cols": [
+                "Sbet",
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
+            ],
+            "target_cols": [
+                "T_beta"
+            ]
+        },
+        "osc": {
+            "base_filter": {
+                "measurement_class": "c"
+            },
             "cannot_be_zero_or_none": [
                 "value_O_umol_per_g_catalyst",
-                "value_raw"
+                "value_raw",
+                "temperature"
             ],
             "default_to_zero_cols": [
                 "h2_vol%",
@@ -140,7 +174,16 @@
             "tag_dynamic": true,
             "dynamic_or_total_tag_name": "is_dynamic_capacity",
             "feature_cols": [],
-            "element_attributes": [],
+            "direct_inputs": [
+                "temperature"
+            ],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
             "material_feature_cols": [
                 "Sbet",
                 "calcination_temp",
@@ -149,6 +192,31 @@
             ],
             "target_cols": [
                 "value_O_umol_per_g_catalyst"
+            ]
+        },
+        "xps": {
+            "base_filter": {},
+            "feature_cols": [],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "direct_inputs": [],
+            "material_feature_cols": [
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
+            ],
+            "target_cols": [
+                "Ce3_fraction"
             ]
         }
     },
@@ -179,23 +247,23 @@
         "split_mode": "Random_by_Material",
         "split_value": 0.2,
         "input_dims": {
-            "conversion": 24,
+            "conversion": 26,
             "reaction_inputs": 7
         }
     },
     "train_config": {
-        "epochs": 200,
+        "epochs": 700,
         "patience": null,
         "optimiser": {
             "name": "AdamW",
-            "lr": 0.0001,
+            "lr": 5e-05,
             "weight_decay": 1e-05
         },
         "scheduler": {
             "name": "ReduceLROnPlateau"
         },
         "dataloader": {
-            "batch_size": 32,
+            "batch_size": 64,
             "shuffle": true,
             "drop_last": false
         },

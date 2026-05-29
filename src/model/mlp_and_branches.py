@@ -94,3 +94,5 @@ class Branch(nn.Module):
             z = torch.cat([z, direct_inputs], dim=-1)
 
         return self.head(z)
+    
+

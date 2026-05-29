@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 import pandas as pd
 
-EXPERIMENT_NAME = "3_full_model"
+EXPERIMENT_NAME = "fixed_no_branch"
 
 DEFAULT_SPLIT_MODES = [
     ("Random_by_Material", 0.2), 
@@ -42,22 +42,35 @@ def main():
             for split_mode, split_value in splits:
                 for i, train_cfg in enumerate(train_cfgs):
                     try:
-                        tail = f"/train_config_{i}" if len(train_cfgs) > 1 else ""
-                        parts = [m_name, data_name, f"{split_mode}_{split_value}"]
-                        print("\n", "/".join(parts) + tail)
+                        parts = [
+                            m_name,
+                            data_name,
+                            f"{split_mode}_{split_value}",
+                        ]
 
-                        if tail:
-                            parts.append(tail)
+                        if train_cfg.get("name") is not None:
+                            parts.append(f"train_config_{train_cfg.get('name')}")
+                        elif len(train_cfgs) > 1 and train_cfg.get("name") is None:
+                            parts.append(f"train_config_{i}")
+
+
+                        print("\n", "/".join(parts))
+
                         outdir = experiment_dir.joinpath(*parts)
+
                         try:
                             outdir.mkdir(parents=True, exist_ok=False)
-                        except:
-                            raise ValueError(f"Could not make directory {outdir}, ensure all config names are unique")
+                        except FileExistsError:
+                            raise ValueError(
+                                f"Could not make directory {outdir}, "
+                                "ensure all config names are unique"
+                            )
                         
                         data.set_split_and_scale(split_mode, split_value)
                         datasets = data.prepare_datasets(m_cfg)
                         save_dataset_debug_json(data, datasets, m_cfg, outdir)
                         data.save(outdir, save_scalers=True, save_preprocess_stats=True, save_scaled=False, save_unscaled=False, save_full=False)
+                        print("N Data", len(data.clean_dataframes["reactions"]))
                         m_cfg.update({"split_mode": split_mode, "split_value": split_value, "input_dims": data.input_dims})
                         config = {
                             "data_config": d_cfg,
@@ -96,25 +109,28 @@ def main():
                         analyser.lightoff_curve_plots(outdir / "lightoff_curves", n=12, split="test")
                         results.append(result)
                     except Exception as e:
-                        print(f"Error in experiment with model {m_name}, data config {data_name}, split mode {split_mode} and train config {train_cfg.get('name', f'train_config_{i}')}: {e}")
+                        print(f"Error in experiment with model {m_name}, data config {data_name}, split mode {split_mode}: {split_value} and train config {train_cfg.get('name', f'train_config_{i}')}: {e}")
                         continue
 
     results_df = pd.DataFrame(results)
     results_df.to_csv(experiment_dir / "results_summary.csv", index=False)
-    plot_remove_metal_test_mae_ptables(
-        results_df=results_df,
-        value_col="test_mae",
-        group_cols=("data_config", "model_config", "train_config"),
-        colorscale="Reds",
-        save_dir=experiment_dir / "Figures/Dopant_Extrapolation_MAE_Ptables",
-    )
-    plot_remove_metal_test_mae_ptables(
-        results_df=results_df,
-        value_col="test_r2",
-        group_cols=("data_config", "model_config", "train_config"),
-        colorscale="Reds",
-        save_dir=experiment_dir / "Figures/Dopant_Extrapolation_R2_Ptables",
-    )
+    try:
+        plot_remove_metal_test_mae_ptables(
+            results_df=results_df,
+            value_col="test_mae",
+            group_cols=("data_config", "model_config", "train_config"),
+            colorscale="Reds",
+            save_dir=experiment_dir / "Figures/Dopant_Extrapolation_MAE_Ptables",
+        )
+        plot_remove_metal_test_mae_ptables(
+            results_df=results_df,
+            value_col="test_r2",
+            group_cols=("data_config", "model_config", "train_config"),
+            colorscale="Reds",
+            save_dir=experiment_dir / "Figures/Dopant_Extrapolation_R2_Ptables",
+        )
+    except:
+        print("Could not make analysis plots")
     db.close()
 
 

@@ -1,0 +1,9 @@
+{
+    "seed": 42,
+    "test_fraction": 0.2,
+    "n_materials_total": 186,
+    "n_materials_train": 148,
+    "n_materials_test": 38,
+    "n_reactions_train": 1535,
+    "n_reactions_test": 411
+}

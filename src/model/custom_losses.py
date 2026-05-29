@@ -37,6 +37,7 @@ class CustomLoss:
         custom_losses = {
             "AutoMaskedMSELoss": AutoMaskedMSELoss,
             "AutoMaskMSELoss": AutoMaskedMSELoss,  # optional backwards-compatible alias
+            "EdgeWeightedMSELoss": EdgeWeightedMSELoss,
         }
 
         if name in custom_losses:
@@ -112,3 +113,27 @@ class AutoMaskedMSELoss(nn.Module):
 
         return ((pred[mask] - target[mask]) ** 2).mean()
     
+class EdgeWeightedMSELoss(nn.Module):
+    """
+    MSE that upweights conversion values near 0 and 1.
+
+    weight = 1 + alpha * (2 * abs(y_true - center)) ** power
+
+    For conversion:
+        y_true=0 or 1 gets max weight
+        y_true=0.5 gets weight ~1
+    """
+
+    def __init__(self, alpha: float = 2.0, power: float = 2.0, center: float = 0.5):
+        super().__init__()
+        self.alpha = alpha
+        self.power = power
+        self.center = center
+
+    def forward(self, pred, target):
+        weights = 1.0 + self.alpha * torch.pow(
+            2.0 * torch.abs(target - self.center),
+            self.power,
+        )
+
+        return (weights * (pred - target) ** 2).mean()

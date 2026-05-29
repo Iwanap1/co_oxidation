@@ -484,6 +484,7 @@ class Preprocessor:
         minimum_number_datapoints: Optional[int] = None,
         convert_percentages_to_fractions: Optional[bool] = None,
         maximum_fractional_conversion: Optional[float] = None,
+        conversion_range: Optional[List[float]] = None
     ) -> Tuple[pd.DataFrame, Dict]:
         
         resolved = self._resolve_from_config(
@@ -497,6 +498,7 @@ class Preprocessor:
             minimum_number_datapoints=minimum_number_datapoints,
             convert_percentages_to_fractions=convert_percentages_to_fractions,
             maximum_fractional_conversion=maximum_fractional_conversion,
+            conversion_range=conversion_range
         )
 
         oxygen_content_in_air = resolved["oxygen_content_in_air"]
@@ -507,6 +509,7 @@ class Preprocessor:
         minimum_number_datapoints = resolved["minimum_number_datapoints"]
         convert_percentages_to_fractions = resolved["convert_percentages_to_fractions"]
         maximum_fractional_conversion = resolved["maximum_fractional_conversion"]
+        conversion_range = resolved["conversion_range"]
 
         if oxygen_content_in_air is None:
             oxygen_content_in_air = 0.2
@@ -653,6 +656,52 @@ class Preprocessor:
         stats["columns_filled_with_mean"] = default_to_mean_cols
         stats["number_of_values_defaulted_to_mean"] = number_of_values_defaulted_to_mean
 
+        conversion_range_stats = {
+            "conversion_range": conversion_range,
+            "rows_checked": 0,
+            "points_removed": 0,
+            "rows_becoming_empty": 0,
+        }
+
+        if conversion_range is not None:
+            low, high = conversion_range
+
+            def _filter_conversion_range(row):
+                temps = row["temps"]
+                convs = row["conversion"]
+
+                if not (
+                    isinstance(temps, (list, tuple))
+                    and isinstance(convs, (list, tuple))
+                    and len(temps) == len(convs)
+                ):
+                    return temps, convs, 0
+
+                keep_idx = [
+                    i for i, x in enumerate(convs)
+                    if low <= x <= high
+                ]
+
+                removed = len(convs) - len(keep_idx)
+
+                new_temps = [temps[i] for i in keep_idx]
+                new_convs = [convs[i] for i in keep_idx]
+
+                return new_temps, new_convs, removed
+
+            processed = reactions_df.apply(_filter_conversion_range, axis=1)
+
+            reactions_df["temps"] = processed.apply(lambda x: x[0])
+            reactions_df["conversion"] = processed.apply(lambda x: x[1])
+
+            conversion_range_stats["rows_checked"] = len(reactions_df)
+            conversion_range_stats["points_removed"] = int(
+                processed.apply(lambda x: x[2]).sum()
+            )
+            conversion_range_stats["rows_becoming_empty"] = int(
+                reactions_df["conversion"].apply(len).eq(0).sum()
+            )
+
         dropped_due_to_missing_values = {}
         dropped_due_to_zero_or_negative_values = {}
 
@@ -712,6 +761,7 @@ class Preprocessor:
             "cannot_be_zero_or_none": cannot_be_zero_or_none,
             "must_be_zero_or_none": must_be_zero_or_none,
             "minimum_number_datapoints": minimum_number_datapoints,
+            "conversion_range_stats": conversion_range_stats,
             "rows_dropped_due_to_too_few_datapoints": rows_dropped_due_to_too_few_datapoints,
             "dropped_due_to_missing_values": dropped_due_to_missing_values,
             "dropped_due_to_zero_or_negative_values": dropped_due_to_zero_or_negative_values,
@@ -737,7 +787,6 @@ class Preprocessor:
                 resolved[key] = value
             else:
                 resolved[key] = section_cfg.get(key, None)
-
         return resolved
 
     def merge_materials_and_reactions(
@@ -2054,3 +2103,14 @@ class Preprocessor:
         }
 
         return xps_df, stats
+    
+    def _has_point_in_conversion_range(vals):
+        if not isinstance(vals, (list, tuple, np.ndarray)):
+            return False
+
+        arr = pd.to_numeric(pd.Series(vals), errors="coerce").dropna().to_numpy(dtype=float)
+
+        if len(arr) == 0:
+            return False
+
+        return ((arr >= low) & (arr <= high)).any()

@@ -1,0 +1,370 @@
+{
+    "data_config": {
+        "name": "1_output_T_beta",
+        "material": {
+            "base_filter": {
+                "phase_flag": {
+                    "$exists": true
+                }
+            },
+            "default_to_mean_cols": [
+                "calcination_time"
+            ],
+            "default_to_zero_cols": [
+                "pretreatment_temp",
+                "pretreatment_o2_vol%",
+                "pretreatment_time_h"
+            ],
+            "cannot_be_zero_or_none": [
+                "calcination_temp"
+            ],
+            "allowed_elements": [
+                "Ce",
+                "Mn",
+                "Cu",
+                "Gd",
+                "Zr",
+                "Bi",
+                "Sm",
+                "Co",
+                "Fe",
+                "La",
+                "Ni",
+                "Hf",
+                "Sn",
+                "Pr",
+                "Ti",
+                "Nd"
+            ],
+            "allow_supported_samples": false,
+            "add_synthesis_flags": true,
+            "minimum_Ce_content": 0.5,
+            "convert_phase_flag_to_binary": true,
+            "phase_flag_output_col": "single_phase_binary",
+            "element_min_appearances": 1,
+            "element_min_papers": 1,
+            "convert_features": true,
+            "dopant_featurisation": "weighted_stats",
+            "weighted_stats": [
+                "mean",
+                "std",
+                "min",
+                "max"
+            ],
+            "max_dopants": 5,
+            "feature_cols_minus_elements": []
+        },
+        "reactions": {
+            "base_filter": {},
+            "oxygen_content_in_air": 0.2,
+            "convert_percentages_to_fractions": true,
+            "convert_ghsv_to_whsv_with_assumed_density": null,
+            "default_to_mean_cols": [],
+            "cannot_be_zero_or_none": [
+                "gas_co_content",
+                "gas_o2_content",
+                "flow_mL_h_g"
+            ],
+            "must_be_zero_or_none": [
+                "gas_h2o_content",
+                "gas_co2_content"
+            ],
+            "minimum_number_datapoints": 1,
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "feature_cols_minus_conversion_temp": [
+                "gas_co_content",
+                "gas_o2_content",
+                "flow_mL_h_g",
+                "pretreatment_temp",
+                "pretreatment_o2_vol%",
+                "pretreatment_time_h"
+            ],
+            "material_feature_cols": [
+                "Sbet",
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary",
+                "crystallite_size_nm",
+                "lattice_parameter_A",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
+            ],
+            "target_cols": [
+                "conversion"
+            ]
+        },
+        "h2_tpr": {
+            "base_filter": {},
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": [],
+            "default_to_zero_cols": [],
+            "min_temps": 1,
+            "use_only_first_temp": true,
+            "first_temp_output_col": "temp",
+            "drop_cols": [
+                "mass_catalyst_g",
+                "temps",
+                "pretreatment_temp",
+                "pretreatment_time"
+            ],
+            "feature_cols": [],
+            "direct_inputs": [],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "material_feature_cols": [
+                "Sbet",
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
+            ],
+            "target_cols": [
+                "temp"
+            ]
+        },
+        "o2_tpd": {
+            "base_filter": {},
+            "cannot_be_none": [],
+            "cannot_be_zero_or_none": [],
+            "default_to_zero_cols": [],
+            "direct_inputs": [],
+            "feature_cols": [],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "material_feature_cols": [
+                "Sbet",
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
+            ],
+            "target_cols": [
+                "T_beta"
+            ]
+        },
+        "osc": {
+            "base_filter": {
+                "measurement_class": "c"
+            },
+            "cannot_be_zero_or_none": [
+                "value_O_umol_per_g_catalyst",
+                "value_raw",
+                "temperature"
+            ],
+            "default_to_zero_cols": [
+                "h2_vol%",
+                "co_vol%",
+                "o2_vol%"
+            ],
+            "allowed_experiment_classes": [
+                "a",
+                "b",
+                "c",
+                "d"
+            ],
+            "tag_dynamic": true,
+            "dynamic_or_total_tag_name": "is_dynamic_capacity",
+            "feature_cols": [],
+            "direct_inputs": [
+                "temperature"
+            ],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "material_feature_cols": [
+                "Sbet",
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary"
+            ],
+            "target_cols": [
+                "value_O_umol_per_g_catalyst"
+            ]
+        },
+        "xps": {
+            "base_filter": {},
+            "feature_cols": [],
+            "element_attributes": [
+                "atomic_radius",
+                "electronegativity_pauling",
+                "protons",
+                "oxidation_states_one_hot",
+                "first_ionisation_energy"
+            ],
+            "direct_inputs": [],
+            "material_feature_cols": [
+                "calcination_temp",
+                "calcination_time",
+                "single_phase_binary",
+                "solid_state",
+                "sol_gel",
+                "pyrolysis",
+                "hydrothermal",
+                "precipitation"
+            ],
+            "target_cols": [
+                "Ce3_fraction"
+            ]
+        }
+    },
+    "model_config": {
+        "conversion_net": {
+            "mode": "sigmoid_curve",
+            "input_temperature": false,
+            "hidden_dim": [
+                16
+            ],
+            "output_dim": 2,
+            "activation": "SiLU",
+            "include_material_features": true,
+            "included_features": [],
+            "input_reaction_cols": [
+                "temperature",
+                "gas_co_content",
+                "gas_o2_content",
+                "flow_mL_h_g",
+                "pretreatment_temp",
+                "pretreatment_o2_vol%",
+                "pretreatment_time_h"
+            ]
+        },
+        "osc_net": null,
+        "tpr_net": {
+            "hidden_dim": [
+                16,
+                16
+            ],
+            "output_dim": 8,
+            "activation": "SiLU",
+            "direct_inputs": []
+        },
+        "tpd_net": null,
+        "xps_net": {
+            "hidden_dim": [
+                16,
+                16
+            ],
+            "output_dim": 8,
+            "activation": "SiLU",
+            "direct_inputs": []
+        },
+        "hybridise_whsv": false,
+        "hybridise_pressures": false,
+        "split_mode": "Remove_Metal",
+        "split_value": "Ni",
+        "input_dims": {
+            "conversion": 0,
+            "reaction_inputs": 6,
+            "tpr": 55,
+            "tpr_direct_inputs": 0,
+            "tpr_target": 1,
+            "xps": 54,
+            "xps_direct_inputs": 0,
+            "xps_target": 1
+        }
+    },
+    "train_config": {
+        "name": "branch_weighted_eval",
+        "epochs": 400,
+        "patience": null,
+        "optimiser": {
+            "name": "AdamW",
+            "lr": 0.0001,
+            "weight_decay": 1e-05
+        },
+        "scheduler": {
+            "name": "ReduceLROnPlateau"
+        },
+        "dataloader": {
+            "batch_size": 128,
+            "shuffle": true,
+            "drop_last": false,
+            "training_mode": "reaction_minibatch_aux_full"
+        },
+        "train_critereon": {
+            "conversion": {
+                "name": "EdgeWeightedMSELoss",
+                "weight": 1.0,
+                "alpha": 10.0,
+                "power": 2.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 1,
+                "decay": 1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 1,
+                "decay": 1
+            },
+            "tpd": {
+                "name": "AutoMaskedMSELoss",
+                "weight": 1,
+                "decay": 1
+            },
+            "xps": {
+                "name": "MSELoss",
+                "weight": 1,
+                "decay": 1
+            }
+        },
+        "eval_critereon": {
+            "conversion": {
+                "name": "MSELoss",
+                "weight": 1.0
+            },
+            "tpr": {
+                "name": "MSELoss",
+                "weight": 1,
+                "decay": 1
+            },
+            "osc": {
+                "name": "MSELoss",
+                "weight": 1,
+                "decay": 1
+            },
+            "tpd": {
+                "name": "AutoMaskedMSELoss",
+                "weight": 1,
+                "decay": 1
+            },
+            "xps": {
+                "name": "MSELoss",
+                "weight": 1,
+                "decay": 1
+            }
+        }
+    }
+}

@@ -153,12 +153,20 @@ After running .set_split():
         tensor_cols_for_input_dims = {}
 
         conversion_cols = self._resolve_conversion_input_cols(model_config)
+        conv_cfg = model_config.get("conversion_net", {})
 
-        input_reaction_cols = (
-            model_config
-            .get("conversion_net", {})
-            .get("input_reaction_cols", ["temperature"])
+        input_reaction_cols = list(
+            conv_cfg.get("input_reaction_cols", ["temperature"])
         )
+
+        if (
+            conv_cfg.get("mode") == "sigmoid_curve"
+            and not conv_cfg.get("input_temperature", True)
+        ):
+            input_reaction_cols = [
+                c for c in input_reaction_cols
+                if c != "temperature"
+            ]
 
         try:
             dfs = [
@@ -175,6 +183,7 @@ After running .set_split():
 
             reaction_tensor_cols = {
                 "conversion_features": conversion_cols,
+                "temperature": ["temperature"]
             }
 
             missing = [c for c in input_reaction_cols if c not in rxn_df.columns]
